@@ -14,7 +14,25 @@
   --shadow-soft: 0 10px 24px rgba(18, 31, 44, 0.05);
   --radius: 18px;
   --radius-sm: 12px;
-  --container: 1180px;
+  --container: 1160px;
+  --measure: 46rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-7: 2rem;
+  --space-8: 2.5rem;
+  --space-9: 3rem;
+  --space-10: 4rem;
+  --space-11: 5rem;
+  --space-12: 6rem;
+  --section-space: clamp(4.75rem, 7vw, 6.5rem);
+  --section-space-tight: clamp(3.75rem, 5vw, 5rem);
+  --card-pad: clamp(1.35rem, 2vw, 1.75rem);
+  --card-gap: var(--space-5);
+  --content-gap: clamp(1.25rem, 2vw, 1.75rem);
 }
 
 *,
@@ -67,12 +85,12 @@ summary {
 }
 
 .container {
-  width: min(calc(100% - 2rem), var(--container));
+  width: min(calc(100% - 2.5rem), var(--container));
   margin: 0 auto;
 }
 
 .section {
-  padding: 6.5rem 0;
+  padding: var(--section-space) 0;
 }
 
 .section-muted {
@@ -82,7 +100,7 @@ summary {
 }
 
 .eyebrow {
-  margin: 0 0 1rem;
+  margin: 0 0 var(--space-3);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -95,8 +113,8 @@ summary {
 }
 
 .section-heading {
-  max-width: 48rem;
-  margin-bottom: 2.75rem;
+  max-width: var(--measure);
+  margin-bottom: clamp(2rem, 3vw, 3rem);
 }
 
 .section-heading h2,
@@ -111,7 +129,7 @@ summary {
 
 .section-heading h2 {
   font-size: clamp(2rem, 4vw, 3.2rem);
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
 }
 
 .section-heading p,
@@ -142,14 +160,14 @@ summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  min-height: 5.2rem;
+  gap: var(--space-6);
+  min-height: 4.9rem;
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.9rem;
+  gap: var(--space-4);
 }
 
 .brand-mark {
@@ -169,7 +187,7 @@ summary {
 .brand-text {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 0.15rem;
 }
 
 .brand-text strong {
@@ -185,12 +203,13 @@ summary {
 .site-nav {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: var(--space-6);
 }
 
 .site-nav a {
   color: var(--muted);
   font-size: 0.95rem;
+  line-height: 1;
 }
 
 .site-nav a:hover,
@@ -201,7 +220,11 @@ summary {
 }
 
 .nav-cta {
-  padding: 0.85rem 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0.75rem 1.1rem;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   background: var(--surface);
@@ -228,40 +251,46 @@ summary {
 }
 
 .hero {
-  padding-top: 4.6rem;
+  padding-top: clamp(2.5rem, 5vw, 4rem);
+  padding-bottom: var(--section-space-tight);
 }
 
 .hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
-  gap: 2.5rem;
-  align-items: center;
+  grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.92fr);
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: start;
+}
+
+.hero-copy {
+  max-width: 35rem;
+  padding-top: var(--space-5);
 }
 
 .hero-copy h1 {
-  font-size: clamp(3rem, 6vw, 5.25rem);
+  font-size: clamp(3rem, 5.8vw, 4.9rem);
   max-width: 11ch;
-  margin-bottom: 1.3rem;
+  margin-bottom: var(--space-4);
 }
 
 .hero-text {
-  max-width: 40rem;
+  max-width: 34rem;
   font-size: 1.08rem;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.9rem;
-  margin: 2rem 0;
+  gap: var(--space-3);
+  margin: var(--space-6) 0;
 }
 
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 3.35rem;
-  padding: 0.95rem 1.35rem;
+  min-height: 3.2rem;
+  padding: 0.9rem 1.3rem;
   border-radius: 999px;
   border: 1px solid transparent;
   font-weight: 600;
@@ -317,14 +346,14 @@ summary {
 .hero-points {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.9rem;
+  gap: var(--space-3);
   padding: 0;
-  margin: 2.3rem 0 0;
+  margin: var(--space-7) 0 0;
   list-style: none;
 }
 
 .hero-points li {
-  padding: 1rem 1rem 1.05rem;
+  padding: 1rem 1rem 1.1rem;
   border: 1px solid rgba(189, 199, 209, 0.7);
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.58);
@@ -334,19 +363,20 @@ summary {
 }
 
 .report-card {
-  padding: 1.25rem;
+  padding: clamp(1.1rem, 1.8vw, 1.4rem);
   border: 1px solid rgba(189, 199, 209, 0.8);
   border-radius: calc(var(--radius) + 4px);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 249, 251, 0.98));
   box-shadow: var(--shadow);
+  align-self: start;
 }
 
 .report-card-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 
 .report-label,
@@ -363,7 +393,7 @@ summary {
 }
 
 .report-card h2 {
-  font-size: clamp(1.5rem, 2.2vw, 2rem);
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
   margin-top: 0.35rem;
 }
 
@@ -371,7 +401,7 @@ summary {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.45rem 0.7rem;
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent-deep);
@@ -396,12 +426,12 @@ summary {
 .report-meta {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.9rem;
-  margin: 1rem 0 0;
+  gap: var(--space-4);
+  margin: var(--space-4) 0 0;
 }
 
 .report-meta div {
-  padding-top: 0.9rem;
+  padding-top: var(--space-4);
   border-top: 1px solid rgba(189, 199, 209, 0.65);
 }
 
@@ -426,13 +456,13 @@ summary {
 .trust-items {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  padding: 1.3rem 0;
+  gap: var(--space-4);
+  padding: 1.15rem 0;
 }
 
 .trust-items p {
   margin: 0;
-  padding-left: 1rem;
+  padding-left: var(--space-4);
   border-left: 2px solid var(--accent-soft);
   color: var(--muted);
   line-height: 1.6;
@@ -442,7 +472,7 @@ summary {
 .pricing-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1.25rem;
+  gap: clamp(1rem, 2vw, 1.5rem);
 }
 
 .service-card,
@@ -457,18 +487,21 @@ summary {
 }
 
 .service-card {
-  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--card-pad);
 }
 
 .service-index {
   color: var(--accent);
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-3);
 }
 
 .service-card h3,
 .process-card h3,
 .tier-helper h3 {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-2);
   font-size: 1.2rem;
   line-height: 1.3;
 }
@@ -476,7 +509,7 @@ summary {
 .process-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1.2rem;
+  gap: clamp(1rem, 2vw, 1.5rem);
   list-style: none;
   padding: 0;
   margin: 0;
@@ -484,21 +517,21 @@ summary {
 
 .process-card {
   position: relative;
-  padding: 1.6rem;
+  padding: var(--card-pad);
   overflow: hidden;
 }
 
 .process-card::after {
   content: "";
   position: absolute;
-  inset: auto 1.6rem 0;
+  inset: auto var(--card-pad) 0;
   height: 3px;
   background: linear-gradient(90deg, var(--accent), transparent);
 }
 
 .step-number {
   display: inline-block;
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-3);
   color: var(--accent);
 }
 
@@ -508,13 +541,16 @@ summary {
 
 .pricing-card {
   position: relative;
-  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  padding: var(--card-pad);
 }
 
 .pricing-head {
-  padding-bottom: 1.25rem;
-  margin-bottom: 1.25rem;
+  padding-bottom: var(--space-5);
+  margin-bottom: var(--space-5);
   border-bottom: 1px solid rgba(189, 199, 209, 0.7);
+  min-height: 13.75rem;
 }
 
 .pricing-tier {
@@ -530,17 +566,19 @@ summary {
 .pricing-price {
   margin: 0 0 0.85rem;
   font-family: "Source Serif 4", Georgia, serif;
-  font-size: 3rem;
+  font-size: clamp(2.6rem, 4vw, 3rem);
   line-height: 1;
   letter-spacing: -0.04em;
 }
 
 .pricing-features {
   display: grid;
-  gap: 0.85rem;
+  gap: var(--space-3);
   padding: 0;
   margin: 0;
   list-style: none;
+  flex: 1;
+  align-content: start;
 }
 
 .pricing-features li {
@@ -569,8 +607,8 @@ summary {
 
 .pricing-badge {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: var(--space-4);
+  right: var(--space-4);
   padding: 0.45rem 0.7rem;
   border-radius: 999px;
   background: var(--accent-deep);
@@ -586,20 +624,20 @@ summary {
 }
 
 .pricing-note {
-  max-width: 70rem;
-  margin-top: 1.5rem;
+  max-width: 62rem;
+  margin-top: var(--space-6);
   font-size: 0.95rem;
 }
 
 .tier-helper {
-  margin-top: 1.5rem;
-  padding: 1.5rem;
+  margin-top: var(--space-6);
+  padding: var(--card-pad);
 }
 
 .tier-helper-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  gap: var(--space-5);
 }
 
 .tier-helper-grid p {
@@ -611,7 +649,7 @@ summary {
 .faq-layout {
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-  gap: 2rem;
+  gap: clamp(1.75rem, 4vw, 3.5rem);
   align-items: start;
 }
 
@@ -621,19 +659,19 @@ summary {
 
 .faq-list {
   display: grid;
-  gap: 0.9rem;
+  gap: var(--space-3);
 }
 
 .faq-item {
-  padding: 0 1.25rem;
+  padding: 0 var(--space-5);
 }
 
 .faq-item summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 1.2rem 0;
+  gap: var(--space-4);
+  padding: 1.15rem 0;
   cursor: pointer;
   font-weight: 600;
   list-style: none;
@@ -655,10 +693,11 @@ summary {
 }
 
 .faq-item p {
-  padding: 0 0 1.2rem;
+  padding: 0 0 var(--space-5);
 }
 
 .final-cta {
+  padding: var(--section-space-tight) 0;
   background: linear-gradient(135deg, #243847 0%, #304f67 100%);
   color: #fff;
 }
@@ -666,7 +705,7 @@ summary {
 .final-cta-inner {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-  gap: 2rem;
+  gap: clamp(1.75rem, 4vw, 4rem);
   align-items: center;
 }
 
@@ -679,16 +718,16 @@ summary {
 }
 
 .site-footer {
-  padding: 1.8rem 0 2.4rem;
+  padding: var(--space-7) 0;
   background: #f7f3ee;
 }
 
 .footer-inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
-  gap: 1rem 2rem;
+  gap: var(--space-4) var(--space-8);
   align-items: center;
-  padding-top: 1.2rem;
+  padding-top: var(--space-5);
   border-top: 1px solid rgba(189, 199, 209, 0.65);
 }
 
@@ -700,11 +739,21 @@ summary {
 .footer-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem 1.25rem;
+  gap: var(--space-4) var(--space-5);
 }
 
 .footer-nav a {
   color: var(--muted);
+}
+
+@media (max-width: 1180px) {
+  .pricing-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pricing-head {
+    min-height: auto;
+  }
 }
 
 @media (max-width: 1080px) {
@@ -715,25 +764,46 @@ summary {
   }
 
   .service-grid,
-  .pricing-grid,
   .process-grid,
   .trust-items,
   .tier-helper-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .hero {
+    padding-top: var(--section-space-tight);
+  }
+
+  .hero-grid {
+    gap: var(--space-8);
+  }
+
+  .hero-copy {
+    max-width: 42rem;
+    padding-top: 0;
+  }
+
   .hero-points {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .footer-inner {
     grid-template-columns: 1fr;
+    align-items: start;
   }
 }
 
 @media (max-width: 760px) {
   .section {
-    padding: 4.8rem 0;
+    padding: clamp(3.5rem, 9vw, 4.5rem) 0;
+  }
+
+  .container {
+    width: min(calc(100% - 1.5rem), var(--container));
+  }
+
+  .header-inner {
+    min-height: 4.4rem;
   }
 
   .nav-toggle {
@@ -744,11 +814,12 @@ summary {
     position: absolute;
     left: 1rem;
     right: 1rem;
-    top: calc(100% + 0.75rem);
+    top: calc(100% + 0.5rem);
     display: none;
     flex-direction: column;
     align-items: stretch;
-    padding: 1rem;
+    gap: 0;
+    padding: var(--space-4);
     border: 1px solid rgba(189, 199, 209, 0.85);
     border-radius: var(--radius);
     background: rgba(255, 255, 255, 0.97);
@@ -760,11 +831,32 @@ summary {
   }
 
   .site-nav a {
-    padding: 0.65rem 0;
+    padding: 0.8rem 0;
   }
 
   .hero {
-    padding-top: 3.3rem;
+    padding-top: var(--space-7);
+    padding-bottom: var(--space-8);
+  }
+
+  .hero-copy h1 {
+    max-width: 10ch;
+    font-size: clamp(2.45rem, 11vw, 3.5rem);
+  }
+
+  .hero-text {
+    font-size: 1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    margin: var(--space-5) 0;
+  }
+
+  .button,
+  .nav-cta {
+    width: 100%;
   }
 
   .service-grid,
@@ -772,7 +864,8 @@ summary {
   .process-grid,
   .trust-items,
   .tier-helper-grid,
-  .report-meta {
+  .report-meta,
+  .hero-points {
     grid-template-columns: 1fr;
   }
 
@@ -780,11 +873,27 @@ summary {
     flex-direction: column;
   }
 
+  .report-card h2 {
+    max-width: 16rem;
+  }
+
+  .trust-items {
+    padding: 1rem 0;
+  }
+
+  .faq-item {
+    padding: 0 var(--space-4);
+  }
+
   .header-inner {
     position: relative;
   }
 
+  .final-cta .hero-actions {
+    margin-bottom: 0;
+  }
+
   .footer-nav {
-    gap: 0.8rem 1rem;
+    gap: var(--space-3) var(--space-4);
   }
 }

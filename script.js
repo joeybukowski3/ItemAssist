@@ -7,6 +7,12 @@ if (currentYear) {
 }
 
 if (navToggle && siteNav) {
+  const closeNav = () => {
+    siteNav.classList.remove("is-open");
+    navToggle.setAttribute("aria-expanded", "false");
+    navToggle.setAttribute("aria-label", "Open navigation");
+  };
+
   navToggle.addEventListener("click", () => {
     const isOpen = siteNav.classList.toggle("is-open");
     navToggle.setAttribute("aria-expanded", String(isOpen));
@@ -15,9 +21,19 @@ if (navToggle && siteNav) {
 
   siteNav.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
-      siteNav.classList.remove("is-open");
-      navToggle.setAttribute("aria-expanded", "false");
-      navToggle.setAttribute("aria-label", "Open navigation");
+      closeNav();
     });
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeNav();
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 760) {
+      closeNav();
+    }
   });
 }
