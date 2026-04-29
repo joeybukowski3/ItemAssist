@@ -6,7 +6,7 @@
   <title>ItemAssist - Professional Contents Pricing Research</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -15,175 +15,303 @@
   <nav>
     <div class="nav-inner">
       <a href="#top" class="logo" aria-label="ItemAssist home">
-        <span class="logo-text">Item<span class="logo-dot">A</span>ssist</span>
+        <span class="logo-box">IA</span>
+        <span class="logo-name">ItemAssist</span>
       </a>
 
-      <button
-        class="nav-toggle"
-        type="button"
-        aria-expanded="false"
-        aria-controls="site-nav"
-        aria-label="Open navigation"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-
       <ul class="nav-links" id="site-nav">
-        <li><a href="#why">Why ItemAssist</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#why">How it Works</a></li>
+        <li><a href="#why">Why Us</a></li>
         <li><a href="#pricing">Pricing</a></li>
-        <li><a href="#contact">Contact</a></li>
-        <li><a href="#contact" class="nav-cta">Submit a File</a></li>
+        <li class="nav-mobile-cta"><a href="#contact" class="nav-cta">Request Research</a></li>
       </ul>
+
+      <div class="nav-actions">
+        <a href="#contact" class="nav-login">Log In</a>
+        <a href="#contact" class="nav-cta">Request Research</a>
+      </div>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
 
   <main id="main">
+
+    <!-- ── Hero ── -->
     <section class="hero" id="top">
-      <div class="hero-eyebrow">
-        Contents Pricing Research Services
-      </div>
-      <h1>
-        Defensible Pricing Research, <em>Delivered with Precision.</em>
-      </h1>
-      <p class="hero-sub">
-        ItemAssist provides insurance adjusters and claims professionals with formal, researched contents pricing reports - built on original market data, not database estimates.
-      </p>
-      <div class="hero-actions">
-        <a href="#contact" class="btn-primary">Submit a Contents List</a>
-        <a href="#why" class="btn-outline">See How It Works</a>
-      </div>
-      <p class="hero-footnote">
-        Trusted by claims professionals &middot; ACV/RCV-ready findings &middot; Audited before delivery
-      </p>
-    </section>
-
-    <div class="cred-bar">
-      <div class="cred-inner">
-        <div class="cred-item">
-          <svg class="cred-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 12l2 2 4-4M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"></path></svg>
-          Original Market Research
+      <div class="hero-content">
+        <div class="hero-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Trusted by Claims Professionals Nationwide
         </div>
-        <div class="cred-item">
-          <svg class="cred-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-          LKQ Determinations
-        </div>
-        <div class="cred-item">
-          <svg class="cred-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          Age Verification Support
-        </div>
-        <div class="cred-item">
-          <svg class="cred-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M9 9h6M9 12h6M9 15h4"></path></svg>
-          Internal Audit Review
-        </div>
-        <div class="cred-item">
-          <svg class="cred-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-          ACV / RCV-Ready Reports
+        <h1>Defensible Pricing Research,<br>Delivered with Precision.</h1>
+        <p class="hero-sub">Stop guessing on LKQ replacements. ItemAssist delivers formal, market-backed pricing research reports that stand up to scrutiny, saving adjusters hours of manual searching.</p>
+        <div class="hero-ctas">
+          <a href="#contact" class="btn-primary">Submit a List for Pricing</a>
+          <a href="#why" class="btn-secondary">See How It Works</a>
         </div>
       </div>
-    </div>
 
-    <section class="why-section" id="why">
-      <div class="section-inner">
-        <div class="section-label">Why ItemAssist</div>
-        <h2 class="section-title">More than a pricing tool.<br> A defensible research record.</h2>
-        <p class="section-desc">
-          Generic software uses database averages. Our team performs original, item-by-item market research - the kind that holds up to scrutiny.
-        </p>
+      <div class="hero-mockup-outer">
+        <div class="mockup-window">
+          <div class="mockup-chrome">
+            <div class="chrome-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <span class="chrome-title">Claim #9482-A &bull; Smith Residence</span>
+            <span class="chrome-spacer"></span>
+          </div>
+          <div class="mockup-body">
+            <aside class="mockup-sidebar">
+              <div class="sidebar-label">REPORT OVERVIEW</div>
+              <ul class="sidebar-nav">
+                <li class="sidebar-item sidebar-item--active">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  Summary Findings
+                </li>
+                <li class="sidebar-item">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                  Itemized LKQ
+                </li>
+                <li class="sidebar-item">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                  Supporting Evidence
+                </li>
+              </ul>
+              <div class="sidebar-total">
+                <div class="sidebar-total-label">Total RCV Determined</div>
+                <div class="sidebar-total-value">$42,850.00</div>
+              </div>
+            </aside>
 
-        <div class="why-grid">
-          <ul class="why-list">
-            <li class="why-item">
-              <div class="why-num">1</div>
-              <div>
-                <div class="why-title">Submit Your Contents List</div>
-                <div class="why-body">Upload your itemized loss inventory via email or our submission form. We accept any standard format - XLS, PDF, or CSV.</div>
+            <div class="mockup-report">
+              <div class="report-header">
+                <div>
+                  <div class="report-title">Pricing Research Report</div>
+                  <div class="report-meta">Completed on Oct 24, 2023 &bull; 45 Items Reviewed</div>
+                </div>
+                <div class="report-btns">
+                  <button class="report-btn">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    PDF
+                  </button>
+                  <button class="report-btn">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Excel
+                  </button>
+                </div>
               </div>
-            </li>
-            <li class="why-item">
-              <div class="why-num">2</div>
-              <div>
-                <div class="why-title">We Research Each Item Individually</div>
-                <div class="why-body">Our team locates actual current retail pricing, verifies Like Kind &amp; Quality equivalents, and documents age and condition factors.</div>
-              </div>
-            </li>
-            <li class="why-item">
-              <div class="why-num">3</div>
-              <div>
-                <div class="why-title">Internal Audit Before Delivery</div>
-                <div class="why-body">Every report is reviewed internally for consistency, accuracy, and completeness before it reaches your desk.</div>
-              </div>
-            </li>
-            <li class="why-item">
-              <div class="why-num">4</div>
-              <div>
-                <div class="why-title">Receive a Formal Researched Report</div>
-                <div class="why-body">You receive a clean, formatted document with sourced pricing, ACV/RCV determinations, and findings ready for claim file inclusion.</div>
-              </div>
-            </li>
-          </ul>
 
-          <div class="compare-panel">
-            <div class="compare-header">
-              <div>Feature</div>
-              <div>Generic Software</div>
-              <div class="col-us">ItemAssist</div>
-            </div>
-            <div class="compare-row">
-              <div class="feature">Pricing Source</div>
-              <div class="col-them">Database estimates</div>
-              <div class="col-us-val"><span class="check">&#10003;</span>Live market research</div>
-            </div>
-            <div class="compare-row">
-              <div class="feature">LKQ Verification</div>
-              <div class="col-them"><span class="cross">&#10007;</span>Rarely documented</div>
-              <div class="col-us-val"><span class="check">&#10003;</span>Every item</div>
-            </div>
-            <div class="compare-row">
-              <div class="feature">Age / Condition Support</div>
-              <div class="col-them"><span class="cross">&#10007;</span>Automated only</div>
-              <div class="col-us-val"><span class="check">&#10003;</span>Researched &amp; sourced</div>
-            </div>
-            <div class="compare-row">
-              <div class="feature">Pre-Delivery Review</div>
-              <div class="col-them"><span class="cross">&#10007;</span>None</div>
-              <div class="col-us-val"><span class="check">&#10003;</span>Internal audit</div>
-            </div>
-            <div class="compare-row">
-              <div class="feature">Report Format</div>
-              <div class="col-them">System printout</div>
-              <div class="col-us-val"><span class="check">&#10003;</span>Formal document</div>
-            </div>
-            <div class="compare-row">
-              <div class="feature">Defensibility</div>
-              <div class="col-them">Algorithm-based</div>
-              <div class="col-us-val"><span class="check">&#10003;</span>Sourced &amp; audited</div>
+              <div class="report-stats">
+                <div class="stat-box">
+                  <div class="stat-label">Items Researched</div>
+                  <div class="stat-val">45</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">LKQ Matches Found</div>
+                  <div class="stat-val">42 <span class="stat-pct">(93%)</span></div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Avg. Age Verified</div>
+                  <div class="stat-val">4.2 Years</div>
+                </div>
+              </div>
+
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th>Claimed Item</th>
+                    <th>LKQ Replacement</th>
+                    <th>RCV</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="item-name">Sony 65&quot; OLED TV</div>
+                      <div class="item-sub">Model: XBR65A8H (2020)</div>
+                    </td>
+                    <td>
+                      <div class="item-name">Sony 65&quot; BRAVIA XR OLED</div>
+                      <div class="item-link">View Retailer Link</div>
+                    </td>
+                    <td class="item-price">$1,898.00</td>
+                    <td><span class="status-badge badge-green">Verified LKQ</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="item-name">MacBook Pro 14&quot;</div>
+                      <div class="item-sub">M1 Pro, 16GB RAM (2021)</div>
+                    </td>
+                    <td>
+                      <div class="item-name">MacBook Pro 14&quot; M3</div>
+                      <div class="item-link">View Retailer Link</div>
+                    </td>
+                    <td class="item-price">$1,999.00</td>
+                    <td><span class="status-badge badge-green">Verified LKQ</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="item-name">Custom Sectional Sofa</div>
+                      <div class="item-sub">Leather, Unknown Brand</div>
+                    </td>
+                    <td>
+                      <div class="item-name">Comparable Standard Leather</div>
+                      <div class="item-sub">Based on dimensions</div>
+                    </td>
+                    <td class="item-price">$3,450.00</td>
+                    <td><span class="status-badge badge-amber">Estimated</span></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- ── Trust Strip ── -->
+    <div class="trust-strip">
+      <div class="trust-inner">
+        <span class="trust-label">TRUSTED BY ADJUSTERS AT LEADING CARRIERS</span>
+        <div class="trust-logos">
+          <div class="trust-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            National Insure
+          </div>
+          <div class="trust-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+            Liberty Claims
+          </div>
+          <div class="trust-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M23 12a11.05 11.05 0 01-22 0zm-5-7a2 2 0 10.001 3.999A2 2 0 0018 5z"/></svg>
+            Standard Mutual
+          </div>
+          <div class="trust-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Property Guard
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Services / Feature Cards ── -->
+    <section class="services-section" id="services">
+      <div class="section-inner">
+        <h2 class="section-heading centered">Comprehensive Contents Research</h2>
+        <p class="section-sub centered">We handle the tedious pricing work so you can focus on adjusting the claim. Every item is researched by real professionals, not just automated bots.</p>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <h3 class="card-title">LKQ Determinations</h3>
+            <p class="card-desc">We locate Like Kind and Quality replacements for discontinued or obscure items, providing detailed reasoning and direct links to current market options.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+            </div>
+            <h3 class="card-title">Age &amp; Condition Verification</h3>
+            <p class="card-desc">We cross-reference serial numbers, model years, and manufacturing data to verify the claimed age of items, ensuring accurate depreciation calculations.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <h3 class="card-title">Ready-to-Import Reports</h3>
+            <p class="card-desc">Receive your data in formal PDF reports for the file, plus Excel formats ready to be imported directly into Xactimate or your preferred estimating platform.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Process Section ── -->
+    <section class="process-section" id="why">
+      <div class="process-inner">
+        <div class="process-text">
+          <h2 class="process-heading">A streamlined process for busy adjusters</h2>
+          <p class="process-desc">We integrate seamlessly into your workflow. Just send us the insured&rsquo;s list, and we handle the rest.</p>
+          <ol class="steps-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <div class="step-title">Submit Your Contents List</div>
+                <div class="step-desc">Upload the insured&rsquo;s handwritten notes, Excel sheet, or PDF via our secure submission form. We accept any standard format.</div>
+              </div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <div class="step-title">We Research Each Item</div>
+                <div class="step-desc">Our team identifies exact matches or LKQ equivalents, verifies pricing across multiple retailers, and documents sources with age and condition factors.</div>
+              </div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <div class="step-title">Receive Your Audited Report</div>
+                <div class="step-desc">Within 48&ndash;72 hours, receive a comprehensive, defensible report with sourced pricing, ACV/RCV determinations, and findings ready for your claim file.</div>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="portal-wrap">
+          <div class="portal-card">
+            <div class="portal-topbar">
+              <span class="portal-label">Portal View</span>
+            </div>
+            <div class="upload-zone">
+              <svg class="upload-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+              <div class="upload-title">Upload Insured&rsquo;s List</div>
+              <div class="upload-sub">PDF, Excel, or Image files</div>
+            </div>
+            <div class="portal-files">
+              <div class="portal-files-label">Recent Submissions</div>
+              <div class="portal-file-row">
+                <div class="portal-file-name">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  Claim_Smith_Contents.pdf
+                </div>
+                <span class="file-badge badge-processing">Processing</span>
+              </div>
+              <div class="portal-file-row">
+                <div class="portal-file-name">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  Johnson_Inventory.xlsx
+                </div>
+                <span class="file-badge badge-completed">Completed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Pricing ── -->
     <section class="pricing-section" id="pricing">
       <div class="section-inner">
-        <div class="section-label">Service Tiers</div>
-        <h2 class="section-title">Clear, straightforward pricing.</h2>
-        <p class="section-desc">
-          Choose the tier that fits your claim volume. All tiers include our full research process and audited report delivery.
-        </p>
-
+        <div class="section-kicker centered">Service Tiers</div>
+        <h2 class="section-heading centered">Clear, straightforward pricing.</h2>
+        <p class="section-sub centered">Choose the tier that fits your claim volume. All tiers include our full research process and audited report delivery.</p>
         <div class="pricing-grid">
+
           <div class="pricing-card">
-            <div class="tier-name">Standard</div>
-            <div class="tier-title">Single Report</div>
-            <div class="tier-desc">For individual claims or one-off engagements. Full research on a single contents list.</div>
+            <div class="tier-kicker">Standard</div>
+            <div class="tier-name">Single Report</div>
+            <p class="tier-desc">For individual claims or one-off engagements. Full research on a single contents list.</p>
             <div class="tier-price">
-              <span class="price-amount">$149</span>
-              <span class="price-unit">/ report</span>
+              <span class="price-amt">$149</span><span class="price-unit">&nbsp;/ report</span>
             </div>
             <div class="price-note">Up to 50 line items included</div>
-            <hr class="tier-divider">
+            <hr class="tier-rule">
             <ul class="tier-features">
               <li>Original market pricing research</li>
               <li>LKQ equivalency determination</li>
@@ -194,20 +322,19 @@
             <a href="#contact" class="btn-tier btn-tier-outline">Get Started</a>
           </div>
 
-          <div class="pricing-card featured">
-            <div class="featured-badge">Most Popular</div>
-            <div class="tier-name">Professional</div>
-            <div class="tier-title">Batch Processing</div>
-            <div class="tier-desc">For adjusters handling multiple claims. Volume pricing with priority turnaround.</div>
+          <div class="pricing-card pricing-card--featured">
+            <div class="featured-pip">Most Popular</div>
+            <div class="tier-kicker">Professional</div>
+            <div class="tier-name">Batch Processing</div>
+            <p class="tier-desc">For adjusters handling multiple claims. Volume pricing with priority turnaround.</p>
             <div class="tier-price">
-              <span class="price-amount">$99</span>
-              <span class="price-unit">/ report</span>
+              <span class="price-amt">$99</span><span class="price-unit">&nbsp;/ report</span>
             </div>
             <div class="price-note">Minimum 5 reports per submission cycle</div>
-            <hr class="tier-divider">
+            <hr class="tier-rule">
             <ul class="tier-features">
               <li>Everything in Standard</li>
-              <li>Priority turnaround (48-72 hrs)</li>
+              <li>Priority turnaround (48&ndash;72 hrs)</li>
               <li>Up to 100 line items per report</li>
               <li>Dedicated point of contact</li>
               <li>Bulk submission portal access</li>
@@ -216,14 +343,14 @@
           </div>
 
           <div class="pricing-card">
-            <div class="tier-name">Enterprise</div>
-            <div class="tier-title">Firm &amp; Carrier Accounts</div>
-            <div class="tier-desc">For adjusting firms and carriers with ongoing, high-volume research needs.</div>
+            <div class="tier-kicker">Enterprise</div>
+            <div class="tier-name">Firm &amp; Carrier Accounts</div>
+            <p class="tier-desc">For adjusting firms and carriers with ongoing, high-volume research needs.</p>
             <div class="tier-price">
-              <span class="price-amount">Custom</span>
+              <span class="price-amt">Custom</span>
             </div>
             <div class="price-note">Volume pricing, billed monthly</div>
-            <hr class="tier-divider">
+            <hr class="tier-rule">
             <ul class="tier-features">
               <li>Everything in Professional</li>
               <li>Unlimited line items per report</li>
@@ -233,47 +360,45 @@
             </ul>
             <a href="#contact" class="btn-tier btn-tier-outline">Request Pricing</a>
           </div>
-        </div>
 
-        <p class="pricing-footer">
-          Not sure which tier fits? <a href="#contact">Contact us</a> and we'll recommend the right option for your volume.
-        </p>
+        </div>
+        <p class="pricing-note">Not sure which tier fits? <a href="#contact">Contact us</a> and we&rsquo;ll recommend the right option for your volume.</p>
       </div>
     </section>
 
+    <!-- ── Contact ── -->
     <section class="contact-section" id="contact">
       <div class="section-inner">
-        <div class="section-label">Submit a File</div>
-        <h2 class="section-title">Ready to get started?</h2>
-        <p class="section-desc">
-          Send us your contents list and we'll follow up with turnaround details and next steps within one business day.
-        </p>
-
         <div class="contact-grid">
-          <div class="contact-info-block">
-            <div class="contact-info-item">
-              <div class="contact-info-label">Email</div>
-              <div class="contact-info-value">submissions@itemassist.com</div>
+          <div class="contact-info">
+            <div class="section-kicker">Submit a File</div>
+            <h2 class="section-heading">Ready to get started?</h2>
+            <p class="section-sub">Send us your contents list and we&rsquo;ll follow up with turnaround details and next steps within one business day.</p>
+
+            <div class="contact-details">
+              <div class="contact-detail">
+                <div class="detail-label">Email</div>
+                <div class="detail-value">submissions@itemassist.com</div>
+              </div>
+              <div class="contact-detail">
+                <div class="detail-label">Business Hours</div>
+                <div class="detail-value">Monday&ndash;Friday, 8am&ndash;6pm EST</div>
+              </div>
+              <div class="contact-detail">
+                <div class="detail-label">Typical Turnaround</div>
+                <div class="detail-value">Standard: 5&ndash;7 business days<br>Professional: 48&ndash;72 hours</div>
+              </div>
             </div>
-            <div class="contact-info-item">
-              <div class="contact-info-label">Business Hours</div>
-              <div class="contact-info-value">Monday - Friday, 8am - 6pm EST</div>
-            </div>
-            <div class="contact-info-item">
-              <div class="contact-info-label">Typical Turnaround</div>
-              <div class="contact-info-value">Standard: 5-7 business days<br>Professional: 48-72 hours</div>
-            </div>
+
             <div class="contact-guarantee">
               <div class="guarantee-title">Our Commitment</div>
-              <div class="guarantee-body">
-                Every report is reviewed by a second set of eyes before delivery. We stand behind the accuracy and defensibility of our findings - if something doesn't hold up, we'll make it right.
-              </div>
+              <p class="guarantee-body">Every report is reviewed by a second set of eyes before delivery. We stand behind the accuracy and defensibility of our findings&mdash;if something doesn&rsquo;t hold up, we&rsquo;ll make it right.</p>
             </div>
           </div>
 
-          <div class="contact-form">
-            <div class="form-title">Submit a Contents List</div>
-            <div class="form-subtitle">Fill out the form below and we'll reach out within one business day.</div>
+          <div class="form-card">
+            <div class="form-card-title">Submit a Contents List</div>
+            <div class="form-card-sub">Fill out the form below and we&rsquo;ll reach out within one business day.</div>
 
             <div class="form-row">
               <div class="form-group">
@@ -285,24 +410,21 @@
                 <input type="text" id="lname" placeholder="Smith">
               </div>
             </div>
-
             <div class="form-group">
               <label for="company">Company / Firm</label>
               <input type="text" id="company" placeholder="Acme Adjusting Group">
             </div>
-
             <div class="form-group">
               <label for="email">Business Email</label>
               <input type="email" id="email" placeholder="jane@acmeadjusting.com">
             </div>
-
             <div class="form-row">
               <div class="form-group">
                 <label for="tier">Service Tier</label>
                 <select id="tier">
                   <option value="">Select a tier...</option>
-                  <option>Standard - Single Report</option>
-                  <option>Professional - Batch</option>
+                  <option>Standard &mdash; Single Report</option>
+                  <option>Professional &mdash; Batch</option>
                   <option>Enterprise / Custom</option>
                   <option>Not sure yet</option>
                 </select>
@@ -312,27 +434,53 @@
                 <input type="text" id="items" placeholder="e.g. 45">
               </div>
             </div>
-
             <div class="form-group">
               <label for="notes">Additional Notes</label>
               <textarea id="notes" placeholder="Claim type, deadline, special requirements..."></textarea>
             </div>
-
             <button type="button" class="form-submit">Submit Request &rarr;</button>
-            <div class="form-privacy">We do not share your information. All submissions are handled confidentially.</div>
+            <p class="form-privacy">We do not share your information. All submissions are handled confidentially.</p>
           </div>
         </div>
       </div>
     </section>
+
   </main>
 
   <footer>
     <div class="footer-inner">
-      <span class="footer-copy">&copy; 2025 ItemAssist. All rights reserved.</span>
-      <div class="footer-links">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#contact">Contact</a>
+      <div class="footer-brand">
+        <a href="#top" class="logo logo--light" aria-label="ItemAssist home">
+          <span class="logo-box">IA</span>
+          <span class="logo-name">ItemAssist</span>
+        </a>
+        <p class="footer-tagline">Professional contents pricing research for property damage claims. Defensible data, delivered fast.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4 class="footer-col-heading">Services</h4>
+          <ul class="footer-col-links">
+            <li><a href="#services">LKQ Research</a></li>
+            <li><a href="#services">Age Verification</a></li>
+            <li><a href="#services">Large Loss Contents</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-col-heading">Company</h4>
+          <ul class="footer-col-links">
+            <li><a href="#">About Us</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <span>&copy; 2025 ItemAssist. All rights reserved.</span>
+        <a href="#" aria-label="LinkedIn" class="footer-social">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
       </div>
     </div>
   </footer>

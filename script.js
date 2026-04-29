@@ -1,5 +1,5 @@
 const navToggle = document.querySelector(".nav-toggle");
-const siteNav = document.querySelector("#site-nav");
+const siteNav   = document.querySelector("#site-nav");
 const formSubmit = document.querySelector(".form-submit");
 
 if (navToggle && siteNav) {
@@ -16,26 +16,20 @@ if (navToggle && siteNav) {
   });
 
   siteNav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      closeNav();
-    });
+    link.addEventListener("click", closeNav);
   });
 
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      closeNav();
-    }
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeNav();
   });
 
   window.addEventListener("resize", () => {
-    if (window.innerWidth > 900) {
-      closeNav();
-    }
+    if (window.innerWidth > 900) closeNav();
   });
 }
 
 const sections = document.querySelectorAll("section[id], div[id]");
-const navLinks = document.querySelectorAll(".nav-links a[href^='#']");
+const navLinks  = document.querySelectorAll(".nav-links a[href^='#']");
 
 if (sections.length && navLinks.length) {
   const observer = new IntersectionObserver((entries) => {
@@ -43,20 +37,20 @@ if (sections.length && navLinks.length) {
       if (entry.isIntersecting) {
         navLinks.forEach((link) => {
           link.style.color = link.getAttribute("href") === `#${entry.target.id}`
-            ? "#3182ce"
+            ? "#1e3a5f"
             : "";
         });
       }
     });
   }, { threshold: 0.3 });
 
-  sections.forEach((section) => observer.observe(section));
+  sections.forEach((s) => observer.observe(s));
 }
 
 if (formSubmit) {
   formSubmit.addEventListener("click", () => {
-    formSubmit.textContent = "Request Received \u2713";
-    formSubmit.style.background = "#2563eb";
+    formSubmit.textContent = "Request Received ✓";
+    formSubmit.style.background = "#16a34a";
     formSubmit.disabled = true;
   });
 }
