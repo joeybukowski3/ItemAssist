@@ -43,7 +43,7 @@ if (sections.length && navLinks.length) {
       if (entry.isIntersecting) {
         navLinks.forEach((link) => {
           link.style.color = link.getAttribute("href") === `#${entry.target.id}`
-            ? "rgba(255,255,255,0.95)"
+            ? "#3182ce"
             : "";
         });
       }
@@ -56,7 +56,7 @@ if (sections.length && navLinks.length) {
 if (formSubmit) {
   formSubmit.addEventListener("click", () => {
     formSubmit.textContent = "Request Received \u2713";
-    formSubmit.style.background = "#1A7A4C";
+    formSubmit.style.background = "#2563eb";
     formSubmit.disabled = true;
   });
 }
