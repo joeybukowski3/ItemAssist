@@ -48,6 +48,7 @@ body {
   background: var(--bg-page);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 img  { display: block; max-width: 100%; }
@@ -101,7 +102,7 @@ nav {
 }
 
 .logo-box {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 30px;
@@ -113,6 +114,7 @@ nav {
   letter-spacing: 0.04em;
   border-radius: var(--r-xs);
   flex-shrink: 0;
+  margin-right: 8px;
 }
 
 .logo-name {
@@ -328,6 +330,7 @@ nav {
 .mockup-body {
   display: grid;
   grid-template-columns: 195px 1fr;
+  min-width: 0;
 }
 
 /* Sidebar */
@@ -337,6 +340,7 @@ nav {
   display: flex;
   flex-direction: column;
   padding: 1rem 0;
+  min-width: 0;
 }
 
 .sidebar-label {
@@ -374,7 +378,7 @@ nav {
 .sidebar-total-value { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.03em; }
 
 /* Report content */
-.mockup-report { padding: 1.25rem; overflow: hidden; }
+.mockup-report { padding: 1.25rem; overflow: hidden; min-width: 0; }
 
 .report-header {
   display: flex;
@@ -418,7 +422,7 @@ nav {
 .stat-val   { font-size: 1.125rem; font-weight: 700; color: var(--text-head); letter-spacing: -0.02em; }
 .stat-pct   { font-size: 0.75rem; font-weight: 400; color: var(--slate-mid); }
 
-.report-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+.report-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; table-layout: fixed; }
 .report-table th {
   padding: 0.5rem 0.75rem;
   text-align: left;
@@ -541,7 +545,7 @@ nav {
 ═══════════════════════════════════════════════ */
 .services-section {
   background: var(--bg-soft);
-  padding: 5rem var(--px);
+  padding: 5rem 0;
 }
 
 .cards-grid {
@@ -745,7 +749,7 @@ nav {
 ═══════════════════════════════════════════════ */
 .pricing-section {
   background: var(--bg-page);
-  padding: 5rem var(--px);
+  padding: 5rem 0;
 }
 
 .pricing-grid {
@@ -896,7 +900,7 @@ nav {
 ═══════════════════════════════════════════════ */
 .contact-section {
   background: var(--bg-soft);
-  padding: 5rem var(--px);
+  padding: 5rem 0;
 }
 
 .contact-grid {
