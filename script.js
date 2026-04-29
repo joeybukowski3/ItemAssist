@@ -1,10 +1,6 @@
 const navToggle = document.querySelector(".nav-toggle");
-const siteNav = document.querySelector(".site-nav");
-const currentYear = document.querySelector("#current-year");
-
-if (currentYear) {
-  currentYear.textContent = new Date().getFullYear();
-}
+const siteNav = document.querySelector("#site-nav");
+const formSubmit = document.querySelector(".form-submit");
 
 if (navToggle && siteNav) {
   const closeNav = () => {
@@ -32,8 +28,35 @@ if (navToggle && siteNav) {
   });
 
   window.addEventListener("resize", () => {
-    if (window.innerWidth > 760) {
+    if (window.innerWidth > 900) {
       closeNav();
     }
+  });
+}
+
+const sections = document.querySelectorAll("section[id], div[id]");
+const navLinks = document.querySelectorAll(".nav-links a[href^='#']");
+
+if (sections.length && navLinks.length) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        navLinks.forEach((link) => {
+          link.style.color = link.getAttribute("href") === `#${entry.target.id}`
+            ? "rgba(255,255,255,0.95)"
+            : "";
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach((section) => observer.observe(section));
+}
+
+if (formSubmit) {
+  formSubmit.addEventListener("click", () => {
+    formSubmit.textContent = "Request Received \u2713";
+    formSubmit.style.background = "#1A7A4C";
+    formSubmit.disabled = true;
   });
 }
