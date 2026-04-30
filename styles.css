@@ -224,33 +224,6 @@ nav {
   margin: 0 auto;
 }
 
-.hero-stat {
-  flex: 1;
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.875rem 1.125rem;
-  text-align: left;
-  box-shadow: var(--shadow-sm);
-}
-
-.hero-stat-num {
-  display: block;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--navy);
-  line-height: 1;
-  margin-bottom: 0.25rem;
-}
-
-.hero-stat-label {
-  display: block;
-  font-size: 0.775rem;
-  font-weight: 500;
-  color: var(--slate-mid);
-  line-height: 1.3;
-}
-
 .hero h1 {
   font-size: clamp(1.875rem, 3.25vw, 2.75rem); /* tighter clamp — fits 2-3 lines, not 4-5 */
   font-weight: 700;
@@ -319,13 +292,13 @@ nav {
 }
 
 .proof-inner {
-  max-width: 860px;
+  max-width: var(--max-w);
   margin: 0 auto;
   padding: 0 var(--px);
 }
 
 .proof-mockup {
-  min-width: 0;
+  width: 100%;
 }
 
 /* ── Report Mockup Window ── */
@@ -498,7 +471,7 @@ nav {
   background: var(--white);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  padding: 2.5rem 0;
+  padding: 2rem 0;
 }
 
 .stats-strip-inner {
@@ -506,13 +479,40 @@ nav {
   margin: 0 auto;
   padding: 0 var(--px);
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 1.5rem;
 }
 
-.stats-strip-inner .hero-stat {
-  flex: 1;
-  max-width: 320px;
+.strip-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 3rem;
+}
+
+.strip-sep {
+  width: 1px;
+  height: 44px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.strip-num {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.3rem;
+}
+
+.strip-lbl {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--slate-mid);
+  line-height: 1.4;
+  max-width: 14ch;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1120,7 +1120,6 @@ footer {
 ═══════════════════════════════════════════════ */
 @media (max-width: 1024px) {
   .mockup-body    { grid-template-columns: 165px 1fr; }
-  .proof-inner    { gap: 2.5rem; }
   .process-inner  { gap: 2.5rem; }
   .contact-grid   { gap: 3rem; }
   .footer-inner   { gap: 3rem; }
@@ -1176,8 +1175,9 @@ footer {
 
   .proof-section { padding: 3.5rem 0; }
 
-  .stats-strip-inner { flex-direction: column; align-items: stretch; }
-  .stats-strip-inner .hero-stat { max-width: none; }
+  .stats-strip-inner { flex-direction: column; gap: 1.5rem; }
+  .strip-sep { width: 44px; height: 1px; }
+  .strip-stat { padding: 0; }
 
   .report-stats { grid-template-columns: 1fr 1fr; }
   .report-table { display: none; }
