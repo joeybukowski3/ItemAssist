@@ -221,21 +221,48 @@ nav {
   padding-bottom: 3.5rem;
 }
 
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--slate);
+.hero-stats {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.625rem;
+  margin-bottom: 1.75rem;
+}
+
+.hero-stat {
+  flex: 1;
+  max-width: 196px;
   background: var(--white);
   border: 1px solid var(--border);
-  padding: 5px 14px;
-  border-radius: 99px;
-  margin-bottom: 1.75rem;
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+  text-align: left;
   box-shadow: var(--shadow-sm);
 }
-.hero-badge svg { color: var(--navy); flex-shrink: 0; }
+
+.hero-stat-num {
+  display: block;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1;
+  margin-bottom: 0.2rem;
+}
+
+.hero-stat-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-head);
+  margin-bottom: 0.3rem;
+}
+
+.hero-stat-desc {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--slate-mid);
+  line-height: 1.4;
+}
 
 .hero h1 {
   font-size: clamp(2.5rem, 5vw, 4.25rem);
@@ -1163,6 +1190,8 @@ footer {
   .hero h1 { font-size: 2.1rem; }
   .hero-ctas { flex-direction: column; align-items: stretch; }
   .hero-ctas a { text-align: center; }
+  .hero-stats { flex-direction: column; gap: 0.5rem; }
+  .hero-stat { max-width: none; }
 
   .trust-logos { gap: 1.5rem; }
   .trust-item  { font-size: 0.875rem; }
