@@ -215,21 +215,21 @@ nav {
 ═══════════════════════════════════════════════ */
 .hero {
   background: var(--bg-page);
-  padding: 5rem var(--px) 4.5rem;
+  padding: 4rem var(--px) 3.5rem;
   text-align: center;
 }
 
 .hero-content {
-  max-width: 860px; /* was 660px — wider stops the tall stacking */
+  max-width: 860px;
   margin: 0 auto;
 }
 
 .hero h1 {
-  font-size: clamp(2.5rem, 5vw, 4.25rem);
+  font-size: clamp(1.875rem, 3.25vw, 2.75rem); /* tighter clamp — fits 2-3 lines, not 4-5 */
   font-weight: 700;
   color: var(--text-head);
-  line-height: 1.1;
-  letter-spacing: -0.03em;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
   margin-bottom: 1.25rem;
 }
 
@@ -285,7 +285,7 @@ nav {
      report mockup right.
 ═══════════════════════════════════════════════ */
 .proof-section {
-  background: var(--white);
+  background: var(--bg-page);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   padding: 5rem 0;
@@ -296,7 +296,7 @@ nav {
   margin: 0 auto;
   padding: 0 var(--px);
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 340px 1fr;
   gap: 4rem;
   align-items: center;
 }
@@ -314,25 +314,21 @@ nav {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--navy);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
 .proof-stat {
-  background: var(--bg-soft);
+  background: var(--white);
   border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 1.375rem 1.5rem;
+  border-left: 4px solid var(--navy); /* strong accent — makes cards visible */
+  border-radius: var(--r);
+  padding: 1.25rem 1.5rem;
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-.proof-stat:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--slate-light);
 }
 
 .proof-stat-num {
   display: block;
-  font-size: 2rem;
+  font-size: 2.125rem;
   font-weight: 700;
   color: var(--navy);
   line-height: 1;
@@ -1201,8 +1197,8 @@ footer {
 
   /* Proof section: stack vertically on tablet */
   .proof-inner  { grid-template-columns: 1fr; gap: 2.5rem; }
-  .proof-stats  { flex-direction: row; flex-wrap: wrap; }
-  .proof-stat   { flex: 1; min-width: 180px; }
+  .proof-stats  { flex-direction: row; flex-wrap: wrap; gap: 0.75rem; }
+  .proof-stat   { flex: 1; min-width: 160px; }
 
   /* Mockup */
   .mockup-sidebar { display: none; }
@@ -1221,8 +1217,8 @@ footer {
 }
 
 @media (max-width: 640px) {
-  .hero { padding-top: 3.5rem; padding-bottom: 3rem; }
-  .hero h1 { font-size: 2.1rem; }
+  .hero { padding-top: 3rem; padding-bottom: 2.5rem; }
+  .hero h1 { font-size: 1.75rem; letter-spacing: -0.02em; }
   .hero-ctas { flex-direction: column; align-items: stretch; }
   .hero-ctas a { text-align: center; }
 
