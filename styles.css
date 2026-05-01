@@ -381,6 +381,12 @@ nav {
   border-radius: var(--r);
   padding: 0.875rem 1rem;
 }
+.sidebar-total-block + .sidebar-total-block { margin-top: 0.75rem; }
+.sidebar-total-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.16);
+  margin: 0.75rem 0;
+}
 .sidebar-total-label { font-size: 0.6rem; opacity: 0.7; margin-bottom: 0.3rem; letter-spacing: 0.03em; }
 .sidebar-total-value { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.03em; }
 
@@ -414,9 +420,31 @@ nav {
 }
 .report-btn:hover { background: var(--bg-page); }
 
+.report-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 1.125rem 0 0.75rem;
+}
+.report-section-header--compact { margin-top: 0; }
+.report-section-kicker {
+  font-size: 0.675rem;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.report-section-note {
+  font-size: 0.7rem;
+  color: var(--slate-mid);
+  text-align: right;
+  max-width: 28rem;
+}
+
 .report-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
   gap: 0.625rem;
   margin-bottom: 1rem;
 }
@@ -424,12 +452,48 @@ nav {
   border: 1px solid var(--border);
   border-radius: var(--r);
   padding: 0.75rem;
+  min-width: 0;
 }
+.stat-box--detail { display: flex; flex-direction: column; justify-content: center; }
 .stat-label { font-size: 0.675rem; color: var(--slate-mid); margin-bottom: 0.25rem; }
 .stat-val   { font-size: 1.125rem; font-weight: 700; color: var(--text-head); letter-spacing: -0.02em; }
 .stat-pct   { font-size: 0.75rem; font-weight: 400; color: var(--slate-mid); }
+.stat-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.675rem;
+  color: var(--text-head);
+}
+.stat-breakdown-line {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  line-height: 1.4;
+}
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-dot--green { background: var(--green); }
+.status-dot--amber { background: var(--amber); }
 
-.report-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; table-layout: fixed; }
+.report-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+.report-table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  table-layout: fixed;
+  background: var(--white);
+}
 .report-table th {
   padding: 0.5rem 0.75rem;
   text-align: left;
@@ -463,6 +527,148 @@ nav {
 }
 .badge-green { background: var(--green-bg); color: var(--green); }
 .badge-amber { background: var(--amber-bg); color: var(--amber); }
+.badge-blue  { background: var(--blue-bg); color: var(--blue); }
+
+.comparison-listing {
+  display: grid;
+  gap: 0.875rem;
+}
+.comparison-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  padding: 0.9rem;
+}
+.comparison-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+.comparison-card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-head);
+}
+.comparison-card-meta {
+  font-size: 0.7rem;
+  color: var(--slate-mid);
+  margin-top: 0.15rem;
+}
+.comparison-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.comparison-cost {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  font-size: 0.675rem;
+  font-weight: 600;
+  color: var(--text-head);
+  white-space: nowrap;
+}
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.comparison-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--bg-soft);
+  padding: 0.8rem;
+  min-width: 0;
+}
+.comparison-panel--accent {
+  background: linear-gradient(180deg, rgba(219,234,254,0.36) 0%, rgba(255,255,255,1) 100%);
+}
+.comparison-panel-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.comparison-panel-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-head);
+  margin-top: 0.35rem;
+}
+.comparison-panel-meta {
+  font-size: 0.7rem;
+  color: var(--slate-mid);
+  margin-top: 0.18rem;
+}
+.comparison-bullets {
+  list-style: none;
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.7rem;
+}
+.comparison-bullets li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.725rem;
+  color: var(--text-body);
+  line-height: 1.45;
+}
+.comparison-bullets li::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  margin-top: 0.36rem;
+  flex-shrink: 0;
+}
+.comparison-panel-foot {
+  margin-top: 0.75rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.7rem;
+  color: var(--slate-mid);
+}
+.comparison-specs {
+  margin-top: 0.8rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r);
+  background: rgba(248,250,252,0.8);
+  padding: 0.75rem;
+}
+.comparison-specs-title {
+  font-size: 0.675rem;
+  font-weight: 700;
+  color: var(--text-head);
+  margin-bottom: 0.55rem;
+}
+.comparison-spec-grid {
+  display: grid;
+  gap: 0.45rem;
+}
+.comparison-spec-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.725rem;
+  color: var(--text-body);
+}
+.comparison-rationale {
+  margin-top: 0.75rem;
+  font-size: 0.7rem;
+  color: var(--slate-mid);
+  line-height: 1.5;
+}
 
 /* ═══════════════════════════════════════════════
    STATS STRIP
@@ -1261,8 +1467,20 @@ footer {
   .strip-sep { width: 44px; height: 1px; }
   .strip-stat { padding: 0; }
 
+  .report-section-header,
+  .comparison-card-header,
+  .comparison-spec-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .report-section-note,
+  .comparison-card-actions {
+    text-align: left;
+    justify-content: flex-start;
+  }
   .report-stats { grid-template-columns: 1fr 1fr; }
-  .report-table { display: none; }
+  .comparison-grid { grid-template-columns: 1fr; }
+  .comparison-specs { padding: 0.7rem; }
 
   .footer-cols { flex-direction: column; gap: 1.5rem; }
 
