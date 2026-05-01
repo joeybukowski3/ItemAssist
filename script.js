@@ -97,3 +97,25 @@ if (contactForm) {
     }
   });
 }
+
+/* Report preview detail rows */
+function toggleReportDetail(id, el) {
+  const row = document.getElementById(id);
+
+  if (!row || !el) {
+    return;
+  }
+
+  const isOpen = row.classList.toggle("open");
+  el.classList.toggle("open", isOpen);
+
+  const labelNode = Array.from(el.childNodes).find(
+    (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0
+  );
+
+  if (labelNode) {
+    labelNode.textContent = isOpen ? "Hide Specs " : "View Specs ";
+  }
+}
+
+window.toggleReportDetail = toggleReportDetail;
