@@ -125,7 +125,7 @@ nav {
   width: auto;
   height: 38px;
   max-width: 220px;
-  max-height: 44px;
+  max-height: 40px;
   object-fit: contain;
 }
 
@@ -1482,6 +1482,21 @@ footer {
   /* Footer */
   .footer-inner { grid-template-columns: 1fr; gap: 2.5rem; }
   .footer-cols  { gap: 2.5rem; }
+}
+
+@media (max-width: 768px) {
+  .header-logo {
+    width: 168px;
+    max-width: 168px;
+    height: 32px;
+    max-height: 32px;
+  }
+  .header-logo-img {
+    width: auto;
+    height: 28px;
+    max-width: 168px;
+    max-height: 28px;
+  }
 }
 
 @media (max-width: 640px) {
