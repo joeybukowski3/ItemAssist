@@ -54,9 +54,9 @@
   .dot-y { background: #febc2e; }
   .dot-g { background: #28c840; }
   .claim-label { margin-left: auto; font-size: 11px; color: var(--text-muted); font-weight: 500; }
-  .app { display: flex; height: 540px; }
+  .app { display: flex; height: 580px; }
   .sidebar {
-    width: 180px; min-width: 180px;
+    width: 188px; min-width: 188px;
     background: var(--white);
     border-right: 1px solid var(--border);
     padding: 20px 0;
@@ -101,7 +101,7 @@
   .kpi-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
   .kpi-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
   .kpi-value { font-size: 20px; font-weight: 700; color: var(--text); line-height: 1.1; letter-spacing: -0.02em; }
-  .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; line-height: 1.5; }
   .divider { height: 1px; background: var(--border); margin: 18px 0; }
   .items-table { width: 100%; border-collapse: collapse; font-size: 12px; }
   .items-table th {
@@ -113,7 +113,8 @@
   .items-table td:not(:first-child) { padding-left: 12px; }
   .items-table tr:last-child td { border-bottom: none; }
   .item-name { font-weight: 600; color: var(--text); margin-bottom: 2px; font-size: 12.5px; }
-  .item-model { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
+  .item-model { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+  .item-msrp { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
   .view-specs { font-size: 11px; color: var(--teal); font-weight: 500; display: inline-flex; align-items: center; gap: 3px; cursor: pointer; text-decoration: none; }
   .rcv-value { font-size: 13px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
   .badge-verified {
@@ -132,7 +133,7 @@
     <span class="dot dot-r"></span>
     <span class="dot dot-y"></span>
     <span class="dot dot-g"></span>
-    <span class="claim-label">Claim #7214-B &bull; Johnson Residence</span>
+    <span class="claim-label">Claim #9482-A &bull; Smith Residence</span>
   </div>
   <div class="app">
     <aside class="sidebar">
@@ -152,14 +153,14 @@
       <div style="flex:1"></div>
       <div class="rcv-box">
         <div class="rcv-label">Total RCV Determined</div>
-        <div class="rcv-amount">$6,847.00</div>
+        <div class="rcv-amount">$34,152.00</div>
       </div>
     </aside>
     <main class="main">
       <div class="report-header">
         <div>
           <div class="report-title">Pricing Research Report</div>
-          <div class="report-meta">Completed on Jan 15, 2026 &bull; 3 Items Reviewed</div>
+          <div class="report-meta">Completed on Apr 18, 2026 &bull; 22 Items Reviewed</div>
         </div>
         <div class="header-actions">
           <button class="btn-outline">
@@ -175,34 +176,39 @@
       <div class="content">
         <div class="section-title">Summary Findings</div>
         <div class="section-sub">Defensible LKQ, RCV, and ACV support aligned to the spreadsheet example.</div>
+
         <div class="kpi-grid">
           <div class="kpi-card">
             <div class="kpi-label">Items Researched</div>
-            <div class="kpi-value">3</div>
+            <div class="kpi-value">22</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-label">LKQ Matches Found</div>
-            <div class="kpi-value">3 <span style="font-size:13px;font-weight:500;color:var(--text-muted)">(100%)</span></div>
-            <div class="kpi-sub">3 Verified LKQ Matches</div>
+            <div class="kpi-value">21 <span style="font-size:13px;font-weight:500;color:var(--text-muted)">(95%)</span></div>
+            <div class="kpi-sub">21 Verified LKQ Matches<br>1 Estimated LKQ Match</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-label">Avg. Age Verified</div>
-            <div class="kpi-value">8.3 <span style="font-size:13px;font-weight:500;color:var(--text-muted)">Years</span></div>
+            <div class="kpi-value">4.3 <span style="font-size:13px;font-weight:500;color:var(--text-muted)">Years</span></div>
           </div>
         </div>
+
         <div class="kpi-grid-2">
           <div class="kpi-card">
             <div class="kpi-label">Total RCV Determined</div>
-            <div class="kpi-value">$6,847.00</div>
+            <div class="kpi-value">$34,152.00</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-label">Total ACV Determined</div>
-            <div class="kpi-value">$3,924.50</div>
+            <div class="kpi-value">$17,022.40</div>
           </div>
         </div>
+
         <div class="divider"></div>
+
         <div class="section-title" style="margin-bottom:4px;">Itemized LKQ</div>
         <div class="section-sub">Representative replacements pulled from the underlying spreadsheet analysis.</div>
+
         <table class="items-table">
           <thead>
             <tr>
@@ -215,48 +221,55 @@
           <tbody>
             <tr>
               <td>
-                <div class="item-name">LG 65" OLED TV</div>
-                <div class="item-model">Model: OLED55C3PUA (2023)</div>
+                <div class="item-name">LG 65&quot; OLED TV</div>
+                <div class="item-model">Model: OLED65C3PUA</div>
+                <div class="item-msrp">Orig. MSRP: $2,299.99 &bull; Mfr: 2023</div>
                 <a class="view-specs" href="#">View Specs <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></a>
               </td>
               <td>
-                <div class="item-name">LG 65" OLED TV</div>
+                <div class="item-name">LG 65&quot; OLED TV</div>
                 <div class="item-model">Model: OLED65C6PUA</div>
+                <div class="item-msrp">Retail Cost: $2,699.99</div>
                 <a class="view-specs" href="#">View Retailer Links</a>
               </td>
-              <td><div class="rcv-value">$1,499.00</div></td>
+              <td><div class="rcv-value">$2,699.99</div></td>
               <td><span class="badge-verified"><span class="badge-dot"></span>Verified LKQ</span></td>
             </tr>
             <tr>
               <td>
                 <div class="item-name">GE Stackable Dryer</div>
-                <div class="item-model">Model: GFD65ESSNWW (2021)</div>
+                <div class="item-model">Model: GFD65ESSNWW</div>
+                <div class="item-msrp">Orig. MSRP: $749.99 &bull; Mfr: 2021</div>
                 <a class="view-specs" href="#">View Specs <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></a>
               </td>
               <td>
                 <div class="item-name">GE Stackable Dryer</div>
-                <div class="item-model">Model: GFD55ESSNVWW</div>
+                <div class="item-model">Model: GFD65ESSNWW</div>
+                <div class="item-msrp">Retail Cost: $798.00</div>
                 <a class="view-specs" href="#">View Retailer Links</a>
               </td>
-              <td><div class="rcv-value">$1,149.00</div></td>
+              <td><div class="rcv-value">$798.00</div></td>
               <td><span class="badge-verified"><span class="badge-dot"></span>Verified LKQ</span></td>
             </tr>
             <tr>
               <td>
                 <div class="item-name">KitchenAid Refrigerator</div>
-                <div class="item-model">Model: KBRS22KWWH (1997)</div>
+                <div class="item-model">Model: KBRS22KWWH</div>
+                <div class="item-msrp">Orig. MSRP: $1,498.00 &bull; Mfr: 1997</div>
                 <a class="view-specs" href="#">View Specs <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></a>
               </td>
               <td>
                 <div class="item-name">KitchenAid Refrigerator</div>
                 <div class="item-model">Model: KRBL102ESS</div>
+                <div class="item-msrp">Retail Cost: $1,899.99</div>
                 <a class="view-specs" href="#">View Retailer Links</a>
               </td>
-              <td><div class="rcv-value">$4,199.00</div></td>
+              <td><div class="rcv-value">$1,899.99</div></td>
               <td><span class="badge-verified"><span class="badge-dot"></span>Verified LKQ</span></td>
             </tr>
           </tbody>
         </table>
+
       </div>
     </main>
   </div>
