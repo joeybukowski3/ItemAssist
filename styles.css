@@ -1272,3 +1272,193 @@ footer {
   .pricing-section,
   .contact-section { padding-top: 3.5rem; padding-bottom: 3.5rem; }
 }
+
+/* ═══════════════════════════════════════════════
+   SERVICES PAGE
+═══════════════════════════════════════════════ */
+
+/* Active nav link */
+.nav-link--active {
+  color: var(--navy) !important;
+  font-weight: 600;
+}
+
+/* Scroll offset for card anchor IDs */
+#age-specification-verification,
+#lkq-replacement-research,
+#contents-list-review,
+#svc-coverage,
+#how-it-works {
+  scroll-margin-top: 80px;
+}
+
+/* Coverage table section */
+.svc-table-section {
+  background: var(--white);
+  padding: 5rem 0;
+}
+
+.svc-table-wrap {
+  margin-top: 2.5rem;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.svc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  background: var(--white);
+}
+
+.svc-table thead tr {
+  background: var(--navy);
+}
+
+.svc-table th {
+  padding: 0.875rem 1.25rem;
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.svc-table td {
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.55;
+  color: var(--text-body);
+}
+
+.svc-table td:first-child {
+  font-weight: 600;
+  color: var(--text-head);
+  white-space: nowrap;
+}
+
+.svc-table tbody tr:last-child td { border-bottom: none; }
+.svc-table tbody tr:nth-child(even) { background: var(--bg-soft); }
+.svc-table tbody tr:hover { background: var(--border-soft); }
+
+/* Process section (services page) */
+.svc-process-section {
+  background: var(--bg-soft);
+  padding: 5rem 0;
+}
+
+.svc-steps {
+  max-width: 680px;
+  margin: 3rem auto 0;
+}
+
+/* SEO section */
+.svc-seo-section {
+  background: var(--bg-page);
+  padding: 5rem 0;
+}
+
+.svc-seo-body {
+  max-width: 800px;
+  margin: 2rem auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.svc-seo-body p {
+  font-size: 1rem;
+  color: var(--text-body);
+  line-height: 1.8;
+}
+
+/* CTA section */
+.svc-cta-section {
+  background: var(--navy-deep);
+  padding: 5rem 0;
+}
+
+.svc-cta-inner {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 var(--px);
+  text-align: center;
+}
+
+.svc-cta-heading {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.svc-cta-sub {
+  font-size: 1.0625rem;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.svc-cta-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Coverage table — mobile stacking */
+@media (max-width: 768px) {
+  .svc-table thead { display: none; }
+
+  .svc-table,
+  .svc-table tbody,
+  .svc-table tr,
+  .svc-table td { display: block; width: 100%; }
+
+  .svc-table tr {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .svc-table tr:last-child { border-bottom: none; }
+
+  .svc-table td {
+    border-bottom: none;
+    padding: 0.2rem 1.25rem;
+    white-space: normal;
+  }
+
+  .svc-table td:first-child {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--navy);
+    padding-top: 0;
+    padding-bottom: 0.375rem;
+  }
+
+  .svc-table td::before {
+    content: attr(data-label) ": ";
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--slate-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.125rem;
+  }
+
+  .svc-table td:first-child::before { display: none; }
+}
+
+@media (max-width: 640px) {
+  .svc-process-section { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+  .svc-table-section    { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+  .svc-seo-section      { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+  .svc-cta-section      { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+  .svc-steps            { margin-top: 2rem; }
+}
