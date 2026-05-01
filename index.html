@@ -397,46 +397,63 @@
             <div class="form-card-title">Submit a Contents List</div>
             <div class="form-card-sub">Fill out the form below and we&rsquo;ll reach out within one business day.</div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="fname">First Name</label>
-                <input type="text" id="fname" placeholder="Jane">
+            <form id="contact-form" novalidate>
+              <input type="hidden" name="_subject" value="New Contents List Submission — ItemAssist">
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="fname">First Name</label>
+                  <input type="text" id="fname" name="first_name" placeholder="Jane">
+                </div>
+                <div class="form-group">
+                  <label for="lname">Last Name</label>
+                  <input type="text" id="lname" name="last_name" placeholder="Smith">
+                </div>
               </div>
               <div class="form-group">
-                <label for="lname">Last Name</label>
-                <input type="text" id="lname" placeholder="Smith">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="company">Company / Firm</label>
-              <input type="text" id="company" placeholder="Acme Adjusting Group">
-            </div>
-            <div class="form-group">
-              <label for="email">Business Email</label>
-              <input type="email" id="email" placeholder="jane@acmeadjusting.com">
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="tier">Service Tier</label>
-                <select id="tier">
-                  <option value="">Select a tier...</option>
-                  <option>Standard &mdash; Single Report</option>
-                  <option>Professional &mdash; Batch</option>
-                  <option>Enterprise / Custom</option>
-                  <option>Not sure yet</option>
-                </select>
+                <label for="company">Company / Firm</label>
+                <input type="text" id="company" name="company" placeholder="Acme Adjusting Group">
               </div>
               <div class="form-group">
-                <label for="items">Approx. Line Items</label>
-                <input type="text" id="items" placeholder="e.g. 45">
+                <label for="email">Business Email</label>
+                <input type="email" id="email" name="email" placeholder="jane@acmeadjusting.com">
               </div>
-            </div>
-            <div class="form-group">
-              <label for="notes">Additional Notes</label>
-              <textarea id="notes" placeholder="Claim type, deadline, special requirements..."></textarea>
-            </div>
-            <button type="button" class="form-submit">Submit Request &rarr;</button>
-            <p class="form-privacy">We do not share your information. All submissions are handled confidentially.</p>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="tier">Service Tier</label>
+                  <select id="tier" name="tier">
+                    <option value="">Select a tier...</option>
+                    <option>Standard &mdash; Single Report</option>
+                    <option>Professional &mdash; Batch</option>
+                    <option>Enterprise / Custom</option>
+                    <option>Not sure yet</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="items">Approx. Line Items</label>
+                  <input type="text" id="items" name="line_items" placeholder="e.g. 45">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="notes">Additional Notes</label>
+                <textarea id="notes" name="notes" placeholder="Claim type, deadline, special requirements..."></textarea>
+              </div>
+              <div class="form-group">
+                <label for="attachment">Attach Contents List <span class="form-label-opt">(optional)</span></label>
+                <div class="file-upload-wrap">
+                  <input type="file" id="attachment" name="attachment" class="file-upload-input"
+                         accept=".pdf,.xlsx,.xls,.csv,.png,.jpg,.jpeg">
+                  <label for="attachment" class="file-upload-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+                    Choose file
+                  </label>
+                  <span class="file-upload-name" id="file-upload-name">PDF, Excel, or Image &middot; Max 25 MB</span>
+                </div>
+              </div>
+              <button type="submit" class="form-submit">Submit Request &rarr;</button>
+              <div class="form-status" id="form-status" aria-live="polite"></div>
+              <p class="form-privacy">We do not share your information. All submissions are handled confidentially.</p>
+            </form>
           </div>
         </div>
       </div>

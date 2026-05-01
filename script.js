@@ -1,6 +1,6 @@
+/* ── Nav toggle ── */
 const navToggle = document.querySelector(".nav-toggle");
 const siteNav   = document.querySelector("#site-nav");
-const formSubmit = document.querySelector(".form-submit");
 
 if (navToggle && siteNav) {
   const closeNav = () => {
@@ -15,19 +15,12 @@ if (navToggle && siteNav) {
     navToggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
   });
 
-  siteNav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", closeNav);
-  });
-
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeNav();
-  });
-
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 900) closeNav();
-  });
+  siteNav.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeNav));
+  window.addEventListener("keydown", (e) => { if (e.key === "Escape") closeNav(); });
+  window.addEventListener("resize",  ()  => { if (window.innerWidth > 900) closeNav(); });
 }
 
+/* ── Active nav link on scroll ── */
 const sections = document.querySelectorAll("section[id], div[id]");
 const navLinks  = document.querySelectorAll(".nav-links a[href^='#']");
 
@@ -36,9 +29,8 @@ if (sections.length && navLinks.length) {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         navLinks.forEach((link) => {
-          link.style.color = link.getAttribute("href") === `#${entry.target.id}`
-            ? "#1e3a5f"
-            : "";
+          link.style.color =
+            link.getAttribute("href") === `#${entry.target.id}` ? "#1e3a5f" : "";
         });
       }
     });
@@ -47,10 +39,61 @@ if (sections.length && navLinks.length) {
   sections.forEach((s) => observer.observe(s));
 }
 
-if (formSubmit) {
-  formSubmit.addEventListener("click", () => {
-    formSubmit.textContent = "Request Received ✓";
-    formSubmit.style.background = "#16a34a";
-    formSubmit.disabled = true;
+/* ── Contact form ── */
+const contactForm = document.getElementById("contact-form");
+
+if (contactForm) {
+  const submitBtn  = contactForm.querySelector(".form-submit");
+  const statusEl   = document.getElementById("form-status");
+  const fileInput  = document.getElementById("attachment");
+  const fileNameEl = document.getElementById("file-upload-name");
+
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files.length > 0) {
+      fileNameEl.textContent = fileInput.files[0].name;
+      fileNameEl.classList.add("has-file");
+    } else {
+      fileNameEl.textContent = "PDF, Excel, or Image · Max 25 MB";
+      fileNameEl.classList.remove("has-file");
+    }
+  });
+
+  contactForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    submitBtn.disabled    = true;
+    submitBtn.textContent = "Sending…";
+    statusEl.className    = "form-status";
+    statusEl.textContent  = "";
+
+    try {
+      // ⚠️  Replace YOUR_FORM_ID with your Formspree form ID.
+      //     Sign up free at formspree.io → New Form → set recipient to joeybuk03@gmail.com
+      const res = await fetch("https://formspree.io/f/YOUR_FORM_ID", {
+        method:  "POST",
+        body:    new FormData(contactForm),
+        headers: { Accept: "application/json" },
+      });
+
+      if (res.ok) {
+        submitBtn.textContent      = "Request Sent ✓";
+        submitBtn.style.background = "#16a34a";
+        statusEl.className         = "form-status form-status--success";
+        statusEl.textContent       =
+          "Your request was submitted. We’ll be in touch within one business day.";
+        contactForm.reset();
+        fileNameEl.textContent = "PDF, Excel, or Image · Max 25 MB";
+        fileNameEl.classList.remove("has-file");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Submission failed");
+      }
+    } catch {
+      submitBtn.disabled    = false;
+      submitBtn.textContent = "Submit Request →";
+      statusEl.className    = "form-status form-status--error";
+      statusEl.textContent  =
+        "Something went wrong. Please email us directly at submissions@itemassist.com.";
+    }
   });
 }
