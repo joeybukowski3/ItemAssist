@@ -113,18 +113,21 @@ nav {
 .header-logo {
   display: inline-flex;
   align-items: center;
-  max-width: 240px;
-  width: 240px;
+  justify-content: flex-start;
+  width: 190px;
+  max-width: 220px;
   height: 44px;
   max-height: 44px;
   overflow: hidden;
+  text-decoration: none;
+  flex-shrink: 0;
 }
 
 .header-logo-img {
   display: block;
   width: auto;
-  height: 36px;
-  max-width: 220px;
+  max-width: 100%;
+  height: 40px;
   max-height: 40px;
   object-fit: contain;
   object-position: left center;
@@ -1453,15 +1456,15 @@ footer {
   .nav-toggle  { display: inline-flex; }
   .nav-mobile-cta { display: block; padding-top: 0.5rem; border-top: 1px solid var(--border); }
   .header-logo {
-    width: 200px;
+    width: 180px;
     max-width: 200px;
     height: 40px;
     max-height: 40px;
   }
   .header-logo-img {
-    height: 32px;
-    max-width: 190px;
-    max-height: 36px;
+    height: 34px;
+    max-width: 180px;
+    max-height: 38px;
   }
 
   .nav-links {
@@ -1503,16 +1506,16 @@ footer {
 
 @media (max-width: 768px) {
   .header-logo {
-    width: 180px;
-    max-width: 180px;
-    height: 36px;
-    max-height: 36px;
+    width: 160px;
+    max-width: 160px;
+    height: 40px;
+    max-height: 40px;
   }
   .header-logo-img {
     width: auto;
-    height: 28px;
-    max-width: 170px;
-    max-height: 32px;
+    height: 30px;
+    max-width: 160px;
+    max-height: 34px;
   }
 }
 
@@ -2106,18 +2109,21 @@ body.homepage-redesign .nav-inner {
 body.homepage-redesign .logo.header-logo {
   display: inline-flex;
   align-items: center;
-  max-width: 240px;
-  width: 240px;
+  justify-content: flex-start;
+  width: 190px;
+  max-width: 220px;
   height: 44px;
   max-height: 44px;
   overflow: hidden;
+  text-decoration: none;
+  flex-shrink: 0;
 }
 
 body.homepage-redesign .header-logo-img {
   display: block;
   width: auto;
-  height: 36px;
-  max-width: 220px;
+  max-width: 100%;
+  height: 40px;
   max-height: 40px;
   object-fit: contain;
   object-position: left center;
@@ -3197,15 +3203,15 @@ body.homepage-redesign .how-card:nth-child(3) { animation: fadeUp 0.5s ease-out 
   body.homepage-redesign .nav-toggle { display: inline-flex; }
   body.homepage-redesign .nav-mobile-cta { display: block; padding-top: 0.5rem; border-top: 1px solid var(--border); }
   body.homepage-redesign .header-logo {
-    width: 200px;
+    width: 180px;
     max-width: 200px;
     height: 40px;
     max-height: 40px;
   }
   body.homepage-redesign .header-logo-img {
-    height: 32px;
-    max-width: 190px;
-    max-height: 36px;
+    height: 34px;
+    max-width: 180px;
+    max-height: 38px;
   }
   body.homepage-redesign .nav-links {
     position: absolute;
@@ -3290,15 +3296,15 @@ body.homepage-redesign .how-card:nth-child(3) { animation: fadeUp 0.5s ease-out 
 
 @media (max-width: 768px) {
   body.homepage-redesign .header-logo {
-    width: 180px;
-    max-width: 180px;
-    height: 36px;
-    max-height: 36px;
+    width: 160px;
+    max-width: 160px;
+    height: 40px;
+    max-height: 40px;
   }
   body.homepage-redesign .header-logo-img {
     width: auto;
-    height: 28px;
-    max-width: 170px;
-    max-height: 32px;
+    height: 30px;
+    max-width: 160px;
+    max-height: 34px;
   }
 }
