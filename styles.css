@@ -1877,9 +1877,9 @@ body.homepage-redesign .home-hero {
   margin: 0 auto;
   padding: 56px var(--px) 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+  grid-template-columns: minmax(320px, 0.88fr) minmax(640px, 1.2fr);
   gap: 48px;
-  align-items: center;
+  align-items: start;
 }
 
 body.homepage-redesign .home-hero-text {
@@ -1997,6 +1997,9 @@ body.homepage-redesign .home-hero-trust-num {
 
 body.homepage-redesign .home-hero-report {
   min-width: 0;
+  width: 100%;
+  max-width: 960px;
+  justify-self: end;
   animation: fadeUp 0.6s ease-out 0.15s both;
 }
 
@@ -2884,6 +2887,18 @@ body.homepage-redesign .how-card:nth-child(3) { animation: fadeUp 0.5s ease-out 
   body.homepage-redesign .nav-mobile-cta .nav-cta {
     justify-content: center;
     border-radius: var(--r);
+  }
+}
+
+@media (max-width: 1180px) {
+  body.homepage-redesign .home-hero {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: 36px;
+  }
+
+  body.homepage-redesign .home-hero-report {
+    justify-self: stretch;
+    max-width: 100%;
   }
 }
 
