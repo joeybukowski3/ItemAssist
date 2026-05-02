@@ -113,20 +113,21 @@ nav {
 .header-logo {
   display: inline-flex;
   align-items: center;
-  width: 660px;
-  max-width: 660px;
-  height: 132px;
-  max-height: 132px;
+  max-width: 240px;
+  width: 240px;
+  height: 44px;
+  max-height: 44px;
   overflow: hidden;
 }
 
 .header-logo-img {
   display: block;
   width: auto;
-  height: 114px;
-  max-width: 660px;
-  max-height: 120px;
+  height: 36px;
+  max-width: 220px;
+  max-height: 40px;
   object-fit: contain;
+  object-position: left center;
 }
 
 .footer-logo {
@@ -1452,15 +1453,15 @@ footer {
   .nav-toggle  { display: inline-flex; }
   .nav-mobile-cta { display: block; padding-top: 0.5rem; border-top: 1px solid var(--border); }
   .header-logo {
-    width: 540px;
-    max-width: 540px;
-    height: 120px;
-    max-height: 120px;
+    width: 200px;
+    max-width: 200px;
+    height: 40px;
+    max-height: 40px;
   }
   .header-logo-img {
-    height: 102px;
-    max-width: 540px;
-    max-height: 120px;
+    height: 32px;
+    max-width: 190px;
+    max-height: 36px;
   }
 
   .nav-links {
@@ -1502,16 +1503,16 @@ footer {
 
 @media (max-width: 768px) {
   .header-logo {
-    width: 504px;
-    max-width: 504px;
-    height: 96px;
-    max-height: 96px;
+    width: 180px;
+    max-width: 180px;
+    height: 36px;
+    max-height: 36px;
   }
   .header-logo-img {
     width: auto;
-    height: 84px;
-    max-width: 504px;
-    max-height: 84px;
+    height: 28px;
+    max-width: 170px;
+    max-height: 32px;
   }
 }
 
@@ -1748,10 +1749,316 @@ footer {
 }
 
 /* =======================================================
+   ABOUT PAGE
+======================================================= */
+.about-page {
+  background: var(--bg-page);
+}
+
+.about-hero {
+  padding-bottom: 3.5rem;
+}
+
+.about-page .hero-content {
+  max-width: 760px;
+}
+
+.about-page .hero-sub {
+  max-width: 760px;
+}
+
+.about-statement-section,
+.about-role-section {
+  background: var(--white);
+}
+
+.about-experience-section,
+.about-explore-section {
+  background: var(--bg-soft);
+}
+
+.about-principles-section {
+  background: var(--white);
+}
+
+.about-principles-grid {
+  margin-top: 2.5rem;
+}
+
+.about-role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+.about-role-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  padding: 1.75rem;
+}
+
+.about-role-card h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-head);
+  margin-bottom: 1rem;
+}
+
+.about-role-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.about-role-list li {
+  position: relative;
+  padding-left: 1.15rem;
+  color: var(--text-body);
+  line-height: 1.65;
+}
+
+.about-role-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.about-explore-grid {
+  margin-top: 2.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.about-nav-card {
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.about-nav-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(37, 99, 235, 0.25);
+  box-shadow: var(--shadow-md);
+}
+
+.about-contact-section {
+  background: var(--bg-page);
+  padding: 5rem 0;
+}
+
+.about-contact-card {
+  background: var(--navy-deep);
+  border-radius: 16px;
+  padding: 3rem;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 2.75rem;
+  color: var(--white);
+  box-shadow: var(--shadow-lg);
+}
+
+.about-contact-info h2 {
+  font-size: clamp(1.75rem, 3vw, 2.2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.875rem;
+}
+
+.about-contact-info p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.72);
+  margin-bottom: 1.75rem;
+}
+
+.about-contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.about-contact-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 0.25rem;
+}
+
+.about-contact-value {
+  font-size: 0.975rem;
+  line-height: 1.65;
+  color: var(--white);
+}
+
+.about-contact-form {
+  background: var(--white);
+  color: var(--text-body);
+  border-radius: var(--r-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-md);
+}
+
+.about-contact-form-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text-head);
+  margin-bottom: 1rem;
+}
+
+.about-page .form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.875rem;
+}
+
+.about-page .form-group {
+  margin-bottom: 0.875rem;
+}
+
+.about-page .form-group label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-head);
+  margin-bottom: 0.4rem;
+}
+
+.about-page .form-group input,
+.about-page .form-group select,
+.about-page .form-group textarea {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-warm);
+  color: var(--text-body);
+  font-size: 0.9375rem;
+}
+
+.about-page .form-group textarea {
+  resize: vertical;
+  min-height: 92px;
+}
+
+.about-page .form-group input:focus,
+.about-page .form-group select:focus,
+.about-page .form-group textarea:focus {
+  outline: none;
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+.about-page .form-opt {
+  font-weight: 400;
+  color: var(--slate-light);
+}
+
+.about-page .file-upload-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+
+.about-page .file-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  color: var(--navy);
+  background: var(--bg-warm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.about-page .file-upload-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.about-page .file-upload-name {
+  font-size: 0.75rem;
+  color: var(--slate-light);
+}
+
+.about-page .file-upload-name.has-file { color: var(--text-body); }
+
+.about-page .form-submit {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: var(--accent);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.about-page .form-submit:hover { background: #1d4ed8; }
+
+.about-page .form-status {
+  min-height: 1.25rem;
+  margin-top: 0.625rem;
+  font-size: 0.75rem;
+}
+
+.about-page .form-status--success { color: #16a34a; }
+.about-page .form-status--error { color: #dc2626; }
+
+.about-page .form-privacy {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--slate-light);
+}
+
+.about-page .form-disclaimer {
+  font-size: 0.72rem;
+  color: var(--slate-light);
+  line-height: 1.6;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .about-role-grid,
+  .about-explore-grid,
+  .about-contact-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .about-contact-section { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+  .about-contact-card { padding: 1.75rem; gap: 2rem; }
+  .about-page .form-row { grid-template-columns: 1fr; }
+}
+
+/* =======================================================
    HOMEPAGE REDESIGN
    Scoped to index.html via body.homepage-redesign
 ======================================================= */
 body.homepage-redesign {
+  --home-max-w: 1320px;
   --navy: #0f1d2f;
   --navy-mid: #1a2d45;
   --slate: #475569;
@@ -1787,7 +2094,7 @@ body.homepage-redesign nav {
 }
 
 body.homepage-redesign .nav-inner {
-  max-width: var(--max-w);
+  max-width: var(--home-max-w);
   margin: 0 auto;
   padding: 0 var(--px);
   height: 56px;
@@ -1799,20 +2106,21 @@ body.homepage-redesign .nav-inner {
 body.homepage-redesign .logo.header-logo {
   display: inline-flex;
   align-items: center;
-  width: 660px;
-  max-width: 660px;
-  height: 132px;
-  max-height: 132px;
+  max-width: 240px;
+  width: 240px;
+  height: 44px;
+  max-height: 44px;
   overflow: hidden;
 }
 
 body.homepage-redesign .header-logo-img {
   display: block;
   width: auto;
-  height: 114px;
-  max-width: 660px;
-  max-height: 120px;
+  height: 36px;
+  max-width: 220px;
+  max-height: 40px;
   object-fit: contain;
+  object-position: left center;
 }
 
 body.homepage-redesign .nav-links {
@@ -1873,17 +2181,17 @@ body.homepage-redesign #main {
 }
 
 body.homepage-redesign .home-hero {
-  max-width: var(--max-w);
+  max-width: var(--home-max-w);
   margin: 0 auto;
   padding: 56px var(--px) 0;
   display: grid;
-  grid-template-columns: minmax(320px, 0.88fr) minmax(640px, 1.2fr);
-  gap: 48px;
+  grid-template-columns: minmax(360px, 0.85fr) minmax(620px, 1.35fr);
+  gap: 56px;
   align-items: start;
 }
 
 body.homepage-redesign .home-hero-text {
-  max-width: 500px;
+  max-width: 560px;
   animation: fadeUp 0.6s ease-out both;
 }
 
@@ -1927,7 +2235,7 @@ body.homepage-redesign .home-hero-sub {
   line-height: 1.6;
   color: var(--slate);
   margin-bottom: 28px;
-  max-width: 440px;
+  max-width: 500px;
 }
 
 body.homepage-redesign .home-hero-ctas {
@@ -2024,14 +2332,14 @@ body.homepage-redesign .home-hero-trust-icon svg {
 body.homepage-redesign .home-hero-report {
   min-width: 0;
   width: 100%;
-  max-width: 960px;
+  max-width: 1080px;
   justify-self: end;
   animation: fadeUp 0.6s ease-out 0.15s both;
 }
 
 body.homepage-redesign .hero-report-preview .window {
   width: 100%;
-  max-width: 960px;
+  max-width: 1080px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
@@ -2428,7 +2736,7 @@ body.homepage-redesign .hero-report-preview .ret-link {
 body.homepage-redesign .hero-report-preview .ret-link:hover { text-decoration: underline; }
 
 body.homepage-redesign .services-row {
-  max-width: var(--max-w);
+  max-width: var(--home-max-w);
   margin: 0 auto;
   padding: 48px var(--px) 0;
   display: flex;
@@ -2463,7 +2771,7 @@ body.homepage-redesign .service-chip svg {
 body.homepage-redesign .how-section,
 body.homepage-redesign .pricing-section,
 body.homepage-redesign .cta-section {
-  max-width: var(--max-w);
+  max-width: var(--home-max-w);
   margin: 0 auto;
   padding: 72px var(--px) 0;
 }
@@ -2854,7 +3162,7 @@ body.homepage-redesign .form-status--success { color: #16a34a; }
 body.homepage-redesign .form-status--error { color: #dc2626; }
 
 body.homepage-redesign footer {
-  max-width: var(--max-w);
+  max-width: var(--home-max-w);
   margin: 0 auto;
   padding: 48px var(--px) 32px;
   display: flex;
@@ -2889,15 +3197,15 @@ body.homepage-redesign .how-card:nth-child(3) { animation: fadeUp 0.5s ease-out 
   body.homepage-redesign .nav-toggle { display: inline-flex; }
   body.homepage-redesign .nav-mobile-cta { display: block; padding-top: 0.5rem; border-top: 1px solid var(--border); }
   body.homepage-redesign .header-logo {
-    width: 540px;
-    max-width: 540px;
-    height: 120px;
-    max-height: 120px;
+    width: 200px;
+    max-width: 200px;
+    height: 40px;
+    max-height: 40px;
   }
   body.homepage-redesign .header-logo-img {
-    height: 102px;
-    max-width: 540px;
-    max-height: 120px;
+    height: 32px;
+    max-width: 190px;
+    max-height: 36px;
   }
   body.homepage-redesign .nav-links {
     position: absolute;
@@ -2927,8 +3235,8 @@ body.homepage-redesign .how-card:nth-child(3) { animation: fadeUp 0.5s ease-out 
 
 @media (max-width: 1180px) {
   body.homepage-redesign .home-hero {
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-    gap: 36px;
+    grid-template-columns: minmax(320px, 0.92fr) minmax(560px, 1.18fr);
+    gap: 40px;
   }
 
   body.homepage-redesign .home-hero-report {
@@ -2982,15 +3290,15 @@ body.homepage-redesign .how-card:nth-child(3) { animation: fadeUp 0.5s ease-out 
 
 @media (max-width: 768px) {
   body.homepage-redesign .header-logo {
-    width: 504px;
-    max-width: 504px;
-    height: 96px;
-    max-height: 96px;
+    width: 180px;
+    max-width: 180px;
+    height: 36px;
+    max-height: 36px;
   }
   body.homepage-redesign .header-logo-img {
     width: auto;
-    height: 84px;
-    max-width: 504px;
-    max-height: 84px;
+    height: 28px;
+    max-width: 170px;
+    max-height: 32px;
   }
 }
