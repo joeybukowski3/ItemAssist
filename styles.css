@@ -1985,14 +1985,40 @@ body.homepage-redesign .home-hero-trust {
 
 body.homepage-redesign .home-hero-trust-item {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 230px;
+  line-height: 1.5;
 }
 
 body.homepage-redesign .home-hero-trust-num {
   font-weight: 700;
   color: var(--navy);
-  font-size: 14px;
+  font-size: 16px;
+  display: block;
+}
+
+body.homepage-redesign .home-hero-trust-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+body.homepage-redesign .home-hero-trust-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--accent);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 body.homepage-redesign .home-hero-report {
@@ -2756,6 +2782,15 @@ body.homepage-redesign .form-opt,
 body.homepage-redesign .form-privacy {
   font-weight: 400;
   color: var(--slate-light);
+}
+
+body.homepage-redesign .form-disclaimer {
+  font-size: 11.5px;
+  color: var(--slate-light);
+  line-height: 1.55;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
 }
 
 body.homepage-redesign .file-upload-wrap {
