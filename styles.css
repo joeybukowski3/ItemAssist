@@ -113,19 +113,19 @@ nav {
 .header-logo {
   display: inline-flex;
   align-items: center;
-  width: 220px;
-  max-width: 220px;
-  height: 44px;
-  max-height: 44px;
+  width: 660px;
+  max-width: 660px;
+  height: 132px;
+  max-height: 132px;
   overflow: hidden;
 }
 
 .header-logo-img {
   display: block;
   width: auto;
-  height: 38px;
-  max-width: 220px;
-  max-height: 40px;
+  height: 114px;
+  max-width: 660px;
+  max-height: 120px;
   object-fit: contain;
 }
 
@@ -1452,15 +1452,15 @@ footer {
   .nav-toggle  { display: inline-flex; }
   .nav-mobile-cta { display: block; padding-top: 0.5rem; border-top: 1px solid var(--border); }
   .header-logo {
-    width: 180px;
-    max-width: 180px;
-    height: 40px;
-    max-height: 40px;
+    width: 540px;
+    max-width: 540px;
+    height: 120px;
+    max-height: 120px;
   }
   .header-logo-img {
-    height: 34px;
-    max-width: 180px;
-    max-height: 40px;
+    height: 102px;
+    max-width: 540px;
+    max-height: 120px;
   }
 
   .nav-links {
@@ -1502,16 +1502,16 @@ footer {
 
 @media (max-width: 768px) {
   .header-logo {
-    width: 168px;
-    max-width: 168px;
-    height: 32px;
-    max-height: 32px;
+    width: 504px;
+    max-width: 504px;
+    height: 96px;
+    max-height: 96px;
   }
   .header-logo-img {
     width: auto;
-    height: 28px;
-    max-width: 168px;
-    max-height: 28px;
+    height: 84px;
+    max-width: 504px;
+    max-height: 84px;
   }
 }
 
@@ -1799,19 +1799,19 @@ body.homepage-redesign .nav-inner {
 body.homepage-redesign .logo.header-logo {
   display: inline-flex;
   align-items: center;
-  width: 220px;
-  max-width: 220px;
-  height: 44px;
-  max-height: 44px;
+  width: 660px;
+  max-width: 660px;
+  height: 132px;
+  max-height: 132px;
   overflow: hidden;
 }
 
 body.homepage-redesign .header-logo-img {
   display: block;
   width: auto;
-  height: 38px;
-  max-width: 220px;
-  max-height: 44px;
+  height: 114px;
+  max-width: 660px;
+  max-height: 120px;
   object-fit: contain;
 }
 
@@ -2854,15 +2854,15 @@ body.homepage-redesign .how-card:nth-child(3) { animation: fadeUp 0.5s ease-out 
   body.homepage-redesign .nav-toggle { display: inline-flex; }
   body.homepage-redesign .nav-mobile-cta { display: block; padding-top: 0.5rem; border-top: 1px solid var(--border); }
   body.homepage-redesign .header-logo {
-    width: 180px;
-    max-width: 180px;
-    height: 40px;
-    max-height: 40px;
+    width: 540px;
+    max-width: 540px;
+    height: 120px;
+    max-height: 120px;
   }
   body.homepage-redesign .header-logo-img {
-    height: 34px;
-    max-width: 180px;
-    max-height: 40px;
+    height: 102px;
+    max-width: 540px;
+    max-height: 120px;
   }
   body.homepage-redesign .nav-links {
     position: absolute;
@@ -2947,15 +2947,15 @@ body.homepage-redesign .how-card:nth-child(3) { animation: fadeUp 0.5s ease-out 
 
 @media (max-width: 768px) {
   body.homepage-redesign .header-logo {
-    width: 168px;
-    max-width: 168px;
-    height: 32px;
-    max-height: 32px;
+    width: 504px;
+    max-width: 504px;
+    height: 96px;
+    max-height: 96px;
   }
   body.homepage-redesign .header-logo-img {
     width: auto;
-    height: 28px;
-    max-width: 168px;
-    max-height: 28px;
+    height: 84px;
+    max-width: 504px;
+    max-height: 84px;
   }
 }
