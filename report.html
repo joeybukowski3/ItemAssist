@@ -1,428 +1,375 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="canonical" href="https://itemassist.com/report.html" />
-<link rel="icon" type="image/svg+xml" href="assets/itemassist-logo.svg">
-<meta property="og:url" content="https://itemassist.com/report.html" />
-<title>ItemAssist – Pricing Research Report</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: #eef1f6;
-  display: flex; align-items: center; justify-content: center;
-  padding: 32px 16px; min-height: 100vh;
-}
-
-.window {
-  width: 100%; max-width: 960px;
-  background: #fff; border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
-  overflow: hidden;
-}
-
-/* Title bar */
-.titlebar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 11px 18px; background: #f8f9fb; border-bottom: 1px solid #e8eaed;
-}
-.dots { display: flex; gap: 7px; }
-.dot { width: 12px; height: 12px; border-radius: 50%; }
-.dot-r { background: #ff5f57; }
-.dot-y { background: #febc2e; }
-.dot-g { background: #28c840; }
-.claim-id { font-size: 13px; color: #6b7280; font-weight: 500; }
-
-/* Layout */
-.body { display: flex; min-height: 560px; }
-
-/* Sidebar */
-.sidebar {
-  width: 195px; min-width: 195px;
-  border-right: 1px solid #e8eaed;
-  padding: 22px 0; background: #fcfcfd;
-  display: flex; flex-direction: column;
-}
-.sb-title {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1.1px; color: #9ca3af; padding: 0 18px; margin-bottom: 10px;
-}
-.sb-item {
-  display: flex; align-items: center; gap: 9px;
-  padding: 9px 18px; font-size: 13.5px; color: #4b5563;
-  font-weight: 500; cursor: pointer; transition: background 0.15s;
-}
-.sb-item:hover { background: #f3f4f6; }
-.sb-item.active {
-  background: #eef2ff; color: #1e3a8a;
-  border-left: 3px solid #3b5bdb; padding-left: 15px;
-}
-.sb-item svg {
-  width: 15px; height: 15px; flex-shrink: 0;
-  stroke: currentColor; fill: none;
-  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
-}
-
-.sb-spacer { flex: 1; }
-
-/* Sidebar total cards */
-.sb-total {
-  margin: 0 14px 10px; padding: 14px 14px;
-  border-radius: 10px; color: #fff;
-}
-.sb-total.rcv { background: #1e293b; }
-.sb-total.acv { background: #0f4a3a; }
-.sb-total-label {
-  font-size: 9px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.8px; color: #94a3b8; margin-bottom: 3px;
-}
-.sb-total.acv .sb-total-label { color: #6ee7b7; }
-.sb-total-val {
-  font-size: 22px; font-weight: 700; letter-spacing: -0.4px;
-}
-.sb-total.acv .sb-total-val { color: #34d399; }
-
-/* Main */
-.main { flex: 1; padding: 24px 28px; overflow-x: auto; }
-
-/* Stat cards */
-.stats { display: flex; gap: 14px; margin-bottom: 22px; }
-.stat {
-  flex: 1; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 16px;
-}
-.stat-label {
-  font-size: 11.5px; color: #9ca3af; font-weight: 500; margin-bottom: 5px;
-}
-.stat-val { font-size: 26px; font-weight: 700; color: #111827; }
-.stat-val small { font-size: 13px; color: #6b7280; font-weight: 500; }
-.stat-break { margin-top: 5px; font-size: 11.5px; line-height: 1.5; }
-.stat-break .v { color: #059669; font-weight: 600; }
-.stat-break .e { color: #d97706; font-weight: 600; }
-
-/* Section header */
-.section-hdr {
-  margin-bottom: 18px; padding-bottom: 0;
-}
-.section-hdr h3 {
-  font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 3px;
-}
-.section-hdr p {
-  font-size: 13px; color: #9ca3af; font-weight: 400;
-}
-
-/* Table */
-.tbl { width: 100%; border-collapse: collapse; }
-.tbl thead th {
-  text-align: left; font-size: 10.5px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af;
-  padding: 9px 10px; border-bottom: 1.5px solid #e5e7eb;
-}
-.tbl tbody td {
-  padding: 14px 10px; border-bottom: 1px solid #f3f4f6;
-  vertical-align: top; font-size: 13.5px;
-}
-.item-name { font-weight: 600; color: #111827; }
-.item-sub {
-  font-size: 11.5px; color: #9ca3af; margin-top: 2px; line-height: 1.4;
-}
-.item-link {
-  font-size: 11.5px; color: #3b5bdb; text-decoration: none;
-  cursor: pointer; display: inline-flex; align-items: center; gap: 3px;
-  margin-top: 3px; font-weight: 500;
-}
-.item-link:hover { text-decoration: underline; }
-.item-link svg {
-  width: 10px; height: 10px; stroke: currentColor; fill: none;
-  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-  transition: transform 0.2s;
-}
-.item-link.open svg { transform: rotate(180deg); }
-.rcv-val { font-weight: 600; color: #111827; }
-.badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 4px 10px; border-radius: 20px;
-  font-size: 11.5px; font-weight: 600; white-space: nowrap;
-}
-.badge.verified { background: #ecfdf5; color: #059669; }
-.badge.estimated { background: #fef3c7; color: #d97706; }
-.badge-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: currentColor; display: inline-block;
-}
-
-/* Expandable specs */
-.detail-row { display: none; }
-.detail-row.open { display: table-row; }
-.detail-cell { padding: 0 10px 14px; background: #f8fafc; }
-.match-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 14px; margin-top: 8px;
-}
-.match-panel {
-  border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;
-}
-.match-panel-hdr {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; padding: 9px 12px;
-  background: #f1f5f9; border-bottom: 1px solid #e5e7eb; color: #475569;
-}
-.match-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 6px 12px; font-size: 12.5px; border-bottom: 1px solid #f3f4f6;
-}
-.match-row:last-child { border-bottom: none; }
-.ml { color: #6b7280; }
-.mv { color: #111827; font-weight: 500; }
-.mv.hi { background: #d1fae5; padding: 1px 6px; border-radius: 4px; color: #065f46; }
-.mv.up { background: #fef9c3; padding: 1px 6px; border-radius: 4px; color: #854d0e; }
-.chk { color: #059669; font-weight: 700; margin-left: 5px; font-size: 13px; }
-.star { color: #d97706; margin-left: 5px; font-size: 13px; }
-.ret-link { color: #3b5bdb; text-decoration: none; font-weight: 500; }
-.ret-link:hover { text-decoration: underline; }
-
-@media (max-width: 700px) {
-  .body { flex-direction: column; }
-  .sidebar {
-    width: 100%; min-width: 100%; border-right: none;
-    border-bottom: 1px solid #e8eaed; padding: 14px 0;
-    flex-direction: row; flex-wrap: wrap; align-items: center;
-  }
-  .sb-title { width: 100%; }
-  .sb-spacer { display: none; }
-  .sb-total { margin: 8px 10px 0; }
-  .match-grid { grid-template-columns: 1fr; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample Pricing Report — LKQ Research &amp; RCV/ACV Documentation | Item Assist</title>
+  <meta name="description" content="See a sample Item Assist pricing report. Each report includes itemized LKQ replacements, specification comparisons, RCV/ACV values, and claim-ready documentation.">
+  <link rel="canonical" href="https://itemassist.com/report.html" />
+  <link rel="icon" type="image/svg+xml" href="assets/itemassist-logo.svg">
+  <meta property="og:title" content="Sample Pricing Report — LKQ Research &amp; RCV/ACV Documentation | Item Assist" />
+  <meta property="og:description" content="See a sample Item Assist pricing report. Each report includes itemized LKQ replacements, specification comparisons, RCV/ACV values, and claim-ready documentation." />
+  <meta property="og:url" content="https://itemassist.com/report.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://itemassist.com/assets/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Sample Pricing Report — LKQ Research &amp; RCV/ACV Documentation | Item Assist" />
+  <meta name="twitter:description" content="See a sample Item Assist pricing report. Each report includes itemized LKQ replacements, specification comparisons, RCV/ACV values, and claim-ready documentation." />
+  <meta name="twitter:image" content="https://itemassist.com/assets/og-image.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "https://itemassist.com/report.html#webpage",
+          "url": "https://itemassist.com/report.html",
+          "name": "Sample Pricing Report — LKQ Research & RCV/ACV Documentation | Item Assist",
+          "description": "Sample Item Assist pricing report with itemized LKQ replacements, specification comparisons, RCV values, and ACV-ready documentation.",
+          "isPartOf": {
+            "@type": "WebSite",
+            "url": "https://itemassist.com/",
+            "name": "Item Assist"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://itemassist.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Sample Report",
+              "item": "https://itemassist.com/report.html"
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </head>
-<body>
+<body class="report-page">
+  <a class="skip-link" href="#main">Skip to content</a>
 
-<div class="window">
-  <div class="titlebar">
-    <div class="dots">
-      <div class="dot dot-r"></div>
-      <div class="dot dot-y"></div>
-      <div class="dot dot-g"></div>
+  <nav>
+    <div class="nav-inner">
+      <a href="https://itemassist.com/" class="logo header-logo" aria-label="Item Assist home">
+        <img src="assets/itemassist-logo-header.svg" alt="Item Assist logo" class="site-logo-img header-logo-img" width="190" height="44">
+      </a>
+
+      <ul class="nav-links" id="site-nav">
+        <li><a href="https://itemassist.com/services.html">Services</a></li>
+        <li><a href="https://itemassist.com/report.html" class="nav-link--active" aria-current="page">Report</a></li>
+        <li><a href="https://itemassist.com/#how">How It Works</a></li>
+        <li><a href="https://itemassist.com/#pricing">Pricing</a></li>
+        <li><a href="https://itemassist.com/about.html">About</a></li>
+        <li><a href="https://itemassist.com/#contact">Contact</a></li>
+        <li class="nav-mobile-cta"><a href="https://itemassist.com/#contact" class="nav-cta">Submit a Contents List</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="https://itemassist.com/#contact" class="nav-login">Submit a Contents List</a>
+        <a href="https://itemassist.com/#contact" class="nav-cta">Submit a Contents List</a>
+      </div>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-    <div class="claim-id">Claim #9482-A • Smith Residence</div>
-  </div>
+  </nav>
 
-  <div class="body">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <div class="sb-title">Report Overview</div>
-      <div class="sb-item active">
-        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-        Summary Findings
+  <main id="main">
+    <section class="hero report-page-hero">
+      <div class="hero-content">
+        <h1>Sample Pricing Report</h1>
+        <p class="hero-sub">This is a representative sample of an Item Assist pricing report. Actual reports may vary based on item type, available documentation, model/serial visibility, and claim-specific research needs.</p>
       </div>
-      <div class="sb-item">
-        <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-        Itemized LKQ
-      </div>
-      <div class="sb-item">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Supporting Evidence
-      </div>
+    </section>
 
-      <div class="sb-spacer"></div>
+    <section class="report-shell-section">
+      <div class="report-shell-wrap">
+        <div class="window report-demo-window">
+          <div class="titlebar">
+            <div class="dots">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+            </div>
+            <div class="claim-id">Claim #9482-A &bull; Smith Residence</div>
+          </div>
 
-      <div class="sb-total rcv">
-        <div class="sb-total-label">Total RCV Determined</div>
-        <div class="sb-total-val">$34,152.00</div>
-      </div>
-      <div class="sb-total acv">
-        <div class="sb-total-label">Total ACV Determined</div>
-        <div class="sb-total-val">$17,022.40</div>
-      </div>
-    </div>
+          <div class="body">
+            <div class="sidebar">
+              <div class="sb-title">Report Overview</div>
+              <div class="sb-item active">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"></path><rect x="9" y="3" width="6" height="4" rx="1"></rect></svg>
+                Summary Findings
+              </div>
+              <div class="sb-item">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>
+                Itemized LKQ
+              </div>
+              <div class="sb-item">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                Supporting Evidence
+              </div>
 
-    <!-- Main -->
-    <div class="main">
-      <!-- Stats -->
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-label">Items Researched</div>
-          <div class="stat-val">22</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">LKQ Matches Found</div>
-          <div class="stat-val">21 <small>(95%)</small></div>
-          <div class="stat-break">
-            <span class="v">21 Verified LKQ Matches</span><br>
-            <span class="e">1 Estimated LKQ Match</span>
+              <div class="sb-spacer"></div>
+
+              <div class="sb-total rcv">
+                <div class="sb-total-label">Total RCV Determined</div>
+                <div class="sb-total-val">$34,152.00</div>
+              </div>
+              <div class="sb-total acv">
+                <div class="sb-total-label">Total ACV Determined</div>
+                <div class="sb-total-val">$17,022.40</div>
+              </div>
+            </div>
+
+            <div class="main">
+              <div class="stats">
+                <div class="stat">
+                  <div class="stat-label">Items Researched</div>
+                  <div class="stat-val">22</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">LKQ Matches Found</div>
+                  <div class="stat-val">21 <small>(95%)</small></div>
+                  <div class="stat-break">
+                    <span class="v">21 Verified LKQ Matches</span><br>
+                    <span class="e">1 Estimated LKQ Match</span>
+                  </div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">Avg. Age Verified</div>
+                  <div class="stat-val">4.3 <small>Years</small></div>
+                </div>
+              </div>
+
+              <div class="section-hdr">
+                <h3>Itemized LKQ</h3>
+                <p>Representative replacements pulled from the underlying spreadsheet analysis.</p>
+              </div>
+
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Claimed Item</th>
+                    <th>LKQ Replacement</th>
+                    <th>RCV</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="item-name">LG 65&quot; OLED TV</div>
+                      <div class="item-sub">Model: OLED65C3PUA</div>
+                      <div class="item-sub">Orig. MSRP: $2,299.99 &bull; Mfr: 2023</div>
+                      <button type="button" class="item-link item-link-btn" onclick="toggleReportDetail('sample-report-lg', this)">View Specs <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+                    </td>
+                    <td>
+                      <div class="item-name">LG 65&quot; OLED TV</div>
+                      <div class="item-sub">Model: OLED65C6PUA</div>
+                      <div class="item-sub">Retail Cost: $2,699.99</div>
+                      <span class="item-link item-link-static">Retailers: Best Buy, Target, LG</span>
+                    </td>
+                    <td class="rcv-val">$2,699.99</td>
+                    <td><span class="badge verified"><span class="badge-dot"></span> Verified LKQ</span></td>
+                  </tr>
+                  <tr class="detail-row" id="sample-report-lg">
+                    <td colspan="4" class="detail-cell">
+                      <div class="match-grid">
+                        <div class="match-panel">
+                          <div class="match-panel-hdr">Claimed Item</div>
+                          <div class="match-row"><span class="ml">Description</span><span class="mv">LG 65&quot; OLED TV</span></div>
+                          <div class="match-row"><span class="ml">Model</span><span class="mv">OLED65C3PUA</span></div>
+                          <div class="match-row"><span class="ml">Original MSRP</span><span class="mv">$2,299.99</span></div>
+                          <div class="match-row"><span class="ml">Manufacturer Date</span><span class="mv">2023</span></div>
+                          <div class="match-row"><span class="ml">Discontinue Date</span><span class="mv">2024</span></div>
+                          <div class="match-row"><span class="ml">Key Specs</span></div>
+                          <div class="match-row"><span class="ml match-indent">Display</span><span class="mv">OLED Display</span></div>
+                          <div class="match-row"><span class="ml match-indent">Resolution</span><span class="mv">4K Resolution</span></div>
+                          <div class="match-row"><span class="ml match-indent">Series</span><span class="mv">C Series Technology</span></div>
+                          <div class="match-row"><span class="ml match-indent">Smart Features</span><span class="mv">Smart Functionality</span></div>
+                        </div>
+                        <div class="match-panel">
+                          <div class="match-panel-hdr">LKQ Replacement</div>
+                          <div class="match-row"><span class="ml">Description</span><span class="mv">LG 65&quot; OLED TV</span></div>
+                          <div class="match-row"><span class="ml">Model</span><span class="mv">OLED65C6PUA</span></div>
+                          <div class="match-row"><span class="ml">Retail Cost</span><span class="mv">$2,699.99</span></div>
+                          <div class="match-row"><span class="ml">Retailers</span><span class="mv">Best Buy, Target, LG</span></div>
+                          <div class="match-row"><span class="ml">LKQ Grade</span><span class="badge verified badge-inline"><span class="badge-dot"></span> Verified LKQ</span></div>
+                          <div class="match-row"><span class="ml">Key Specs Comparison</span></div>
+                          <div class="match-row"><span class="ml match-indent">Display</span><span class="mv hi">OLED Display <span class="chk">✓</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Resolution</span><span class="mv hi">4K Resolution <span class="chk">✓</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Series</span><span class="mv hi">C Series Technology <span class="chk">✓</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Smart Features</span><span class="mv up">Smart/AI Functionality <span class="star">★</span></span></div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="item-name">GE Stackable Dryer</div>
+                      <div class="item-sub">Model: GFD65ESSNWW</div>
+                      <div class="item-sub">Orig. MSRP: $749.99 &bull; Mfr: 2021</div>
+                      <button type="button" class="item-link item-link-btn" onclick="toggleReportDetail('sample-report-ge', this)">View Specs <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+                    </td>
+                    <td>
+                      <div class="item-name">GE Stackable Dryer</div>
+                      <div class="item-sub">Model: GFD55ESSNWW</div>
+                      <div class="item-sub">Retail Cost: $798.00</div>
+                      <span class="item-link item-link-static">Retailers: Home Depot, Lowes</span>
+                    </td>
+                    <td class="rcv-val">$798.00</td>
+                    <td><span class="badge verified"><span class="badge-dot"></span> Verified LKQ</span></td>
+                  </tr>
+                  <tr class="detail-row" id="sample-report-ge">
+                    <td colspan="4" class="detail-cell">
+                      <div class="match-grid">
+                        <div class="match-panel">
+                          <div class="match-panel-hdr">Claimed Item</div>
+                          <div class="match-row"><span class="ml">Description</span><span class="mv">GE Stackable Dryer</span></div>
+                          <div class="match-row"><span class="ml">Model</span><span class="mv">GFD65ESSNWW</span></div>
+                          <div class="match-row"><span class="ml">Original MSRP</span><span class="mv">$749.99</span></div>
+                          <div class="match-row"><span class="ml">Manufacturer Date</span><span class="mv">2021</span></div>
+                          <div class="match-row"><span class="ml">Discontinue Date</span><span class="mv">2022</span></div>
+                          <div class="match-row"><span class="ml">Key Specs</span></div>
+                          <div class="match-row"><span class="ml match-indent">Type</span><span class="mv">Stackable</span></div>
+                          <div class="match-row"><span class="ml match-indent">Power</span><span class="mv">Electric</span></div>
+                          <div class="match-row"><span class="ml match-indent">Capacity</span><span class="mv">7.8 cu. ft.</span></div>
+                          <div class="match-row"><span class="ml match-indent">Feature</span><span class="mv">Steam</span></div>
+                          <div class="match-row"><span class="ml match-indent">Smart Features</span><span class="mv">Smart Functionality</span></div>
+                        </div>
+                        <div class="match-panel">
+                          <div class="match-panel-hdr">LKQ Replacement</div>
+                          <div class="match-row"><span class="ml">Description</span><span class="mv">GE Stackable Dryer</span></div>
+                          <div class="match-row"><span class="ml">Model</span><span class="mv">GFD55ESSNWW</span></div>
+                          <div class="match-row"><span class="ml">Retail Cost</span><span class="mv">$798.00</span></div>
+                          <div class="match-row"><span class="ml">Retailers</span><span class="mv">Home Depot, Lowes</span></div>
+                          <div class="match-row"><span class="ml">LKQ Grade</span><span class="badge verified badge-inline"><span class="badge-dot"></span> Verified LKQ</span></div>
+                          <div class="match-row"><span class="ml">Key Specs Comparison</span></div>
+                          <div class="match-row"><span class="ml match-indent">Type</span><span class="mv hi">Stackable <span class="chk">✓</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Power</span><span class="mv hi">Electric <span class="chk">✓</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Capacity</span><span class="mv hi">7.8 cu. ft. <span class="chk">✓</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Feature</span><span class="mv hi">Steam <span class="chk">✓</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Smart Features</span><span class="mv hi">Smart Functionality <span class="chk">✓</span></span></div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="item-name">KitchenAid Refrigerator</div>
+                      <div class="item-sub">Model: KBRS22KWWH</div>
+                      <div class="item-sub">Orig. MSRP: $1,498.00 &bull; Mfr: 1997</div>
+                      <button type="button" class="item-link item-link-btn" onclick="toggleReportDetail('sample-report-kitchenaid', this)">View Specs <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+                    </td>
+                    <td>
+                      <div class="item-name">KitchenAid Refrigerator</div>
+                      <div class="item-sub">Model: KRBL102ESS</div>
+                      <div class="item-sub">Retail Cost: $1,899.99</div>
+                      <span class="item-link item-link-static">Retailers: Home Depot, Lowes</span>
+                    </td>
+                    <td class="rcv-val">$1,899.99</td>
+                    <td><span class="badge verified"><span class="badge-dot"></span> Verified LKQ</span></td>
+                  </tr>
+                  <tr class="detail-row" id="sample-report-kitchenaid">
+                    <td colspan="4" class="detail-cell">
+                      <div class="match-grid">
+                        <div class="match-panel">
+                          <div class="match-panel-hdr">Claimed Item</div>
+                          <div class="match-row"><span class="ml">Description</span><span class="mv">KitchenAid Refrigerator</span></div>
+                          <div class="match-row"><span class="ml">Model</span><span class="mv">KBRS22KWWH</span></div>
+                          <div class="match-row"><span class="ml">Original MSRP</span><span class="mv">$1,498.00</span></div>
+                          <div class="match-row"><span class="ml">Manufacturer Date</span><span class="mv">1997</span></div>
+                          <div class="match-row"><span class="ml">Discontinue Date</span><span class="mv">1999</span></div>
+                          <div class="match-row"><span class="ml">Key Specs</span></div>
+                          <div class="match-row"><span class="ml match-indent">Freezer</span><span class="mv">Bottom Mount Freezer</span></div>
+                          <div class="match-row"><span class="ml match-indent">Controls</span><span class="mv">Digital Controls</span></div>
+                          <div class="match-row"><span class="ml match-indent">Capacity</span><span class="mv">21.9 cu. ft.</span></div>
+                          <div class="match-row"><span class="ml match-indent">Finish</span><span class="mv">White Finish</span></div>
+                        </div>
+                        <div class="match-panel">
+                          <div class="match-panel-hdr">LKQ Replacement</div>
+                          <div class="match-row"><span class="ml">Description</span><span class="mv">KitchenAid Refrigerator</span></div>
+                          <div class="match-row"><span class="ml">Model</span><span class="mv">KRBL102ESS</span></div>
+                          <div class="match-row"><span class="ml">Retail Cost</span><span class="mv">$1,899.99</span></div>
+                          <div class="match-row"><span class="ml">Retailers</span><span class="mv">Home Depot, Lowes</span></div>
+                          <div class="match-row"><span class="ml">LKQ Grade</span><span class="badge verified badge-inline"><span class="badge-dot"></span> Verified LKQ</span></div>
+                          <div class="match-row"><span class="ml">Key Specs Comparison</span></div>
+                          <div class="match-row"><span class="ml match-indent">Freezer</span><span class="mv hi">Bottom Mount Freezer <span class="chk">✓</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Controls</span><span class="mv hi">Digital Controls <span class="chk">✓</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Capacity</span><span class="mv hi">22.1 cu. ft. <span class="chk">✓</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Finish</span><span class="mv up">Stainless Steel Finish <span class="star">★</span></span></div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-        <div class="stat">
-          <div class="stat-label">Avg. Age Verified</div>
-          <div class="stat-val">4.3 <small>Years</small></div>
+      </div>
+    </section>
+
+    <section class="report-page-cta-section">
+      <div class="report-page-cta-inner">
+        <h2>Need a report like this for a claim?</h2>
+        <p>Submit a contents list and we&rsquo;ll review the assignment scope, research the items, and return claim-ready pricing support.</p>
+        <a href="https://itemassist.com/#contact" class="btn-primary">Submit a Contents List</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="https://itemassist.com/" class="logo logo--light footer-logo" aria-label="Item Assist home">
+          <img src="assets/itemassist-logo.svg" alt="Item Assist logo" class="site-logo-img footer-logo-img" loading="lazy">
+        </a>
+        <p class="footer-tagline">Professional contents pricing research for property damage claims. Defensible data, delivered fast.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4 class="footer-col-heading">Services</h4>
+          <ul class="footer-col-links">
+            <li><a href="https://itemassist.com/services.html">Contents Pricing Services</a></li>
+            <li><a href="https://itemassist.com/report.html">Sample Report</a></li>
+            <li><a href="https://itemassist.com/#pricing">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-col-heading">Company</h4>
+          <ul class="footer-col-links">
+            <li><a href="https://itemassist.com/about.html">About Us</a></li>
+            <li><a href="https://itemassist.com/privacy.html">Privacy Policy</a></li>
+            <li><a href="https://itemassist.com/#contact">Contact</a></li>
+          </ul>
         </div>
       </div>
-
-      <!-- Section header -->
-      <div class="section-hdr">
-        <h3>Itemized LKQ</h3>
-        <p>Representative replacements pulled from the underlying spreadsheet analysis.</p>
-      </div>
-
-      <!-- Table -->
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>Claimed Item</th>
-            <th>LKQ Replacement</th>
-            <th>RCV</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- LG TV -->
-          <tr>
-            <td>
-              <div class="item-name">LG 65" OLED TV</div>
-              <div class="item-sub">Model: OLED65C3PUA</div>
-              <div class="item-sub">Orig. MSRP: $2,299.99 • Mfr: 2023</div>
-              <a class="item-link" onclick="toggle('d1',this)">View Specs <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></a>
-            </td>
-            <td>
-              <div class="item-name">LG 65" OLED TV</div>
-              <div class="item-sub">Model: OLED65C6PUA</div>
-              <div class="item-sub">Retail Cost: $2,699.99</div>
-              <a class="item-link" href="#">View Retailer Links</a>
-            </td>
-            <td class="rcv-val">$2,699.99</td>
-            <td><span class="badge verified"><span class="badge-dot"></span> Verified LKQ</span></td>
-          </tr>
-          <tr class="detail-row" id="d1"><td colspan="4" class="detail-cell"><div class="match-grid">
-            <div class="match-panel"><div class="match-panel-hdr">Claimed Item</div>
-              <div class="match-row"><span class="ml">Description</span><span class="mv">LG 65" OLED TV</span></div>
-              <div class="match-row"><span class="ml">Model</span><span class="mv">OLED65C3PUA</span></div>
-              <div class="match-row"><span class="ml">Original MSRP</span><span class="mv">$2,299.99</span></div>
-              <div class="match-row"><span class="ml">Manufacturer Date</span><span class="mv">2023</span></div>
-              <div class="match-row"><span class="ml">Discontinue Date</span><span class="mv">2024</span></div>
-              <div class="match-row"><span class="ml">Key Specs</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Display</span><span class="mv">OLED Display</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Resolution</span><span class="mv">4K Resolution</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Series</span><span class="mv">C Series Technology</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Smart Features</span><span class="mv">Smart Functionality</span></div>
-            </div>
-            <div class="match-panel"><div class="match-panel-hdr">LKQ Replacement</div>
-              <div class="match-row"><span class="ml">Description</span><span class="mv">LG 65" OLED TV</span></div>
-              <div class="match-row"><span class="ml">Model</span><span class="mv">OLED65C6PUA</span></div>
-              <div class="match-row"><span class="ml">Retail Cost</span><span class="mv">$2,699.99</span></div>
-              <div class="match-row"><span class="ml">Retailers</span><span class="mv"><a class="ret-link" href="#">Bestbuy</a>, <a class="ret-link" href="#">Target</a>, <a class="ret-link" href="#">LG</a></span></div>
-              <div class="match-row"><span class="ml">LKQ Grade</span><span class="badge verified" style="padding:2px 8px;font-size:10.5px"><span class="badge-dot"></span> Verified LKQ</span></div>
-              <div class="match-row"><span class="ml">Key Specs Comparison</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Display</span><span class="mv hi">OLED Display <span class="chk">✓</span></span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Resolution</span><span class="mv hi">4K Resolution <span class="chk">✓</span></span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Series</span><span class="mv hi">C Series Technology <span class="chk">✓</span></span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Smart Features</span><span class="mv up">Smart/AI Functionality <span class="star">★</span></span></div>
-            </div>
-          </div></td></tr>
-
-          <!-- GE Dryer -->
-          <tr>
-            <td>
-              <div class="item-name">GE Stackable Dryer</div>
-              <div class="item-sub">Model: GFD65ESSNWW</div>
-              <div class="item-sub">Orig. MSRP: $749.99 • Mfr: 2021</div>
-              <a class="item-link" onclick="toggle('d2',this)">View Specs <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></a>
-            </td>
-            <td>
-              <div class="item-name">GE Stackable Dryer</div>
-              <div class="item-sub">Model: GFD55ESSNWW</div>
-              <div class="item-sub">Retail Cost: $798.00</div>
-              <a class="item-link" href="#">View Retailer Links</a>
-            </td>
-            <td class="rcv-val">$798.00</td>
-            <td><span class="badge verified"><span class="badge-dot"></span> Verified LKQ</span></td>
-          </tr>
-          <tr class="detail-row" id="d2"><td colspan="4" class="detail-cell"><div class="match-grid">
-            <div class="match-panel"><div class="match-panel-hdr">Claimed Item</div>
-              <div class="match-row"><span class="ml">Description</span><span class="mv">GE Stackable Dryer</span></div>
-              <div class="match-row"><span class="ml">Model</span><span class="mv">GFD65ESSNWW</span></div>
-              <div class="match-row"><span class="ml">Original MSRP</span><span class="mv">$749.99</span></div>
-              <div class="match-row"><span class="ml">Manufacturer Date</span><span class="mv">2021</span></div>
-              <div class="match-row"><span class="ml">Discontinue Date</span><span class="mv">2022</span></div>
-              <div class="match-row"><span class="ml">Key Specs</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Type</span><span class="mv">Stackable</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Power</span><span class="mv">Electric</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Capacity</span><span class="mv">7.8 cu. ft.</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Feature</span><span class="mv">Steam</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Smart Features</span><span class="mv">Smart Functionality</span></div>
-            </div>
-            <div class="match-panel"><div class="match-panel-hdr">LKQ Replacement</div>
-              <div class="match-row"><span class="ml">Description</span><span class="mv">GE Stackable Dryer</span></div>
-              <div class="match-row"><span class="ml">Model</span><span class="mv">GFD55ESSNWW</span></div>
-              <div class="match-row"><span class="ml">Retail Cost</span><span class="mv">$798.00</span></div>
-              <div class="match-row"><span class="ml">Retailers</span><span class="mv"><a class="ret-link" href="#">Home Depot</a>, <a class="ret-link" href="#">Lowes</a></span></div>
-              <div class="match-row"><span class="ml">LKQ Grade</span><span class="badge verified" style="padding:2px 8px;font-size:10.5px"><span class="badge-dot"></span> Verified LKQ</span></div>
-              <div class="match-row"><span class="ml">Key Specs Comparison</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Type</span><span class="mv hi">Stackable <span class="chk">✓</span></span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Power</span><span class="mv hi">Electric <span class="chk">✓</span></span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Capacity</span><span class="mv hi">7.8 cu. ft. <span class="chk">✓</span></span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Feature</span><span class="mv hi">Steam <span class="chk">✓</span></span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Smart Features</span><span class="mv hi">Smart Functionality <span class="chk">✓</span></span></div>
-            </div>
-          </div></td></tr>
-
-          <!-- KitchenAid Fridge -->
-          <tr>
-            <td>
-              <div class="item-name">KitchenAid Refrigerator</div>
-              <div class="item-sub">Model: KBRS22KWWH</div>
-              <div class="item-sub">Orig. MSRP: $1,498.00 • Mfr: 1997</div>
-              <a class="item-link" onclick="toggle('d3',this)">View Specs <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></a>
-            </td>
-            <td>
-              <div class="item-name">KitchenAid Refrigerator</div>
-              <div class="item-sub">Model: KRBL102ESS</div>
-              <div class="item-sub">Retail Cost: $1,899.99</div>
-              <a class="item-link" href="#">View Retailer Links</a>
-            </td>
-            <td class="rcv-val">$1,899.99</td>
-            <td><span class="badge verified"><span class="badge-dot"></span> Verified LKQ</span></td>
-          </tr>
-          <tr class="detail-row" id="d3"><td colspan="4" class="detail-cell"><div class="match-grid">
-            <div class="match-panel"><div class="match-panel-hdr">Claimed Item</div>
-              <div class="match-row"><span class="ml">Description</span><span class="mv">KitchenAid Refrigerator</span></div>
-              <div class="match-row"><span class="ml">Model</span><span class="mv">KBRS22KWWH</span></div>
-              <div class="match-row"><span class="ml">Original MSRP</span><span class="mv">$1,498.00</span></div>
-              <div class="match-row"><span class="ml">Manufacturer Date</span><span class="mv">1997</span></div>
-              <div class="match-row"><span class="ml">Discontinue Date</span><span class="mv">1999</span></div>
-              <div class="match-row"><span class="ml">Key Specs</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Freezer</span><span class="mv">Bottom Mount Freezer</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Controls</span><span class="mv">Digital Controls</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Capacity</span><span class="mv">21.9 cu. ft.</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Finish</span><span class="mv">White Finish</span></div>
-            </div>
-            <div class="match-panel"><div class="match-panel-hdr">LKQ Replacement</div>
-              <div class="match-row"><span class="ml">Description</span><span class="mv">KitchenAid Refrigerator</span></div>
-              <div class="match-row"><span class="ml">Model</span><span class="mv">KRBL102ESS</span></div>
-              <div class="match-row"><span class="ml">Retail Cost</span><span class="mv">$1,899.99</span></div>
-              <div class="match-row"><span class="ml">Retailers</span><span class="mv"><a class="ret-link" href="#">Home Depot</a>, <a class="ret-link" href="#">Lowes</a></span></div>
-              <div class="match-row"><span class="ml">LKQ Grade</span><span class="badge verified" style="padding:2px 8px;font-size:10.5px"><span class="badge-dot"></span> Verified LKQ</span></div>
-              <div class="match-row"><span class="ml">Key Specs Comparison</span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Freezer</span><span class="mv hi">Bottom Mount Freezer <span class="chk">✓</span></span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Controls</span><span class="mv hi">Digital Controls <span class="chk">✓</span></span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Capacity</span><span class="mv hi">22.1 cu. ft. <span class="chk">✓</span></span></div>
-              <div class="match-row"><span class="ml" style="padding-left:6px">Finish</span><span class="mv up">Stainless Steel Finish <span class="star">★</span></span></div>
-            </div>
-          </div></td></tr>
-        </tbody>
-      </table>
     </div>
-  </div>
-</div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <span>&copy; 2025 ItemAssist. All rights reserved.</span>
+        <a href="https://itemassist.com/services.html" class="footer-social footer-social-link">Services</a>
+      </div>
+    </div>
+  </footer>
 
-<script>
-function toggle(id, el) {
-  const row = document.getElementById(id);
-  row.classList.toggle('open');
-  el.classList.toggle('open');
-  el.childNodes[0].textContent = row.classList.contains('open') ? 'Hide Specs ' : 'View Specs ';
-}
-</script>
+  <script src="script.js"></script>
 </body>
 </html>

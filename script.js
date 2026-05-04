@@ -22,15 +22,22 @@ if (navToggle && siteNav) {
 
 /* ── Active nav link on scroll ── */
 const sections = document.querySelectorAll("section[id], div[id]");
-const navLinks  = document.querySelectorAll(".nav-links a[href^='#']");
+const navLinks  = Array.from(document.querySelectorAll(".nav-links a")).filter((link) => {
+  try {
+    const url = new URL(link.href, window.location.href);
+    return url.pathname === window.location.pathname && url.hash;
+  } catch {
+    return false;
+  }
+});
 
 if (sections.length && navLinks.length) {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         navLinks.forEach((link) => {
-          link.style.color =
-            link.getAttribute("href") === `#${entry.target.id}` ? "#1e3a5f" : "";
+          const url = new URL(link.href, window.location.href);
+          link.style.color = url.hash === `#${entry.target.id}` ? "#1e3a5f" : "";
         });
       }
     });

@@ -2,14 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://itemassist.com/</loc>
+    <lastmod>2026-05-04</lastmod>
   </url>
   <url>
     <loc>https://itemassist.com/services.html</loc>
+    <lastmod>2026-05-04</lastmod>
   </url>
   <url>
     <loc>https://itemassist.com/about.html</loc>
+    <lastmod>2026-05-04</lastmod>
   </url>
   <url>
     <loc>https://itemassist.com/report.html</loc>
+    <lastmod>2026-05-04</lastmod>
+  </url>
+  <url>
+    <loc>https://itemassist.com/privacy.html</loc>
+    <lastmod>2026-05-04</lastmod>
   </url>
 </urlset>
