@@ -1723,6 +1723,67 @@ footer {
   line-height: 1.75;
 }
 
+.submission-help-card {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--r-lg);
+  padding: 1rem 1rem 1.05rem;
+  margin-bottom: 1rem;
+}
+
+.submission-help-card h3 {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+
+.submission-help-card p {
+  margin-bottom: 0.7rem;
+}
+
+.submission-help-list,
+.after-submit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding-left: 1.05rem;
+}
+
+.submission-help-list li,
+.after-submit-list li {
+  color: rgba(255,255,255,0.82);
+  line-height: 1.65;
+}
+
+.trust-signal-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.trust-signal {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  color: var(--navy);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.form-upload-note {
+  margin-top: 0.55rem;
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: var(--slate-mid);
+}
+
 .trust-note {
   margin-top: 1.5rem;
   color: var(--slate);
@@ -2102,6 +2163,20 @@ footer {
 .about-page .form-security-note {
   margin-top: 0.75rem;
   color: var(--slate);
+}
+
+.about-page .submission-help-card {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.12);
+}
+
+.about-page .submission-help-card h3 {
+  color: var(--white);
+}
+
+.about-page .submission-help-list li,
+.about-page .after-submit-list li {
+  color: rgba(255,255,255,0.82);
 }
 
 .about-page .form-disclaimer {
@@ -3654,6 +3729,24 @@ body.homepage-redesign .form-process-note {
 body.homepage-redesign .form-security-note {
   margin-top: 0.8rem;
   color: rgba(15, 29, 47, 0.64);
+}
+
+body.homepage-redesign .submission-help-card {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.12);
+}
+
+body.homepage-redesign .submission-help-card h3 {
+  color: var(--white);
+}
+
+body.homepage-redesign .submission-help-list li,
+body.homepage-redesign .after-submit-list li {
+  color: rgba(255,255,255,0.82);
+}
+
+body.homepage-redesign .form-upload-note {
+  font-size: 11.5px;
 }
 
 body.homepage-redesign .how-section,

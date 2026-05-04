@@ -93,7 +93,7 @@
         <h1 class="home-hero-title">We price your contents list. <em>You close the claim.</em></h1>
         <p class="home-hero-sub">Send us the insured's list and get back a defensible, sourced pricing report with LKQ matches, verified ages, and RCV/ACV values ready for the file.</p>
         <div class="home-hero-ctas">
-          <a href="https://itemassist.com/#contact" class="btn-primary">Submit a List for Pricing &rarr;</a>
+          <a href="https://itemassist.com/#contact" class="btn-primary">Submit a Contents List &rarr;</a>
           <a href="https://itemassist.com/#how" class="btn-secondary">How It Works</a>
         </div>
         <div class="home-hero-trust" role="list">
@@ -468,7 +468,7 @@
             <li>RCV/ACV-ready findings</li>
             <li>PDF report delivery</li>
           </ul>
-          <a href="https://itemassist.com/#contact" class="btn-tier btn-tier-outline">Get Started</a>
+          <a href="https://itemassist.com/#contact" class="btn-tier btn-tier-outline">Submit a Contents List</a>
         </div>
         <div class="pricing-card featured">
           <div class="featured-badge">Core Offer</div>
@@ -485,7 +485,7 @@
             <li>LKQ replacement recommendation</li>
             <li>Pricing rationale and confidence notes</li>
           </ul>
-          <a href="https://itemassist.com/#contact" class="btn-tier btn-tier-primary">Get Started</a>
+          <a href="https://itemassist.com/#contact" class="btn-tier btn-tier-primary">Request Pricing Research</a>
         </div>
         <div class="pricing-card">
           <div class="pc-tier">Tier 3</div>
@@ -501,7 +501,7 @@
             <li>Specialty &amp; complex item review</li>
             <li>Custom report formatting</li>
           </ul>
-          <a href="https://itemassist.com/#contact" class="btn-tier btn-tier-outline">Request Pricing</a>
+          <a href="https://itemassist.com/#contact" class="btn-tier btn-tier-outline">Ask About a Claim Assignment</a>
         </div>
       </div>
     </section>
@@ -511,6 +511,27 @@
         <div class="cta-info">
           <h2>Ready to get started?</h2>
           <p>Send us what you have and we&rsquo;ll organize the details, research the items, and build the assignment around the claim scope.</p>
+          <div class="submission-help-card">
+            <h3>What to send us</h3>
+            <p>Your list does not need to be perfect. Submit what you have and we&rsquo;ll help organize the assignment from there.</p>
+            <ul class="submission-help-list">
+              <li>Contents list or spreadsheet</li>
+              <li>Item descriptions and approximate item count</li>
+              <li>Photos, model numbers, or serial numbers when available</li>
+              <li>Purchase documentation if available</li>
+              <li>Claim deadline, urgency, or review timeline</li>
+              <li>Whether the request is standard pricing, specialty research, or intake organization</li>
+            </ul>
+          </div>
+          <div class="submission-help-card">
+            <h3>After you submit</h3>
+            <ol class="after-submit-list">
+              <li>We review the request.</li>
+              <li>We confirm scope, item count, and timeline.</li>
+              <li>We identify missing model, serial, or photo details if needed.</li>
+              <li>We provide next steps before research begins.</li>
+            </ol>
+          </div>
           <p class="form-process-note">After submission, we review the assignment, identify any missing details, and follow up with next steps, expected turnaround, and whether the scope fits standard, specialty, or custom review.</p>
           <p class="form-security-note">Please limit or redact sensitive personal information where practical before upload. Claim file details are used only for assignment review, pricing research, and related communication.</p>
           <div class="cta-details">
@@ -531,6 +552,12 @@
 
         <div class="cta-form">
           <div class="cta-form-title">Submit a Contents List</div>
+          <div class="trust-signal-row" aria-label="Submission trust signals">
+            <span class="trust-signal">Human-reviewed before delivery</span>
+            <span class="trust-signal">Source-backed documentation</span>
+            <span class="trust-signal">Clear assumptions and confidence notes</span>
+            <span class="trust-signal">No coverage or settlement decisions</span>
+          </div>
           <form id="contact-form" novalidate>
             <input type="hidden" name="_subject" value="New Contents List Submission — ItemAssist">
 
@@ -591,17 +618,18 @@
               <textarea id="scope" name="scope_of_assignment" placeholder="What needs to be researched, clarified, or priced for this claim?" required></textarea>
             </div>
 
-            <div class="form-group">
-              <label for="attachment">Upload files</label>
-              <div class="file-upload-wrap">
+              <div class="form-group">
+                <label for="attachment">Upload files</label>
+                <div class="file-upload-wrap">
                 <input type="file" id="attachment" name="attachment" class="file-upload-input" accept=".pdf,.xlsx,.xls,.csv,.png,.jpg,.jpeg" required>
                 <label for="attachment" class="file-upload-btn">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"></path></svg>
                   Choose file
                 </label>
-                <span class="file-upload-name" id="file-upload-name">PDF, Excel, or Image &middot; Max 25 MB</span>
+                  <span class="file-upload-name" id="file-upload-name">PDF, Excel, or Image &middot; Max 25 MB</span>
+                </div>
+                <p class="form-upload-note">Please limit or redact sensitive claim information where practical. Item-level details, photos, model or serial numbers, and replacement context are usually enough to begin review. If additional attachments are needed, we&rsquo;ll reply with the best way to send them.</p>
               </div>
-            </div>
 
             <div class="form-group">
               <label for="notes">Notes <span class="form-opt">(optional)</span></label>
