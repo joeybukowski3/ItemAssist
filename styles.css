@@ -2106,10 +2106,76 @@ footer {
   border: 1px solid var(--border);
 }
 
-.report-page .titlebar {
+.report-branded-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
+  padding: 20px 28px;
+  border-bottom: 2px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.report-branded-header .rbh-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.report-branded-header .rbh-logo {
+  height: 36px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.report-branded-header .rbh-divider {
+  width: 1px;
+  height: 32px;
+  background: #cbd5e1;
+  flex-shrink: 0;
+}
+
+.report-branded-header .rbh-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: 0.02em;
+}
+
+.report-branded-header .rbh-right {
+  text-align: right;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+.report-branded-header .rbh-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.report-branded-header .rbh-contact,
+.report-branded-header .rbh-contact a {
+  font-size: 12px;
+  color: #64748b;
+  text-decoration: none;
+}
+
+.report-branded-header .rbh-contact a:hover {
+  color: #1e293b;
+  text-decoration: underline;
+}
+
+.report-claim-bar {
+  padding: 10px 28px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e8eaed;
+}
+
+.report-page .titlebar {
+  display: flex;
+  align-items: center;
   padding: 11px 18px;
   background: #f8f9fb;
   border-bottom: 1px solid #e8eaed;
@@ -2603,6 +2669,20 @@ footer {
 }
 
 @media (max-width: 900px) {
+  .report-branded-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px 20px;
+  }
+
+  .report-branded-header .rbh-right {
+    text-align: left;
+  }
+
+  .report-claim-bar {
+    padding: 10px 20px;
+  }
+
   .report-page .body,
   .report-page .match-grid {
     grid-template-columns: 1fr;
@@ -2646,6 +2726,19 @@ footer {
 }
 
 @media (max-width: 640px) {
+  .report-branded-header .rbh-left {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .report-branded-header .rbh-logo {
+    height: 32px;
+  }
+
+  .report-branded-header .rbh-divider {
+    display: none;
+  }
+
   .legal-card,
   .error-card {
     padding: 1.5rem;
@@ -2952,7 +3045,6 @@ body.homepage-redesign .hero-report-preview .window {
 body.homepage-redesign .hero-report-preview .titlebar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 11px 18px;
   background: #f8f9fb;
   border-bottom: 1px solid #e8eaed;

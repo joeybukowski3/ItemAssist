@@ -126,3 +126,15 @@ function toggleReportDetail(id, el) {
 }
 
 window.toggleReportDetail = toggleReportDetail;
+
+const publishedDateEls = document.querySelectorAll(".report-published-date");
+
+if (publishedDateEls.length) {
+  const today = new Date();
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  const formatted = `Published ${today.toLocaleDateString("en-US", options)}`;
+
+  publishedDateEls.forEach((el) => {
+    el.textContent = formatted;
+  });
+}
