@@ -115,6 +115,7 @@ function toggleReportDetail(id, el) {
 
   const isOpen = row.classList.toggle("open");
   el.classList.toggle("open", isOpen);
+  el.setAttribute("aria-expanded", String(isOpen));
 
   const labelNode = Array.from(el.childNodes).find(
     (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0

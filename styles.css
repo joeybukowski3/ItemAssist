@@ -4078,3 +4078,301 @@ body.homepage-redesign .how-card:nth-child(3) { animation: fadeUp 0.5s ease-out 
     max-height: 34px;
   }
 }
+
+/* =======================================================
+   MOBILE POLISH
+======================================================= */
+.nav-links a,
+.nav-login,
+.nav-cta,
+.btn-primary,
+.btn-secondary,
+.item-link,
+.footer-links a,
+.footer-col-links a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.report-page .claim-id,
+.report-page .item-sub,
+.report-page .mv,
+.report-page .ml,
+body.homepage-redesign .hero-report-preview .claim-id,
+body.homepage-redesign .hero-report-preview .item-sub,
+body.homepage-redesign .hero-report-preview .mv,
+body.homepage-redesign .hero-report-preview .ml,
+.footer-links a,
+.footer-col-links a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.report-page .tbl tbody td,
+body.homepage-redesign .hero-report-preview .tbl tbody td {
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 768px) {
+  .nav-inner {
+    height: 64px;
+    gap: 0.875rem;
+  }
+
+  .nav-toggle {
+    width: 44px;
+    height: 44px;
+    padding: 11px;
+  }
+
+  .nav-links a,
+  .nav-mobile-cta .nav-cta {
+    min-height: 44px;
+  }
+
+  .hero,
+  .services-hero,
+  .about-hero,
+  .report-page-hero,
+  .legal-hero,
+  .error-hero {
+    padding-top: 3rem;
+    padding-bottom: 2.75rem;
+  }
+
+  .footer-col-links a,
+  .footer-links a {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+  }
+
+  .report-page .main,
+  body.homepage-redesign .hero-report-preview .main {
+    overflow-x: visible;
+  }
+
+  .report-page .stats,
+  body.homepage-redesign .hero-report-preview .stats {
+    gap: 12px;
+  }
+
+  .report-page .stat-total .stat-val,
+  body.homepage-redesign .hero-report-preview .stat-total .stat-val {
+    font-size: 1.3rem;
+  }
+
+  .report-page .match-row,
+  body.homepage-redesign .hero-report-preview .match-row {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .report-page .match-row .mv,
+  body.homepage-redesign .hero-report-preview .match-row .mv {
+    text-align: right;
+    max-width: 62%;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .about-page .form-group input,
+  .about-page .form-group select,
+  .about-page .form-group textarea,
+  body.homepage-redesign .form-group input,
+  body.homepage-redesign .form-group select,
+  body.homepage-redesign .form-group textarea {
+    font-size: 16px;
+    min-height: 48px;
+  }
+
+  .form-group textarea,
+  .about-page .form-group textarea,
+  body.homepage-redesign .form-group textarea {
+    min-height: 120px;
+  }
+
+  .form-submit,
+  .about-page .form-submit,
+  body.homepage-redesign .form-submit {
+    min-height: 48px;
+    width: 100%;
+  }
+
+  body.homepage-redesign .home-hero-report {
+    justify-self: stretch;
+    max-width: 100%;
+  }
+
+  body.homepage-redesign .hero-report-preview .window,
+  .report-page .window {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .header-logo {
+    width: 146px;
+    max-width: 146px;
+    height: 36px;
+    max-height: 36px;
+  }
+
+  .header-logo-img {
+    height: 28px;
+    max-width: 146px;
+    max-height: 30px;
+  }
+
+  body.homepage-redesign .header-logo {
+    width: 146px;
+    max-width: 146px;
+    height: 36px;
+    max-height: 36px;
+  }
+
+  body.homepage-redesign .header-logo-img {
+    height: 28px;
+    max-width: 146px;
+    max-height: 30px;
+  }
+
+  .nav-links,
+  body.homepage-redesign .nav-links {
+    left: 1rem;
+    right: 1rem;
+  }
+
+  .report-branded-header,
+  .report-claim-bar,
+  body.homepage-redesign .report-branded-header,
+  body.homepage-redesign .report-claim-bar {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .report-branded-header .rbh-right,
+  body.homepage-redesign .report-branded-header .rbh-right {
+    width: 100%;
+  }
+
+  .report-page .stats,
+  body.homepage-redesign .hero-report-preview .stats {
+    flex-direction: column;
+  }
+
+  .report-page .stat,
+  body.homepage-redesign .hero-report-preview .stat {
+    width: 100%;
+  }
+
+  .report-page .tbl thead,
+  body.homepage-redesign .hero-report-preview .tbl thead {
+    display: none;
+  }
+
+  .report-page .tbl,
+  .report-page .tbl tbody,
+  .report-page .tbl tr,
+  .report-page .tbl td,
+  body.homepage-redesign .hero-report-preview .tbl,
+  body.homepage-redesign .hero-report-preview .tbl tbody,
+  body.homepage-redesign .hero-report-preview .tbl tr,
+  body.homepage-redesign .hero-report-preview .tbl td {
+    display: block;
+    width: 100%;
+  }
+
+  .report-page .tbl > tbody > tr:not(.detail-row),
+  body.homepage-redesign .hero-report-preview .tbl > tbody > tr:not(.detail-row) {
+    margin-bottom: 14px;
+    border: 1px solid #e8eaed;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  }
+
+  .report-page .tbl > tbody > tr:not(.detail-row) td,
+  body.homepage-redesign .hero-report-preview .tbl > tbody > tr:not(.detail-row) td {
+    border-bottom: 1px solid #eef2f7;
+    padding: 10px 14px;
+  }
+
+  .report-page .tbl > tbody > tr:not(.detail-row) td:last-child,
+  body.homepage-redesign .hero-report-preview .tbl > tbody > tr:not(.detail-row) td:last-child {
+    border-bottom: none;
+  }
+
+  .report-page .tbl > tbody > tr:not(.detail-row) td::before,
+  body.homepage-redesign .hero-report-preview .tbl > tbody > tr:not(.detail-row) td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
+  }
+
+  .report-page .tbl > tbody > tr:not(.detail-row) td[data-label="Claimed Item"]::before,
+  .report-page .tbl > tbody > tr:not(.detail-row) td[data-label="LKQ Replacement"]::before,
+  body.homepage-redesign .hero-report-preview .tbl > tbody > tr:not(.detail-row) td[data-label="Claimed Item"]::before,
+  body.homepage-redesign .hero-report-preview .tbl > tbody > tr:not(.detail-row) td[data-label="LKQ Replacement"]::before {
+    margin-bottom: 8px;
+  }
+
+  .report-page .detail-row.open,
+  body.homepage-redesign .hero-report-preview .detail-row.open {
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .report-page .detail-cell,
+  body.homepage-redesign .hero-report-preview .detail-cell {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+  }
+
+  .report-page .match-grid,
+  body.homepage-redesign .hero-report-preview .match-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .report-page .match-panel,
+  body.homepage-redesign .hero-report-preview .match-panel {
+    border-radius: 12px;
+  }
+
+  .report-page .match-row,
+  body.homepage-redesign .hero-report-preview .match-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .report-page .match-row .mv,
+  body.homepage-redesign .hero-report-preview .match-row .mv {
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .report-page .item-link,
+  body.homepage-redesign .hero-report-preview .item-link {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .report-page .sidebar,
+  body.homepage-redesign .hero-report-preview .sidebar {
+    padding-bottom: 10px;
+  }
+}
