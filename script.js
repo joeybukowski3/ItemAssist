@@ -52,56 +52,16 @@ const contactForm = document.getElementById("contact-form");
 if (contactForm) {
   const submitBtn  = contactForm.querySelector(".form-submit");
   const statusEl   = document.getElementById("form-status");
-  const fileInput  = document.getElementById("attachment");
-  const fileNameEl = document.getElementById("file-upload-name");
-
-  fileInput.addEventListener("change", () => {
-    if (fileInput.files.length > 0) {
-      fileNameEl.textContent = fileInput.files[0].name;
-      fileNameEl.classList.add("has-file");
-    } else {
-      fileNameEl.textContent = "PDF, Excel, or Image · Max 25 MB";
-      fileNameEl.classList.remove("has-file");
-    }
-  });
 
   contactForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    submitBtn.disabled    = true;
-    submitBtn.textContent = "Sending…";
+    submitBtn.disabled    = false;
+    submitBtn.textContent = "Submit Request →";
     statusEl.className    = "form-status";
-    statusEl.textContent  = "";
-
-    try {
-      // ⚠️  Replace YOUR_FORM_ID with your Formspree form ID.
-      //     Sign up free at formspree.io → New Form → set recipient to joeybuk03@gmail.com
-      const res = await fetch("https://formspree.io/f/YOUR_FORM_ID", {
-        method:  "POST",
-        body:    new FormData(contactForm),
-        headers: { Accept: "application/json" },
-      });
-
-      if (res.ok) {
-        submitBtn.textContent      = "Request Sent ✓";
-        submitBtn.style.background = "#16a34a";
-        statusEl.className         = "form-status form-status--success";
-        statusEl.textContent       =
-          "Your request was submitted. We’ll be in touch within one business day.";
-        contactForm.reset();
-        fileNameEl.textContent = "PDF, Excel, or Image · Max 25 MB";
-        fileNameEl.classList.remove("has-file");
-      } else {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Submission failed");
-      }
-    } catch {
-      submitBtn.disabled    = false;
-      submitBtn.textContent = "Submit Request →";
-      statusEl.className    = "form-status form-status--error";
-      statusEl.textContent  =
-        "Something went wrong. Please email us directly at submissions@itemassist.com.";
-    }
+    statusEl.className    = "form-status form-status--error";
+    statusEl.textContent  =
+      "Online submission is not connected yet. Please email your request to submissions@itemassist.com and we’ll follow up with the best way to send any attachments.";
   });
 }
 
