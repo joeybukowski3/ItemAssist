@@ -1664,6 +1664,70 @@ footer {
   line-height: 1.8;
 }
 
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.trust-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+}
+
+.trust-card h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text-head);
+  margin-bottom: 0.75rem;
+}
+
+.trust-card p {
+  color: var(--text-body);
+  line-height: 1.75;
+}
+
+.trust-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.trust-list li {
+  position: relative;
+  padding-left: 1.05rem;
+  color: var(--text-body);
+  line-height: 1.7;
+}
+
+.trust-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+
+.trust-note,
+.form-process-note,
+.form-security-note {
+  font-size: 0.9375rem;
+  line-height: 1.75;
+}
+
+.trust-note {
+  margin-top: 1.5rem;
+  color: var(--slate);
+}
+
 /* CTA section */
 .svc-cta-section {
   background: var(--navy-deep);
@@ -1749,6 +1813,7 @@ footer {
   .svc-seo-section      { padding-top: 3.5rem; padding-bottom: 3.5rem; }
   .svc-cta-section      { padding-top: 3.5rem; padding-bottom: 3.5rem; }
   .svc-steps            { margin-top: 2rem; }
+  .trust-grid           { grid-template-columns: 1fr; }
 }
 
 /* =======================================================
@@ -2031,6 +2096,12 @@ footer {
   margin-top: 0.75rem;
   font-size: 0.75rem;
   color: var(--slate-light);
+}
+
+.about-page .form-process-note,
+.about-page .form-security-note {
+  margin-top: 0.75rem;
+  color: var(--slate);
 }
 
 .about-page .form-disclaimer {
@@ -3540,6 +3611,51 @@ body.homepage-redesign .service-chip svg {
   stroke-linejoin: round;
 }
 
+body.homepage-redesign .home-hero-report-note {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--slate);
+  max-width: 760px;
+}
+
+body.homepage-redesign .trust-section {
+  max-width: var(--home-max-w);
+  margin: 0 auto;
+  padding: 64px var(--px) 0;
+}
+
+body.homepage-redesign .trust-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+body.homepage-redesign .trust-header h2 {
+  font-family: "Outfit", system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--text-head);
+  margin-bottom: 10px;
+}
+
+body.homepage-redesign .trust-header p {
+  font-size: 15px;
+  color: var(--slate);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+body.homepage-redesign .form-process-note {
+  margin-top: 0.95rem;
+  color: rgba(15, 29, 47, 0.74);
+}
+
+body.homepage-redesign .form-security-note {
+  margin-top: 0.8rem;
+  color: rgba(15, 29, 47, 0.64);
+}
+
 body.homepage-redesign .how-section,
 body.homepage-redesign .pricing-section,
 body.homepage-redesign .cta-section {
@@ -4032,6 +4148,7 @@ body.homepage-redesign .how-card:nth-child(3) { animation: fadeUp 0.5s ease-out 
     max-width: 400px;
     margin: 0 auto;
   }
+  body.homepage-redesign .trust-grid { grid-template-columns: 1fr; }
   body.homepage-redesign .cta-card {
     grid-template-columns: 1fr;
     padding: 32px 24px;
