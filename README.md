@@ -31,10 +31,10 @@ Option 2:
 The live contact workflow uses:
 
 - Static HTML forms in `index.html` and `about.html`
-- `script.js` for async submission and UI state
+- `script.js` for async submission, attachment validation, and UI state
 - `api/contact.js` as the Vercel serverless endpoint
 - Cloudflare Turnstile for spam protection
-- Resend for outbound email delivery
+- Resend for outbound email delivery, including internal notification attachments
 
 ### Required Vercel Environment Variables
 
@@ -67,6 +67,13 @@ When the branded inbox is live, change only:
 4. Set `CONTACT_FROM_EMAIL` to a verified sender on that domain, such as `noreply@itemassist.com`.
 5. Keep `CONTACT_TO_EMAIL` pointed at a real inbox until branded inbox delivery is live.
 6. `CONTACT_FROM_EMAIL` must be an address on a domain verified in Resend. Do not use Gmail or personal inboxes as `FROM`.
+
+### Attachment Limits
+
+- Maximum of `5` files per submission
+- Maximum of `5MB` per file
+- Maximum of `15MB` total attachment size before email encoding
+- Allowed file types: `.pdf`, `.xlsx`, `.xls`, `.csv`, `.doc`, `.docx`, `.txt`, `.jpg`, `.jpeg`, `.png`, `.heic`, `.zip`
 
 ### Internal Routing Note
 

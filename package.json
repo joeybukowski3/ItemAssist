@@ -2,6 +2,7 @@
   "name": "itemassist",
   "private": true,
   "dependencies": {
+    "busboy": "^1.6.0",
     "resend": "^4.4.0"
   }
 }

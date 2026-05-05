@@ -61,9 +61,26 @@ if (contactForm) {
   const submitBtn = contactForm.querySelector(".form-submit");
   const statusEl = document.getElementById("form-status");
   const turnstileContainer = contactForm.querySelector("[data-turnstile-container]");
+  const attachmentsInput = contactForm.querySelector('input[name="attachments"]');
   const originalSubmitLabel = submitBtn ? submitBtn.textContent : "Submit Request →";
   const requiredFields = Array.from(contactForm.querySelectorAll("[required]"));
-  const emailPattern = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i;
+  const maxFileCount = 5;
+  const maxFileSizeBytes = 5 * 1024 * 1024;
+  const maxTotalFileSizeBytes = 15 * 1024 * 1024;
+  const allowedFileExtensions = new Set([
+    ".pdf",
+    ".xlsx",
+    ".xls",
+    ".csv",
+    ".doc",
+    ".docx",
+    ".txt",
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".heic",
+    ".zip"
+  ]);
   let isSubmitting = false;
   let lastSubmissionAt = 0;
   let turnstileWidgetId = null;
@@ -94,6 +111,47 @@ if (contactForm) {
     const isValid = Boolean(field.value.trim());
     field.setAttribute("aria-invalid", String(!isValid));
     return isValid;
+  };
+
+  const getFileExtension = (filename) => {
+    const value = String(filename || "").toLowerCase();
+    const index = value.lastIndexOf(".");
+    return index >= 0 ? value.slice(index) : "";
+  };
+
+  const validateAttachments = () => {
+    if (!attachmentsInput || !attachmentsInput.files) {
+      return null;
+    }
+
+    const files = Array.from(attachmentsInput.files);
+    if (files.length === 0) {
+      return null;
+    }
+
+    if (files.length > maxFileCount) {
+      return `Please attach no more than ${maxFileCount} files.`;
+    }
+
+    let totalSize = 0;
+
+    for (const file of files) {
+      totalSize += file.size;
+
+      if (!allowedFileExtensions.has(getFileExtension(file.name))) {
+        return "One or more files use an unsupported format.";
+      }
+
+      if (file.size > maxFileSizeBytes) {
+        return "Each file must be 5MB or smaller.";
+      }
+    }
+
+    if (totalSize > maxTotalFileSizeBytes) {
+      return "Total attachment size must be 15MB or smaller.";
+    }
+
+    return null;
   };
 
   requiredFields.forEach((field) => {
@@ -172,6 +230,15 @@ if (contactForm) {
       return;
     }
 
+    const attachmentError = validateAttachments();
+    if (attachmentError) {
+      setStatus(attachmentError, "error");
+      if (attachmentsInput) {
+        attachmentsInput.focus();
+      }
+      return;
+    }
+
     if (!turnstileReady || typeof window.turnstile === "undefined") {
       setStatus("Spam protection is still loading. Please wait a moment and try again.", "error");
       return;
@@ -184,8 +251,19 @@ if (contactForm) {
     }
 
     const formData = new FormData(contactForm);
-    const emailPhoneValue = String(formData.get("email_phone") || "").trim();
-    const emailMatch = emailPhoneValue.match(emailPattern);
+    formData.set("adjuster_name", String(formData.get("adjuster_name") || "").trim());
+    formData.set("email_phone", String(formData.get("email_phone") || "").trim());
+    formData.set("claim_number", String(formData.get("claim_number") || "").trim());
+    formData.set("company", String(formData.get("company") || "").trim());
+    formData.set("line_items", String(formData.get("line_items") || "").trim());
+    formData.set("assignment_type", String(formData.get("assignment_type") || "").trim());
+    formData.set("rush_request", String(formData.get("rush_request") || "").trim());
+    formData.set("custom_assignment_type", String(formData.get("custom_assignment_type") || "").trim());
+    formData.set("scope_of_assignment", String(formData.get("scope_of_assignment") || "").trim());
+    formData.set("notes", String(formData.get("notes") || "").trim());
+    formData.set("subject", String(formData.get("_subject") || "").trim());
+    formData.set("website", String(formData.get("website") || "").trim());
+    formData.set("turnstileToken", turnstileToken);
 
     setSubmittingState(true);
     setStatus("Sending your request...", "pending");
@@ -194,25 +272,9 @@ if (contactForm) {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
+          Accept: "application/json"
         },
-        body: JSON.stringify({
-          adjuster_name: String(formData.get("adjuster_name") || "").trim(),
-          email_phone: emailPhoneValue,
-          claim_number: String(formData.get("claim_number") || "").trim(),
-          company: String(formData.get("company") || "").trim(),
-          line_items: String(formData.get("line_items") || "").trim(),
-          assignment_type: String(formData.get("assignment_type") || "").trim(),
-          rush_request: String(formData.get("rush_request") || "").trim(),
-          custom_assignment_type: String(formData.get("custom_assignment_type") || "").trim(),
-          scope_of_assignment: String(formData.get("scope_of_assignment") || "").trim(),
-          notes: String(formData.get("notes") || "").trim(),
-          subject: String(formData.get("_subject") || "").trim(),
-          website: String(formData.get("website") || "").trim(),
-          submitter_email: emailMatch ? emailMatch[0] : "",
-          turnstileToken
-        })
+        body: formData
       });
 
       const payload = await response.json().catch(() => ({}));
