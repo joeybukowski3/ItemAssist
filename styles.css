@@ -1276,6 +1276,19 @@ nav {
   border-color: var(--navy);
   box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.08);
 }
+.form-group input[aria-invalid="true"],
+.form-group select[aria-invalid="true"],
+.form-group textarea[aria-invalid="true"] {
+  border-color: #c62828;
+  box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.12);
+}
+.form-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
 
 .form-submit {
   width: 100%;
@@ -1361,6 +1374,15 @@ nav {
   padding: 0.75rem 1rem;
   border-radius: var(--r);
   margin-top: 0.75rem;
+}
+.form-turnstile {
+  margin: 0.35rem 0 1rem;
+}
+.form-status--pending {
+  display: block;
+  background: rgba(30, 58, 95, 0.06);
+  color: var(--navy);
+  border: 1px solid rgba(30, 58, 95, 0.12);
 }
 .form-status--success {
   display: block;
@@ -4061,6 +4083,12 @@ body.homepage-redesign .form-group textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
 }
+body.homepage-redesign .form-group input[aria-invalid="true"],
+body.homepage-redesign .form-group select[aria-invalid="true"],
+body.homepage-redesign .form-group textarea[aria-invalid="true"] {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.12);
+}
 
 body.homepage-redesign .form-group textarea {
   resize: vertical;
@@ -4139,6 +4167,7 @@ body.homepage-redesign .form-status {
   font-size: 12px;
 }
 
+body.homepage-redesign .form-status--pending { color: var(--navy); }
 body.homepage-redesign .form-status--success { color: #16a34a; }
 body.homepage-redesign .form-status--error { color: #dc2626; }
 

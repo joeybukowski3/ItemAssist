@@ -1,0 +1,7 @@
+{
+  "name": "itemassist",
+  "private": true,
+  "dependencies": {
+    "resend": "^4.4.0"
+  }
+}

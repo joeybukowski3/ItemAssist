@@ -559,6 +559,10 @@
             <span class="trust-signal">No coverage or settlement decisions</span>
           </div>
           <form id="contact-form" novalidate>
+            <div class="form-honeypot" aria-hidden="true">
+              <label for="company-website">Website</label>
+              <input type="text" id="company-website" name="website" tabindex="-1" autocomplete="off">
+            </div>
             <input type="hidden" name="_subject" value="New Contents List Submission — ItemAssist">
 
             <div class="form-group">
@@ -623,6 +627,7 @@
               <textarea id="notes" name="notes" placeholder="Deadlines, item concerns, missing details, or special handling notes..."></textarea>
             </div>
 
+            <div class="form-turnstile" id="contact-turnstile" data-turnstile-container></div>
             <button type="submit" class="form-submit">Submit Request &rarr;</button>
             <div class="form-status" id="form-status" aria-live="polite"></div>
             <p class="form-process-note">Submissions are reviewed by a specialist before work begins. If documentation is limited, Item Assist notes assumptions, confidence level, and any follow-up needed.</p>
@@ -644,6 +649,7 @@
     </div>
   </footer>
 
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
   <script src="script.js"></script>
 </body>
 </html>
