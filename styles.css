@@ -1282,6 +1282,22 @@ nav {
   border-color: #c62828;
   box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.12);
 }
+.form-group--file input[type="file"] {
+  padding: 0.5rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.form-group--file input[type="file"]:focus {
+  outline: none;
+}
+.form-help {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--slate-light);
+}
 .form-honeypot {
   position: absolute;
   left: -9999px;
@@ -4089,6 +4105,16 @@ body.homepage-redesign .form-group textarea[aria-invalid="true"] {
   border-color: #dc2626;
   box-shadow: 0 0 0 3px rgba(220,38,38,0.12);
 }
+body.homepage-redesign .form-group--file input[type="file"] {
+  padding: 0.5rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+body.homepage-redesign .form-group--file input[type="file"]:focus {
+  outline: none;
+}
 
 body.homepage-redesign .form-group textarea {
   resize: vertical;
@@ -4098,6 +4124,12 @@ body.homepage-redesign .form-group textarea {
 body.homepage-redesign .form-opt,
 body.homepage-redesign .form-privacy {
   font-weight: 400;
+  color: var(--slate-light);
+}
+body.homepage-redesign .form-help {
+  margin-top: 0.25rem;
+  font-size: 12px;
+  line-height: 1.5;
   color: var(--slate-light);
 }
 
