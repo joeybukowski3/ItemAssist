@@ -2609,6 +2609,11 @@ footer {
   box-shadow: 0 0 0 2px rgba(22, 129, 93, 0.06);
 }
 
+.replacement-option--upgrade {
+  border-color: rgba(166, 107, 22, 0.28);
+  background: var(--about-gold-soft);
+}
+
 .replacement-status {
   width: 26px;
   height: 26px;
@@ -2625,6 +2630,11 @@ footer {
 .replacement-option--match .replacement-status {
   background: var(--about-green);
   color: #fff;
+}
+
+.replacement-option--upgrade .replacement-status {
+  background: rgba(166, 107, 22, 0.14);
+  color: var(--about-gold);
 }
 
 .replacement-status svg {
