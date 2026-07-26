@@ -4,7 +4,7 @@ const { Resend } = require("resend");
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const contactFromEmail = process.env.CONTACT_FROM_EMAIL || "";
 
-const REQUIRED_FIELDS = ["adjuster_name", "email_phone", "claim_number", "scope_of_assignment"];
+const REQUIRED_FIELDS = ["name", "email", "assignment_notes"];
 const EMAIL_PATTERN = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i;
 const MAX_FILE_COUNT = 5;
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -59,8 +59,8 @@ function normalizeField(value) {
   return String(value || "").trim();
 }
 
-function extractEmailFromEmailPhone(emailPhoneString) {
-  const value = normalizeField(emailPhoneString);
+function extractValidEmail(emailString) {
+  const value = normalizeField(emailString);
   const match = value.match(/[^\s@]+@[^\s@]+\.[^\s@]+/);
 
   if (!match) {
@@ -107,16 +107,15 @@ function getContentType(req) {
 
 function buildFieldRows(fields, attachments) {
   const labels = {
-    adjuster_name: "Adjuster name",
-    email_phone: "Email / phone",
-    claim_number: "Claim number",
+    name: "Name",
     company: "Company",
-    line_items: "Estimated line items",
-    assignment_type: "Assignment type",
-    rush_request: "Rush request",
-    custom_assignment_type: "Custom assignment type",
-    scope_of_assignment: "Scope of assignment",
-    notes: "Notes"
+    email: "Email",
+    phone: "Phone",
+    client_reference: "Client or claim reference",
+    item_count: "Number of items",
+    output_format: "Desired output format",
+    requested_turnaround: "Requested turnaround",
+    assignment_notes: "Assignment notes"
   };
 
   const rows = Object.entries(labels)
@@ -141,16 +140,15 @@ function buildFieldRows(fields, attachments) {
 
 function buildTextBody(fields, attachments) {
   const pairs = [
-    ["Adjuster name", fields.adjuster_name],
-    ["Email / phone", fields.email_phone],
-    ["Claim number", fields.claim_number],
+    ["Name", fields.name],
     ["Company", fields.company],
-    ["Estimated line items", fields.line_items],
-    ["Assignment type", fields.assignment_type],
-    ["Rush request", fields.rush_request],
-    ["Custom assignment type", fields.custom_assignment_type],
-    ["Scope of assignment", fields.scope_of_assignment],
-    ["Notes", fields.notes]
+    ["Email", fields.email],
+    ["Phone", fields.phone],
+    ["Client or claim reference", fields.client_reference],
+    ["Number of items", fields.item_count],
+    ["Desired output format", fields.output_format],
+    ["Requested turnaround", fields.requested_turnaround],
+    ["Assignment notes", fields.assignment_notes]
   ];
 
   const lines = pairs
@@ -188,16 +186,15 @@ async function verifyTurnstile(token, remoteIp) {
 function parseJsonBody(body) {
   return {
     fields: {
-      adjuster_name: normalizeField(body.adjuster_name),
-      email_phone: normalizeField(body.email_phone),
-      claim_number: normalizeField(body.claim_number),
+      name: normalizeField(body.name || body.adjuster_name),
       company: normalizeField(body.company),
-      line_items: normalizeField(body.line_items),
-      assignment_type: normalizeField(body.assignment_type),
-      rush_request: normalizeField(body.rush_request),
-      custom_assignment_type: normalizeField(body.custom_assignment_type),
-      scope_of_assignment: normalizeField(body.scope_of_assignment),
-      notes: normalizeField(body.notes),
+      email: normalizeField(body.email || body.email_phone),
+      phone: normalizeField(body.phone),
+      client_reference: normalizeField(body.client_reference || body.claim_number),
+      item_count: normalizeField(body.item_count || body.line_items),
+      output_format: normalizeField(body.output_format),
+      requested_turnaround: normalizeField(body.requested_turnaround || body.rush_request),
+      assignment_notes: normalizeField(body.assignment_notes || body.scope_of_assignment || body.notes),
       subject: normalizeField(body.subject) || "New Contents List Submission - ItemAssist",
       website: normalizeField(body.website),
       turnstileToken: normalizeField(body.turnstileToken)
@@ -294,16 +291,15 @@ function parseMultipartForm(req) {
 
       resolve({
         fields: {
-          adjuster_name: normalizeField(fields.adjuster_name),
-          email_phone: normalizeField(fields.email_phone),
-          claim_number: normalizeField(fields.claim_number),
+          name: normalizeField(fields.name || fields.adjuster_name),
           company: normalizeField(fields.company),
-          line_items: normalizeField(fields.line_items),
-          assignment_type: normalizeField(fields.assignment_type),
-          rush_request: normalizeField(fields.rush_request),
-          custom_assignment_type: normalizeField(fields.custom_assignment_type),
-          scope_of_assignment: normalizeField(fields.scope_of_assignment),
-          notes: normalizeField(fields.notes),
+          email: normalizeField(fields.email || fields.email_phone),
+          phone: normalizeField(fields.phone),
+          client_reference: normalizeField(fields.client_reference || fields.claim_number),
+          item_count: normalizeField(fields.item_count || fields.line_items),
+          output_format: normalizeField(fields.output_format),
+          requested_turnaround: normalizeField(fields.requested_turnaround || fields.rush_request),
+          assignment_notes: normalizeField(fields.assignment_notes || fields.scope_of_assignment || fields.notes),
           subject: normalizeField(fields.subject) || "New Contents List Submission - ItemAssist",
           website: normalizeField(fields.website),
           turnstileToken: normalizeField(fields.turnstileToken)
@@ -360,7 +356,7 @@ module.exports = async (req, res) => {
   }
 
   const { fields, attachments } = parsedRequest;
-  const submitterEmail = extractEmailFromEmailPhone(fields.email_phone);
+  const submitterEmail = extractValidEmail(fields.email);
 
   if (fields.website) {
     return json(res, 200, { ok: true, message: "Submission received." });
@@ -369,6 +365,10 @@ module.exports = async (req, res) => {
   const missingField = REQUIRED_FIELDS.find((field) => !fields[field]);
   if (missingField) {
     return json(res, 400, { ok: false, error: "Please complete all required fields." });
+  }
+
+  if (!submitterEmail) {
+    return json(res, 400, { ok: false, error: "Please enter a valid email address." });
   }
 
   if (!fields.turnstileToken) {
@@ -408,6 +408,13 @@ module.exports = async (req, res) => {
     });
 
     if (submitterEmail) {
+      const referenceHtml = fields.client_reference
+        ? `<p>Client or claim reference: <strong>${escapeHtml(fields.client_reference)}</strong></p>`
+        : "";
+      const referenceText = fields.client_reference
+        ? `\n\nClient or claim reference: ${fields.client_reference}`
+        : "";
+
       try {
         await resend.emails.send({
           from: contactFromEmail,
@@ -415,12 +422,12 @@ module.exports = async (req, res) => {
           subject: "We received your Item Assist request",
           html: `
             <div style="font-family:Arial,sans-serif;color:#10243e;line-height:1.6;">
-              <p>We received your Item Assist request and will review it shortly.</p>
-              <p>Claim number: <strong>${escapeHtml(fields.claim_number)}</strong></p>
-              <p>If we need attachments or clarification, we'll follow up using the contact details you provided.</p>
+              <p>We received your Item Assist contents list and will review the scope shortly.</p>
+              ${referenceHtml}
+              <p>We will confirm the accepted items, expected turnaround, and any additional charge before research begins.</p>
             </div>
           `,
-          text: `We received your Item Assist request and will review it shortly.\n\nClaim number: ${fields.claim_number}\n\nIf we need attachments or clarification, we'll follow up using the contact details you provided.`
+          text: `We received your Item Assist contents list and will review the scope shortly.${referenceText}\n\nWe will confirm the accepted items, expected turnaround, and any additional charge before research begins.`
         });
       } catch (error) {
         console.error("Auto-reply email failed", error);

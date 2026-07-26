@@ -108,7 +108,7 @@ if (contactForm) {
   };
 
   const validateField = (field) => {
-    const isValid = Boolean(field.value.trim());
+    const isValid = Boolean(field.value.trim()) && field.checkValidity();
     field.setAttribute("aria-invalid", String(!isValid));
     return isValid;
   };
@@ -251,16 +251,15 @@ if (contactForm) {
     }
 
     const formData = new FormData(contactForm);
-    formData.set("adjuster_name", String(formData.get("adjuster_name") || "").trim());
-    formData.set("email_phone", String(formData.get("email_phone") || "").trim());
-    formData.set("claim_number", String(formData.get("claim_number") || "").trim());
+    formData.set("name", String(formData.get("name") || "").trim());
     formData.set("company", String(formData.get("company") || "").trim());
-    formData.set("line_items", String(formData.get("line_items") || "").trim());
-    formData.set("assignment_type", String(formData.get("assignment_type") || "").trim());
-    formData.set("rush_request", String(formData.get("rush_request") || "").trim());
-    formData.set("custom_assignment_type", String(formData.get("custom_assignment_type") || "").trim());
-    formData.set("scope_of_assignment", String(formData.get("scope_of_assignment") || "").trim());
-    formData.set("notes", String(formData.get("notes") || "").trim());
+    formData.set("email", String(formData.get("email") || "").trim());
+    formData.set("phone", String(formData.get("phone") || "").trim());
+    formData.set("client_reference", String(formData.get("client_reference") || "").trim());
+    formData.set("item_count", String(formData.get("item_count") || "").trim());
+    formData.set("output_format", String(formData.get("output_format") || "").trim());
+    formData.set("requested_turnaround", String(formData.get("requested_turnaround") || "").trim());
+    formData.set("assignment_notes", String(formData.get("assignment_notes") || "").trim());
     formData.set("subject", String(formData.get("_subject") || "").trim());
     formData.set("website", String(formData.get("website") || "").trim());
     formData.set("turnstileToken", turnstileToken);
@@ -289,7 +288,7 @@ if (contactForm) {
         window.turnstile.reset(turnstileWidgetId);
       }
       lastSubmissionAt = Date.now();
-      setStatus("Request sent. We'll review it and follow up shortly.", "success");
+      setStatus("Contents list received. We'll review the scope and follow up shortly.", "success");
     } catch (error) {
       setStatus(error.message || "We couldn't send your request. Please try again.", "error");
       if (typeof window.turnstile !== "undefined" && turnstileWidgetId !== null) {
