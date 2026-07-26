@@ -2783,23 +2783,9 @@ footer {
 .about-founder-person {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
-}
-
-.about-founder-initials {
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  flex: 0 0 60px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 14px;
-  background: var(--about-blue);
-  color: #fff;
-  font-size: 1.15rem;
-  font-weight: 750;
-  letter-spacing: 0.04em;
+  padding: 0.35rem 0 0.1rem;
+  text-align: center;
 }
 
 .about-founder-person strong,
@@ -3877,10 +3863,6 @@ footer {
 
   .about-flow-node {
     padding: 0.75rem;
-  }
-
-  .about-founder-person {
-    align-items: flex-start;
   }
 
   .about-expertise-chips span {
