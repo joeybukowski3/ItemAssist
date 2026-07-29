@@ -1,8 +1,18 @@
 {
   "name": "itemassist",
   "private": true,
+  "scripts": {
+    "test": "node --test tests/request-intake/unit/**/*.test.mjs tests/request-intake/endpoint/**/*.test.mjs",
+    "test:request-intake": "node --test tests/request-intake/unit/**/*.test.mjs tests/request-intake/endpoint/**/*.test.mjs",
+    "test:e2e:request-intake": "playwright test --config=tests/request-intake/e2e/playwright.config.js"
+  },
   "dependencies": {
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
     "busboy": "^1.6.0",
     "resend": "^4.4.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.0"
   }
 }
