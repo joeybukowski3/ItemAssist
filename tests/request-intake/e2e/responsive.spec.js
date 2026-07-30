@@ -59,6 +59,7 @@ test("the comparison table stays inside a horizontally scrollable wrapper instea
 test("item cards and buttons remain visible and tappable at this viewport", async ({ page }) => {
   await stubTurnstileAndApi(page);
   await page.goto("/request-age-verification.html");
+  await page.check("#avr-method-enter_items_now");
 
   const addButton = page.locator("#avr-add-item");
   await expect(addButton).toBeVisible();

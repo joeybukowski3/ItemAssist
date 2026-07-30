@@ -11,22 +11,26 @@ test.describe("direct visit", () => {
     await page.goto("/request-age-verification.html");
 
     await expect(page.locator("nav .logo")).toBeVisible();
-    await expect(page.locator("h1")).toHaveText("Professional Age Verification");
+    await expect(page.locator("h1")).toHaveText("Submit a Work Order Request");
     await expect(page.locator("footer")).toBeVisible();
     await expect(page.locator("#avr-referral-banner")).toBeHidden();
   });
 
-  test("starts with exactly one item block and no service preselected", async ({ page }) => {
+  test("starts with exactly one item block, no service preselected, and no information method preselected", async ({ page }) => {
     await stubTurnstileAndApi(page);
     await page.goto("/request-age-verification.html");
 
     await expect(page.locator(".avr-item-card")).toHaveCount(1);
-    await expect(page.locator('[data-service-option].is-selected')).toHaveCount(0);
+    await expect(page.locator("[data-service-checkbox]:checked")).toHaveCount(0);
+    await expect(page.locator('input[name="information_method"]:checked')).toHaveCount(0);
+    await expect(page.locator("#avr-path-enter-items")).toBeHidden();
+    await expect(page.locator("#avr-path-upload-paste")).toBeHidden();
+    await expect(page.locator("#avr-path-collection")).toBeHidden();
   });
 });
 
 test.describe("DecodeMyItem referral", () => {
-  test("resolved status shows the correct banner copy and prefills brand/model/category", async ({ page }) => {
+  test("resolved status shows the correct banner copy, preselects Age Verification, defaults to Enter Items Now, and prefills brand/model/category", async ({ page }) => {
     await stubTurnstileAndApi(page);
     // "category=electronics" is DecodeMyItem's real internal key (not a
     // form option label) -- this exercises the actual cross-site contract,
@@ -36,7 +40,9 @@ test.describe("DecodeMyItem referral", () => {
 
     await expect(page.locator("#avr-referral-banner")).toBeVisible();
     await expect(page.locator("#avr-referral-copy")).toContainText("automated age estimate");
-    await expect(page.locator('[data-service-option="age_verification"]')).toHaveClass(/is-selected/);
+    await expect(page.locator("#avr-service-age_verification")).toBeChecked();
+    await expect(page.locator('input[name="information_method"][value="enter_items_now"]')).toBeChecked();
+    await expect(page.locator("#avr-path-enter-items")).toBeVisible();
 
     const firstItem = page.locator(".avr-item-card").first();
     await expect(firstItem.locator('input[name$="_brand"]')).toHaveValue("Sony");
@@ -44,9 +50,9 @@ test.describe("DecodeMyItem referral", () => {
     await expect(firstItem.locator('select[name$="_category"]')).toHaveValue("Television / Home Electronics");
     await expect(firstItem.locator('input[type="text"][name$="_serial"]')).toHaveValue("");
 
-    // The select must remain a normal, user-editable control -- not locked
-    // to the prefilled value.
+    // The select and information-method radio must remain fully user-editable.
     await expect(firstItem.locator('select[name$="_category"]')).toBeEnabled();
+    await expect(page.locator('input[name="information_method"][value="upload_or_paste_list"]')).toBeEnabled();
   });
 
   test("ambiguous status shows the correct banner copy", async ({ page }) => {
@@ -74,11 +80,13 @@ test.describe("DecodeMyItem referral", () => {
     expect(html).not.toContain("CLAIM-999");
   });
 
-  test("without source=decodemyitem, the banner stays hidden even if other referral params are present", async ({ page }) => {
+  test("without source=decodemyitem, the banner stays hidden and the information method is not defaulted even if other referral params are present", async ({ page }) => {
     await stubTurnstileAndApi(page);
     await page.goto("/request-age-verification.html?brand=Sony&result_status=resolved");
 
     await expect(page.locator("#avr-referral-banner")).toBeHidden();
+    await expect(page.locator('input[name="information_method"]:checked')).toHaveCount(0);
+    await expect(page.locator("#avr-service-age_verification")).not.toBeChecked();
   });
 });
 
@@ -138,22 +146,148 @@ test.describe("DecodeMyItem category prefill mapping", () => {
   });
 });
 
-test.describe("service selection", () => {
-  test("clicking a service card selects it and updates the hidden select", async ({ page }) => {
+test.describe("requested-services multi-select", () => {
+  test("selecting one service checks only that card", async ({ page }) => {
     await stubTurnstileAndApi(page);
     await page.goto("/request-age-verification.html");
 
-    await page.click('[data-service-option="full_valuation"]');
-    await expect(page.locator('[data-service-option="full_valuation"]')).toHaveClass(/is-selected/);
-    await expect(page.locator("#avr-requested-service")).toHaveValue("full_valuation");
+    await page.check("#avr-service-age_verification");
+    await expect(page.locator("#avr-service-age_verification")).toBeChecked();
+    await expect(page.locator("#avr-service-item_pricing_valuation")).not.toBeChecked();
+    await expect(page.locator('[data-service-card="age_verification"]')).toHaveClass(/is-selected/);
   });
 
-  test("the full valuation upsell CTA selects the full valuation service and scrolls to the form", async ({ page }) => {
+  test("selecting multiple services checks each of them independently", async ({ page }) => {
     await stubTurnstileAndApi(page);
     await page.goto("/request-age-verification.html");
 
+    await page.check("#avr-service-age_verification");
+    await page.check("#avr-service-item_list_collection");
+
+    await expect(page.locator("#avr-service-age_verification")).toBeChecked();
+    await expect(page.locator("#avr-service-item_list_collection")).toBeChecked();
+    await expect(page.locator("#avr-service-item_pricing_valuation")).not.toBeChecked();
+  });
+
+  test('"All of the Above" selects exactly the three concrete services', async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    await page.check("#avr-service-all");
+
+    await expect(page.locator("#avr-service-age_verification")).toBeChecked();
+    await expect(page.locator("#avr-service-item_pricing_valuation")).toBeChecked();
+    await expect(page.locator("#avr-service-item_list_collection")).toBeChecked();
+    await expect(page.locator("#avr-service-unsure")).not.toBeChecked();
+  });
+
+  test("selecting Unsure clears every concrete service", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    await page.check("#avr-service-age_verification");
+    await page.check("#avr-service-unsure");
+
+    await expect(page.locator("#avr-service-unsure")).toBeChecked();
+    await expect(page.locator("#avr-service-age_verification")).not.toBeChecked();
+  });
+
+  test("selecting a concrete service clears Unsure", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    await page.check("#avr-service-unsure");
+    await page.check("#avr-service-item_pricing_valuation");
+
+    await expect(page.locator("#avr-service-item_pricing_valuation")).toBeChecked();
+    await expect(page.locator("#avr-service-unsure")).not.toBeChecked();
+  });
+
+  test('manually deselecting one concrete service after "All of the Above" un-checks the shortcut', async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    await page.check("#avr-service-all");
+    await expect(page.locator("#avr-service-all")).toBeChecked();
+
+    await page.uncheck("#avr-service-item_list_collection");
+    await expect(page.locator("#avr-service-all")).not.toBeChecked();
+    await expect(page.locator("#avr-service-age_verification")).toBeChecked();
+    await expect(page.locator("#avr-service-item_pricing_valuation")).toBeChecked();
+  });
+
+  test("the Age-Verification-specific limitations acknowledgement only appears when Age Verification is selected without Item Pricing / Valuation", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    await expect(page.locator("#avr-av-limitations-row")).toBeHidden();
+
+    await page.check("#avr-service-age_verification");
+    await expect(page.locator("#avr-av-limitations-row")).toBeVisible();
+
+    await page.check("#avr-service-item_pricing_valuation");
+    await expect(page.locator("#avr-av-limitations-row")).toBeHidden();
+  });
+
+  test('the upsell CTA adds Item Pricing / Valuation without clearing an already-selected service', async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    await page.check("#avr-service-age_verification");
     await page.click("#avr-upsell-submit-cta");
-    await expect(page.locator("#avr-requested-service")).toHaveValue("full_valuation");
+
+    await expect(page.locator("#avr-service-age_verification")).toBeChecked();
+    await expect(page.locator("#avr-service-item_pricing_valuation")).toBeChecked();
+  });
+});
+
+test.describe("information method switching", () => {
+  test("selecting Enter Items Now reveals only that fieldset plus the shared files fieldset", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    await page.check("#avr-method-enter_items_now");
+
+    await expect(page.locator("#avr-path-enter-items")).toBeVisible();
+    await expect(page.locator("#avr-path-upload-paste")).toBeHidden();
+    await expect(page.locator("#avr-path-collection")).toBeHidden();
+    await expect(page.locator("#avr-path-files")).toBeVisible();
+  });
+
+  test("selecting Upload or Paste an Item List reveals only that fieldset plus the shared files fieldset", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    await page.check("#avr-method-upload_or_paste_list");
+
+    await expect(page.locator("#avr-path-upload-paste")).toBeVisible();
+    await expect(page.locator("#avr-path-enter-items")).toBeHidden();
+    await expect(page.locator("#avr-path-collection")).toBeHidden();
+    await expect(page.locator("#avr-path-files")).toBeVisible();
+  });
+
+  test("selecting Item List Still Needs to Be Collected reveals only that fieldset, and hides the files fieldset", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    await page.check("#avr-method-list_needs_collection");
+
+    await expect(page.locator("#avr-path-collection")).toBeVisible();
+    await expect(page.locator("#avr-path-enter-items")).toBeHidden();
+    await expect(page.locator("#avr-path-upload-paste")).toBeHidden();
+    await expect(page.locator("#avr-path-files")).toBeHidden();
+  });
+
+  test("switching methods does not leave stale validation errors from the previously-active path visible", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    await page.check("#avr-method-enter_items_now");
+    await page.click("#avr-submit-btn");
+    await expect(page.locator("#avr-error-summary")).toBeVisible();
+
+    await page.check("#avr-method-upload_or_paste_list");
+    await expect(page.locator("#avr-error-summary")).toBeHidden();
   });
 });
 
@@ -181,6 +315,7 @@ test.describe("missing-serial checkbox", () => {
   test("checking it disables and clears the serial input", async ({ page }) => {
     await stubTurnstileAndApi(page);
     await page.goto("/request-age-verification.html");
+    await page.check("#avr-method-enter_items_now");
 
     const firstItem = page.locator(".avr-item-card").first();
     const serialInput = firstItem.locator('input[type="text"][name$="_serial"]');
@@ -193,21 +328,22 @@ test.describe("missing-serial checkbox", () => {
 });
 
 test.describe("dynamic item add/remove", () => {
-  test("adding an item increases the count and each item shows its own file inputs", async ({ page }) => {
+  test("adding an item increases the count and each item shows a description field", async ({ page }) => {
     await stubTurnstileAndApi(page);
     await page.goto("/request-age-verification.html");
+    await page.check("#avr-method-enter_items_now");
 
     await page.click("#avr-add-item");
     await expect(page.locator(".avr-item-card")).toHaveCount(2);
 
     const secondItem = page.locator(".avr-item-card").nth(1);
-    await expect(secondItem.locator('input[type="file"][name$="_data_label_photo"]')).toHaveCount(1);
-    await expect(secondItem.locator('input[type="file"][name$="_overview_photo"]')).toHaveCount(1);
+    await expect(secondItem.locator('input[name$="_description"]')).toHaveCount(1);
   });
 
   test("removing an item decreases the count, and the remove button is hidden on the last remaining item", async ({ page }) => {
     await stubTurnstileAndApi(page);
     await page.goto("/request-age-verification.html");
+    await page.check("#avr-method-enter_items_now");
 
     await expect(page.locator(".avr-item-card .avr-remove-item").first()).toBeHidden();
 
@@ -222,6 +358,7 @@ test.describe("dynamic item add/remove", () => {
   test("item numbers renumber correctly after removal", async ({ page }) => {
     await stubTurnstileAndApi(page);
     await page.goto("/request-age-verification.html");
+    await page.check("#avr-method-enter_items_now");
 
     await page.click("#avr-add-item");
     await page.click("#avr-add-item");
@@ -236,24 +373,134 @@ test.describe("dynamic item add/remove", () => {
 });
 
 test.describe("pricing guidance", () => {
-  test("shows the planning-only estimate disclaimer once a service is selected", async ({ page }) => {
-    await stubTurnstileAndApi(page);
-    await page.goto("/request-age-verification.html");
-
-    await page.click('[data-service-option="age_verification"]');
-    await expect(page.locator("#avr-estimate")).toContainText("Estimated pricing for planning purposes only.");
-  });
-
-  test("the published pricing guidance strings appear on the page", async ({ page }) => {
+  test("the published pricing and submission-statement guidance strings appear on the page", async ({ page }) => {
     await stubTurnstileAndApi(page);
     await page.goto("/request-age-verification.html");
 
     await expect(page.locator(".avr-pricing-highlight")).toContainText(
-      "Typical Professional Age Verification pricing starts at $35"
+      "Professional Age Verification typically starts at $35"
     );
-    await expect(page.getByText(/does not authorize paid work/)).toBeVisible();
+    await expect(page.getByText(/Volume pricing may be available/)).toBeVisible();
+    await expect(page.getByText(/additional collection or coordination charge|additional charge will be explained/)).toBeVisible();
+    await expect(page.getByText(/does not authorize paid work/).first()).toBeVisible();
+    await expect(page.getByText(/no charge to submit a work order/i).first()).toBeVisible();
+    await expect(page.locator("#avr-estimate")).toHaveCount(0);
   });
 });
+
+test.describe("upload/paste an item list path", () => {
+  test("shows the centralized upload limit copy and the larger-list fallback message", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await page.check("#avr-method-upload_or_paste_list");
+
+    await expect(page.locator("#avr-upload-limit-copy")).toHaveText("Upload up to 2 files, with a maximum combined size of 3.5 MB.");
+    await expect(page.getByText(/Have a larger item list or supporting file/)).toBeVisible();
+  });
+
+  test('submission succeeds with only "I will provide the full item list after Item Assist contacts me" checked', async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.check("#avr-method-upload_or_paste_list");
+    await page.check("#avr-will-provide-later");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-confirmation")).toBeVisible();
+  });
+
+  test("submission succeeds with only pasted list text", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.check("#avr-method-upload_or_paste_list");
+    await page.fill("#avr-pasted-list", "TV, refrigerator, microwave");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-confirmation")).toBeVisible();
+  });
+
+  test("submission is blocked when no file, no pasted text, and no will-provide-later flag is present", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.check("#avr-method-upload_or_paste_list");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-error-summary")).toBeVisible();
+    await expect(page.locator("#avr-confirmation")).toBeHidden();
+  });
+});
+
+test.describe("item list collection path", () => {
+  test("submission succeeds with authorization confirmed and an email-only third-party contact", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.check("#avr-method-list_needs_collection");
+    await page.fill("#avr-tp-name", "John Insured");
+    await page.fill("#avr-tp-email", "john@example.com");
+    await page.check("#avr-tp-authorization-ack");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-confirmation")).toBeVisible();
+  });
+
+  test("submission is blocked without the third-party authorization acknowledgement", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.check("#avr-method-list_needs_collection");
+    await page.fill("#avr-tp-name", "John Insured");
+    await page.fill("#avr-tp-email", "john@example.com");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-error-summary")).toBeVisible();
+    await expect(page.locator("#avr-confirmation")).toBeHidden();
+  });
+
+  test("third-party contact information never appears in the page URL or in dispatched analytics events", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    const analyticsEvents = [];
+    await page.exposeFunction("__captureAnalytics", (detail) => analyticsEvents.push(detail));
+    await page.addInitScript(() => {
+      window.addEventListener("itemassist:analytics", (event) => window.__captureAnalytics(event.detail));
+    });
+
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.check("#avr-method-list_needs_collection");
+    await page.fill("#avr-tp-name", "John Insured");
+    await page.fill("#avr-tp-email", "john-secret@example.com");
+    await page.fill("#avr-tp-phone", "555-000-1111");
+    await page.check("#avr-tp-authorization-ack");
+
+    await page.click("#avr-submit-btn");
+    await expect(page.locator("#avr-confirmation")).toBeVisible();
+
+    expect(page.url()).not.toContain("john-secret");
+    expect(page.url()).not.toContain("555-000-1111");
+
+    const serializedEvents = JSON.stringify(analyticsEvents);
+    expect(serializedEvents).not.toContain("john-secret");
+    expect(serializedEvents).not.toContain("555-000-1111");
+    expect(serializedEvents).not.toContain("John Insured");
+  });
+});
+
+async function fillUniversalFields(page) {
+  await page.fill("#avr-full-name", "Jane Smith");
+  await page.fill("#avr-email", "jane@example.com");
+  await page.check("#avr-service-age_verification");
+  await page.fill("#avr-reason", "Need a supportable age estimate for a claim.");
+  await page.check("#avr-universal-ack");
+  await page.check("#avr-limitations-ack");
+}
 
 async function fillRequiredContactFields(page) {
   await page.fill("#avr-full-name", "Jane Smith");
@@ -261,16 +508,58 @@ async function fillRequiredContactFields(page) {
   await page.fill("#avr-phone", "555-555-5555");
   await page.selectOption("#avr-preferred-contact", "email");
   await page.selectOption("#avr-customer-type", "homeowner_or_consumer");
-  await page.selectOption("#avr-requested-service", "age_verification");
+  await page.check("#avr-service-age_verification");
   await page.fill("#avr-reason", "Need a supportable age estimate for a claim.");
+  await page.check("#avr-method-enter_items_now");
 
   const firstItem = page.locator(".avr-item-card").first();
+  await firstItem.locator('input[name$="_description"]').fill("Living room television");
   await firstItem.locator('select[name$="_category"]').selectOption("Television / Home Electronics");
   await firstItem.locator(".avr-no-serial-checkbox").check();
 
-  await page.check("#avr-authorization-ack");
+  await page.check("#avr-universal-ack");
   await page.check("#avr-limitations-ack");
 }
+
+test.describe("minimum submission", () => {
+  test("a valid request with only universal required fields succeeds (no phone, no company, no customer type)", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.check("#avr-method-enter_items_now");
+    await page.locator(".avr-item-card").first().locator('input[name$="_description"]').fill("Living room television");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-confirmation")).toBeVisible();
+  });
+
+  test("missing a required universal field blocks submission", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.fill("#avr-full-name", "");
+    await page.check("#avr-method-enter_items_now");
+    await page.locator(".avr-item-card").first().locator('input[name$="_description"]').fill("Living room television");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-error-summary")).toBeVisible();
+    await expect(page.locator("#avr-confirmation")).toBeHidden();
+  });
+
+  test("an item without a description blocks submission under Enter Items Now", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.check("#avr-method-enter_items_now");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-error-summary")).toBeVisible();
+    await expect(page.locator("#avr-confirmation")).toBeHidden();
+  });
+});
 
 test.describe("submission", () => {
   test("a fully valid submission shows the confirmation panel with the expected fields", async ({ page }) => {
@@ -283,7 +572,7 @@ test.describe("submission", () => {
     await expect(page.locator("#avr-confirmation")).toBeVisible();
     await expect(page.locator("#avr-intake-form")).toBeHidden();
     await expect(page.locator("#avr-confirm-id")).toHaveText("IAV-20260729-DEADBEEF");
-    await expect(page.locator("#avr-confirm-service")).toHaveText("Professional Age Verification");
+    await expect(page.locator("#avr-confirm-service")).toHaveText("Age Verification");
     await expect(page.locator("#avr-confirm-items")).toHaveText("1");
     await expect(page.locator("#avr-confirm-email")).toHaveText("jane@example.com");
 
@@ -328,15 +617,16 @@ test.describe("submission", () => {
 });
 
 test.describe("keyboard navigation and focus", () => {
-  test("service cards and the add-item button are reachable and operable via keyboard", async ({ page }) => {
+  test("service checkboxes and the add-item button are reachable and operable via keyboard", async ({ page }) => {
     await stubTurnstileAndApi(page);
     await page.goto("/request-age-verification.html");
 
-    await page.locator('[data-service-option="age_verification"]').focus();
-    await expect(page.locator('[data-service-option="age_verification"]')).toBeFocused();
-    await page.keyboard.press("Enter");
-    await expect(page.locator('[data-service-option="age_verification"]')).toHaveClass(/is-selected/);
+    await page.locator("#avr-service-age_verification").focus();
+    await expect(page.locator("#avr-service-age_verification")).toBeFocused();
+    await page.keyboard.press("Space");
+    await expect(page.locator("#avr-service-age_verification")).toBeChecked();
 
+    await page.check("#avr-method-enter_items_now");
     await page.locator("#avr-add-item").focus();
     await expect(page.locator("#avr-add-item")).toBeFocused();
     await page.keyboard.press("Enter");
@@ -351,10 +641,8 @@ test.describe("keyboard navigation and focus", () => {
     const boxShadow = await page.locator("#avr-full-name").evaluate((el) => getComputedStyle(el).boxShadow);
     expect(boxShadow).not.toBe("none");
 
-    await page.locator('[data-service-option="age_verification"]').focus();
-    const cardOutline = await page
-      .locator('[data-service-option="age_verification"]')
-      .evaluate((el) => getComputedStyle(el).outlineStyle);
-    expect(cardOutline).not.toBe("none");
+    await page.locator("#avr-service-age_verification").focus();
+    const outline = await page.locator("#avr-service-age_verification").evaluate((el) => getComputedStyle(el).outlineStyle);
+    expect(outline).not.toBe("none");
   });
 });

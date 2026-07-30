@@ -9,11 +9,14 @@ const { checkRateLimit } = require("./lib/age-verification/ratelimit");
 const { verifyTurnstile } = require("./lib/age-verification/turnstile");
 const { sendInternalNotification, sendCustomerConfirmation } = require("./lib/age-verification/email");
 const AVShared = require("../assets/js/av-shared.js");
+const AVFileRules = require("../assets/js/av-file-rules.js");
 
 const RESULT_STATUSES = AVShared.RESULT_STATUSES;
 const EXPECTED_RESPONSE_WINDOW = "within 1–2 business days";
-const ITEM_FIELD_PATTERN = /^item_(\d+)_(category|brand|model|serial|no_serial|notes|purchase_info)$/;
+const ITEM_FIELD_PATTERN = /^item_(\d+)_(description|category|brand|model|serial|no_serial|approximate_age|requested_research|notes)$/;
 const SHARED_DOCUMENT_FIELDS = ["shared_document_1", "shared_document_2"];
+const MULTI_VALUE_FIELDS = new Set(["requested_services"]);
+const MAX_PASTED_LIST_LENGTH = AVShared.MAX_PASTED_LIST_LENGTH;
 
 function json(res, status, payload) {
   res.status(status).setHeader("Content-Type", "application/json; charset=utf-8");
@@ -24,6 +27,11 @@ function normalizeField(value) {
   return String(value == null ? "" : value).trim();
 }
 
+function normalizeRequestedServices(value) {
+  const list = Array.isArray(value) ? value : value ? [value] : [];
+  return list.map(normalizeField).filter(Boolean);
+}
+
 function extractValidEmail(emailString) {
   const value = normalizeField(emailString);
   return validation.isValidEmail(value) ? value : null;
@@ -31,14 +39,15 @@ function extractValidEmail(emailString) {
 
 /**
  * Reconstructs the item list from flat multipart/JSON field names like
- * item_3_category, item_3_serial, item_3_no_serial, merging in any files
- * collected under item_3_data_label_photo / item_3_overview_photo.
+ * item_3_description, item_3_category, item_3_serial, item_3_no_serial.
+ * Files are never per-item in this architecture — all uploads share one
+ * capped pool (see SHARED_DOCUMENT_FIELDS) that stays well under Vercel's
+ * fixed request-body limit.
  *
  * @param {Record<string,string>} fields
- * @param {Record<number,{dataLabelPhoto?: object, overviewPhoto?: object}>} itemFiles
  * @returns {Array<object>}
  */
-function buildItemsFromFields(fields, itemFiles) {
+function buildItemsFromFields(fields) {
   const indices = new Set();
 
   Object.keys(fields).forEach((key) => {
@@ -48,40 +57,38 @@ function buildItemsFromFields(fields, itemFiles) {
     }
   });
 
-  Object.keys(itemFiles || {}).forEach((key) => indices.add(Number(key)));
-
   return Array.from(indices)
     .sort((a, b) => a - b)
     .map((index) => ({
+      description: normalizeField(fields[`item_${index}_description`]),
       category: normalizeField(fields[`item_${index}_category`]),
       brand: normalizeField(fields[`item_${index}_brand`]),
       model: normalizeField(fields[`item_${index}_model`]),
       serial: normalizeField(fields[`item_${index}_serial`]),
       noSerial: Boolean(fields[`item_${index}_no_serial`]),
-      notes: normalizeField(fields[`item_${index}_notes`]),
-      purchaseInfo: normalizeField(fields[`item_${index}_purchase_info`]),
-      files: {
-        dataLabelPhoto: (itemFiles && itemFiles[index] && itemFiles[index].dataLabelPhoto) || null,
-        overviewPhoto: (itemFiles && itemFiles[index] && itemFiles[index].overviewPhoto) || null
-      }
+      approximateAge: normalizeField(fields[`item_${index}_approximate_age`]),
+      requestedResearch: normalizeField(fields[`item_${index}_requested_research`]),
+      notes: normalizeField(fields[`item_${index}_notes`])
     }));
 }
 
 function parseJsonBody(body) {
   const fields = {};
   Object.keys(body || {}).forEach((key) => {
-    if (typeof body[key] === "string" || typeof body[key] === "boolean" || typeof body[key] === "number") {
-      fields[key] = body[key];
+    const value = body[key];
+    if (typeof value === "string" || typeof value === "boolean" || typeof value === "number") {
+      fields[key] = value;
+    } else if (Array.isArray(value) && MULTI_VALUE_FIELDS.has(key)) {
+      fields[key] = value.filter((entry) => typeof entry === "string");
     }
   });
 
-  return { fields, itemFiles: {}, sharedDocuments: [], fileBuffers: [] };
+  return { fields, sharedDocuments: [], fileBuffers: [] };
 }
 
 function parseMultipartForm(req) {
   return new Promise((resolve, reject) => {
     const fields = {};
-    const itemFiles = {};
     const sharedDocuments = [];
     const fileBuffers = [];
     let totalBytes = 0;
@@ -93,19 +100,23 @@ function parseMultipartForm(req) {
       limits: {
         files: files.MAX_FILE_COUNT,
         fileSize: files.MAX_FILE_SIZE_BYTES,
-        fields: 60
+        fields: 80
       }
     });
 
     busboy.on("field", (name, value) => {
-      fields[name] = value;
+      if (MULTI_VALUE_FIELDS.has(name)) {
+        fields[name] = fields[name] || [];
+        fields[name].push(value);
+      } else {
+        fields[name] = value;
+      }
     });
 
     busboy.on("file", (name, stream, info) => {
       const isSharedDocument = SHARED_DOCUMENT_FIELDS.includes(name);
-      const itemFileMatch = name.match(/^item_(\d+)_(data_label_photo|overview_photo)$/);
 
-      if (!isSharedDocument && !itemFileMatch) {
+      if (!isSharedDocument) {
         stream.resume();
         return;
       }
@@ -120,7 +131,7 @@ function parseMultipartForm(req) {
       const mimeType = String(info && info.mimeType ? info.mimeType : "").toLowerCase();
 
       if (!files.isAllowedAttachment(filename, mimeType)) {
-        parseError = "Only JPG, JPEG, PNG, and PDF files are accepted.";
+        parseError = `Only ${AVFileRules.ALLOWED_TYPES_SUMMARY} files are accepted.`;
       }
 
       fileCount += 1;
@@ -132,7 +143,7 @@ function parseMultipartForm(req) {
       let size = 0;
 
       stream.on("limit", () => {
-        parseError = `Each file must be ${Math.round(files.MAX_FILE_SIZE_BYTES / (1024 * 1024))}MB or smaller.`;
+        parseError = `Each file must be ${AVFileRules.formatMB(files.MAX_FILE_SIZE_BYTES)}MB or smaller.`;
       });
 
       stream.on("data", (chunk) => {
@@ -140,7 +151,7 @@ function parseMultipartForm(req) {
         totalBytes += chunk.length;
 
         if (!parseError && totalBytes > files.MAX_TOTAL_BYTES) {
-          parseError = `Total attachment size must be ${Math.round(files.MAX_TOTAL_BYTES / (1024 * 1024))}MB or smaller.`;
+          parseError = `Total attachment size must be ${AVFileRules.formatMB(files.MAX_TOTAL_BYTES)}MB or smaller.`;
         }
 
         if (!parseError) {
@@ -156,15 +167,7 @@ function parseMultipartForm(req) {
         const fileMeta = { filename, mimeType: mimeType || "application/octet-stream", size };
         const buffer = Buffer.concat(chunks);
         fileBuffers.push({ filename, buffer });
-
-        if (isSharedDocument) {
-          sharedDocuments.push(fileMeta);
-        } else if (itemFileMatch) {
-          const index = Number(itemFileMatch[1]);
-          const slot = itemFileMatch[2] === "data_label_photo" ? "dataLabelPhoto" : "overviewPhoto";
-          itemFiles[index] = itemFiles[index] || {};
-          itemFiles[index][slot] = fileMeta;
-        }
+        sharedDocuments.push(fileMeta);
       });
     });
 
@@ -180,7 +183,7 @@ function parseMultipartForm(req) {
         return;
       }
 
-      resolve({ fields, itemFiles, sharedDocuments, fileBuffers });
+      resolve({ fields, sharedDocuments, fileBuffers });
     });
 
     req.pipe(busboy);
@@ -216,8 +219,27 @@ function buildSubmission(fields, items, sharedDocuments) {
       preferredContactMethod: normalizeField(fields.preferred_contact_method)
     },
     company: normalizeField(fields.company),
-    selectedService: normalizeField(fields.requested_service),
-    reasonForRequest: normalizeField(fields.reason_for_request),
+    insuredOrPolicyholderName: normalizeField(fields.insured_or_policyholder_name),
+    requestedServices: normalizeRequestedServices(fields.requested_services),
+    workOrderDescription: normalizeField(fields.work_order_description),
+    informationMethod: normalizeField(fields.information_method),
+    items,
+    itemList: {
+      pastedText: normalizeField(fields.pasted_item_list).slice(0, MAX_PASTED_LIST_LENGTH),
+      estimatedItemCount: normalizeField(fields.estimated_item_count),
+      workInstructions: normalizeField(fields.work_instructions),
+      willProvideLater: Boolean(fields.will_provide_list_later)
+    },
+    thirdPartyCollection: {
+      contactNameOrOrg: normalizeField(fields.third_party_contact_name),
+      phone: normalizeField(fields.third_party_phone),
+      email: normalizeField(fields.third_party_email),
+      relationship: normalizeField(fields.third_party_relationship),
+      preferredContactMethod: normalizeField(fields.third_party_preferred_contact_method),
+      contactInstructions: normalizeField(fields.third_party_contact_instructions),
+      knownCategoriesOrScope: normalizeField(fields.third_party_known_scope),
+      authorizationAck: Boolean(fields.third_party_authorization_ack)
+    },
     claimReference: normalizeField(fields.claim_reference),
     requestedCompletionDate: normalizeField(fields.requested_completion_date),
     billing: {
@@ -225,9 +247,8 @@ function buildSubmission(fields, items, sharedDocuments) {
       poRequired: normalizeField(fields.po_required),
       specialReportingRequirements: normalizeField(fields.special_reporting_requirements)
     },
-    authorizationAck: Boolean(fields.authorization_ack),
-    limitationsAck: Boolean(fields.limitations_ack),
-    items,
+    universalAck: Boolean(fields.universal_ack),
+    ageVerificationLimitationsAck: Boolean(fields.limitations_ack),
     sharedDocuments,
     attribution: {
       source: referral.source || "",
@@ -240,7 +261,7 @@ function buildSubmission(fields, items, sharedDocuments) {
 }
 
 /**
- * Builds the age-verification-request handler with all external clients
+ * Builds the work-order-request handler with all external clients
  * injectable, so tests can exercise the full request lifecycle (parsing,
  * validation, rate limiting, Turnstile, persistence, email) against fakes
  * with no live network calls.
@@ -291,7 +312,7 @@ function createHandler(overrides = {}) {
       return json(res, 400, { ok: false, error: error.message || "One or more attachments could not be processed." });
     }
 
-    const { fields, itemFiles, sharedDocuments, fileBuffers } = parsed;
+    const { fields, sharedDocuments, fileBuffers } = parsed;
 
     if (normalizeField(fields.website)) {
       return json(res, 200, { ok: true, message: "Request received." });
@@ -309,7 +330,7 @@ function createHandler(overrides = {}) {
       return json(res, 429, { ok: false, error: "Too many requests. Please try again in a few minutes." });
     }
 
-    const items = buildItemsFromFields(fields, itemFiles);
+    const items = buildItemsFromFields(fields);
     const submission = buildSubmission(fields, items, sharedDocuments);
 
     const contactErrors = validation.validateContactFields({
@@ -319,29 +340,35 @@ function createHandler(overrides = {}) {
       customerType: submission.customerType,
       preferredContactMethod: submission.contact.preferredContactMethod,
       company: submission.company,
-      requestedService: submission.selectedService,
-      reasonForRequest: submission.reasonForRequest,
-      authorizationAck: submission.authorizationAck,
-      limitationsAck: submission.limitationsAck
+      requestedServices: submission.requestedServices,
+      informationMethod: submission.informationMethod,
+      workOrderDescription: submission.workOrderDescription,
+      universalAck: submission.universalAck,
+      ageVerificationLimitationsAck: submission.ageVerificationLimitationsAck
     });
-    const itemErrors = validation.validateItems(items);
 
-    if (contactErrors.length > 0 || itemErrors.length > 0) {
-      return json(res, 400, { ok: false, error: contactErrors.concat(itemErrors)[0], errors: contactErrors.concat(itemErrors) });
+    const pathErrors = validation.validateInformationMethodPath(submission.informationMethod, {
+      items,
+      itemList: {
+        hasUploadedFile: sharedDocuments.length > 0,
+        pastedText: submission.itemList.pastedText,
+        willProvideLater: submission.itemList.willProvideLater
+      },
+      thirdPartyCollection: submission.thirdPartyCollection
+    });
+
+    if (contactErrors.length > 0 || pathErrors.length > 0) {
+      return json(res, 400, { ok: false, error: contactErrors.concat(pathErrors)[0], errors: contactErrors.concat(pathErrors) });
     }
 
-    const allFileMeta = items
-      .flatMap((item) => [item.files.dataLabelPhoto, item.files.overviewPhoto])
-      .filter(Boolean)
-      .concat(sharedDocuments);
-    const fileError = files.validateUploadSet(allFileMeta, sharedDocuments);
+    const fileError = files.validateUploadSet(sharedDocuments, sharedDocuments);
 
     if (fileError) {
       return json(res, 400, { ok: false, error: fileError });
     }
 
     const submitterEmail = extractValidEmail(submission.contact.email);
-    if (!submitterEmail) {
+    if (submission.contact.email && !submitterEmail) {
       return json(res, 400, { ok: false, error: "Please enter a valid email address." });
     }
 
@@ -365,39 +392,76 @@ function createHandler(overrides = {}) {
 
     const requestId = makeRequestId(now());
     const timestamp = now().toISOString();
+    const requiresAvAck = validation.requiresAgeVerificationLimitationsAck(submission.requestedServices);
+    const isCollectionPath = submission.informationMethod === "list_needs_collection";
+    const isUploadPastePath = submission.informationMethod === "upload_or_paste_list";
 
     const record = {
       requestId,
+      schemaVersion: 2,
       status: "submitted",
+      pricingScopeStatus: "pending_review",
       createdAt: timestamp,
       updatedAt: timestamp,
       customerType: submission.customerType,
       contact: submission.contact,
       company: submission.company,
-      selectedService: submission.selectedService,
-      reasonForRequest: submission.reasonForRequest,
+      insuredOrPolicyholderName: submission.insuredOrPolicyholderName,
+      requestedServices: submission.requestedServices,
+      workOrderDescription: submission.workOrderDescription,
+      informationMethod: submission.informationMethod,
       items: items.map((item) => ({
+        description: item.description,
         category: item.category,
         brand: item.brand,
         model: item.model,
         serial: item.noSerial ? "" : item.serial,
         noSerial: item.noSerial,
-        notes: item.notes,
-        purchaseInfo: item.purchaseInfo,
-        files: item.files
+        approximateAge: item.approximateAge,
+        requestedResearch: item.requestedResearch,
+        notes: item.notes
       })),
+      itemList: isUploadPastePath
+        ? {
+            pastedText: submission.itemList.pastedText,
+            estimatedItemCount: submission.itemList.estimatedItemCount,
+            workInstructions: submission.itemList.workInstructions,
+            willProvideLater: submission.itemList.willProvideLater,
+            uploadedFiles: sharedDocuments
+          }
+        : null,
+      thirdPartyCollection: isCollectionPath
+        ? {
+            contactNameOrOrg: submission.thirdPartyCollection.contactNameOrOrg,
+            phone: submission.thirdPartyCollection.phone,
+            email: submission.thirdPartyCollection.email,
+            relationship: submission.thirdPartyCollection.relationship,
+            preferredContactMethod: submission.thirdPartyCollection.preferredContactMethod,
+            contactInstructions: submission.thirdPartyCollection.contactInstructions,
+            knownCategoriesOrScope: submission.thirdPartyCollection.knownCategoriesOrScope,
+            authorizationAck: submission.thirdPartyCollection.authorizationAck,
+            authorizationAckAt: submission.thirdPartyCollection.authorizationAck ? timestamp : null
+          }
+        : null,
       claimReference: submission.claimReference,
       requestedCompletionDate: submission.requestedCompletionDate,
       billing: submission.billing,
       attribution: submission.attribution,
       sharedDocuments,
       authorization: {
-        authorizationAck: submission.authorizationAck,
-        limitationsAck: submission.limitationsAck
+        universalAck: submission.universalAck,
+        ageVerificationLimitationsAck: requiresAvAck ? submission.ageVerificationLimitationsAck : null,
+        thirdPartyContactAck: isCollectionPath ? submission.thirdPartyCollection.authorizationAck : null
       },
       submissionMeta: {
+        informationMethod: submission.informationMethod,
         itemCount: items.length,
-        fileCount: allFileMeta.length,
+        hasPastedList: Boolean(submission.itemList.pastedText),
+        hasUploadedList: isUploadPastePath && sharedDocuments.length > 0,
+        willProvideListLater: submission.itemList.willProvideLater,
+        thirdPartyCollectionRequested: isCollectionPath,
+        fileCount: sharedDocuments.length,
+        totalFileBytes: sharedDocuments.reduce((sum, file) => sum + (file.size || 0), 0),
         userAgent: normalizeField(req.headers["user-agent"]),
         submittedAt: timestamp
       }
@@ -425,16 +489,18 @@ function createHandler(overrides = {}) {
       });
     }
 
-    try {
-      await sendCustomerConfirmation(resend, record, { fromEmail });
-    } catch (error) {
-      logError("age-verification-request customer confirmation failed", requestId, error.message);
+    if (record.contact.email) {
+      try {
+        await sendCustomerConfirmation(resend, record, { fromEmail });
+      } catch (error) {
+        logError("age-verification-request customer confirmation failed", requestId, error.message);
+      }
     }
 
     return json(res, 200, {
       ok: true,
       requestId,
-      selectedService: record.selectedService,
+      requestedServices: record.requestedServices,
       itemCount: items.length,
       contactEmail: record.contact.email,
       expectedResponseWindow: EXPECTED_RESPONSE_WINDOW

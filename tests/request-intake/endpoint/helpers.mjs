@@ -48,7 +48,7 @@ export function createFakeResend({ failOn = null } = {}) {
     sent,
     emails: {
       async send(payload) {
-        const isInternal = payload.subject.startsWith("New Professional Request");
+        const isInternal = payload.subject.startsWith("New Work Order Request");
         const isCustomer = payload.subject.startsWith("Your Item Assist");
 
         if (failOn === "internal" && isInternal) {
@@ -130,18 +130,45 @@ export function validSubmissionBody(overrides = {}) {
     customer_type: "homeowner_or_consumer",
     preferred_contact_method: "email",
     company: "",
-    requested_service: "age_verification",
-    reason_for_request: "Need a supportable age estimate for an insurance claim.",
-    authorization_ack: true,
+    requested_services: ["age_verification"],
+    information_method: "enter_items_now",
+    work_order_description: "Need a supportable age estimate for an insurance claim.",
+    universal_ack: true,
     limitations_ack: true,
     website: "",
     turnstileToken: "valid-token",
-    item_0_category: "Television",
+    item_0_description: "Living room television",
+    item_0_category: "Television / Home Electronics",
     item_0_brand: "Sony",
     item_0_model: "XBR-65X900F",
     item_0_serial: "",
     item_0_no_serial: true,
     item_0_notes: "Found in living room, no visible label.",
+    ...overrides
+  };
+}
+
+/**
+ * Minimal universal-fields-only submission: no company, no customer type, no
+ * preferred contact method, phone omitted (email present), one item with
+ * only a description.
+ */
+export function minimalSubmissionBody(overrides = {}) {
+  return {
+    full_name: "Jane Smith",
+    email: "jane@example.com",
+    phone: "",
+    customer_type: "",
+    preferred_contact_method: "",
+    company: "",
+    requested_services: ["age_verification"],
+    information_method: "enter_items_now",
+    work_order_description: "Need a supportable age estimate.",
+    universal_ack: true,
+    limitations_ack: true,
+    website: "",
+    turnstileToken: "valid-token",
+    item_0_description: "Living room television",
     ...overrides
   };
 }

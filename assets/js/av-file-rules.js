@@ -6,12 +6,39 @@
 (function (root) {
   "use strict";
 
-  var MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
-  var MAX_TOTAL_BYTES = 20 * 1024 * 1024;
-  var MAX_FILE_COUNT = 10;
-  var ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".pdf"];
-  var ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "application/pdf"];
+  /* Proof-of-concept limits: files stay on the existing multipart/Resend-
+   * attachment path (not direct-to-storage), so every byte of every upload
+   * counts against Vercel's fixed 4.5MB Serverless Function request-body
+   * limit alongside the rest of the multipart request -- form fields,
+   * pasted item-list text, filenames, MIME headers, and multipart boundary
+   * overhead. 2 files x 2MB each caps combined file bytes at 4MB, which
+   * would leave almost no headroom, so the combined cap is set below that
+   * ceiling (3.5MB) to leave roughly 1MB of headroom for everything else in
+   * the request. Do not raise these without re-verifying the complete
+   * multipart request stays safely under that platform limit. */
+  var MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024;
+  var MAX_TOTAL_BYTES = 3.5 * 1024 * 1024;
+  var MAX_FILE_COUNT = 2;
+  var ALLOWED_EXTENSIONS = [".pdf", ".xlsx", ".csv", ".docx", ".txt", ".jpg", ".jpeg", ".png"];
+  var ALLOWED_MIME_TYPES = [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel",
+    "text/csv",
+    "application/csv",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "text/plain",
+    "image/jpeg",
+    "image/png"
+  ];
   var MAX_SHARED_DOCUMENTS = 2;
+  var UPLOAD_LIMIT_SUMMARY = "Upload up to 2 files, with a maximum combined size of 3.5 MB.";
+  var ALLOWED_TYPES_SUMMARY = "PDF, XLSX, CSV, DOCX, TXT, JPG, JPEG, or PNG";
+
+  function formatMB(bytes) {
+    var mb = bytes / (1024 * 1024);
+    return (Math.round(mb * 10) / 10).toString();
+  }
 
   function getExtension(filename) {
     var value = String(filename || "").trim().toLowerCase();
@@ -49,22 +76,22 @@
       var mimeType = file.type || file.mimeType || "";
 
       if (!isAllowedExtension(file.name)) {
-        return "Only JPG, JPEG, PNG, and PDF files are accepted.";
+        return "Only " + ALLOWED_TYPES_SUMMARY + " files are accepted.";
       }
 
       if (!isAllowedMimeType(mimeType)) {
-        return "Only JPG, JPEG, PNG, and PDF files are accepted.";
+        return "Only " + ALLOWED_TYPES_SUMMARY + " files are accepted.";
       }
 
       if (file.size > MAX_FILE_SIZE_BYTES) {
-        return "Each file must be " + Math.round(MAX_FILE_SIZE_BYTES / (1024 * 1024)) + "MB or smaller.";
+        return "Each file must be " + formatMB(MAX_FILE_SIZE_BYTES) + "MB or smaller.";
       }
 
       totalSize += file.size;
     }
 
     if (totalSize > MAX_TOTAL_BYTES) {
-      return "Total attachment size must be " + Math.round(MAX_TOTAL_BYTES / (1024 * 1024)) + "MB or smaller.";
+      return "Total attachment size must be " + formatMB(MAX_TOTAL_BYTES) + "MB or smaller.";
     }
 
     return null;
@@ -99,6 +126,9 @@
     MAX_SHARED_DOCUMENTS: MAX_SHARED_DOCUMENTS,
     ALLOWED_EXTENSIONS: ALLOWED_EXTENSIONS,
     ALLOWED_MIME_TYPES: ALLOWED_MIME_TYPES,
+    UPLOAD_LIMIT_SUMMARY: UPLOAD_LIMIT_SUMMARY,
+    formatMB: formatMB,
+    ALLOWED_TYPES_SUMMARY: ALLOWED_TYPES_SUMMARY,
     getExtension: getExtension,
     isAllowedExtension: isAllowedExtension,
     isAllowedMimeType: isAllowedMimeType,
