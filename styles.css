@@ -7132,6 +7132,41 @@ body.homepage-redesign .hero-report-preview .tbl tbody td {
   margin: 0.5rem auto 0;
 }
 
+.avr-service-card,
+.avr-method-card {
+  align-items: flex-start;
+}
+
+.avr-service-card input[type="checkbox"],
+.avr-method-card input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin: 0 0 0.5rem;
+  flex-shrink: 0;
+}
+
+.avr-service-card-body,
+.avr-method-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.avr-service-card--shortcut {
+  border-style: dashed;
+}
+
+.avr-method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.avr-universal-submission-note {
+  font-weight: 600;
+}
+
 .avr-table-wrap {
   overflow-x: auto;
 }
@@ -7340,6 +7375,10 @@ body.homepage-redesign .hero-report-preview .tbl tbody td {
   margin-top: 0.25rem;
 }
 
+.avr-checkbox-row[hidden] {
+  display: none;
+}
+
 .avr-checkbox-row {
   display: flex;
   align-items: flex-start;
@@ -7439,7 +7478,8 @@ body.homepage-redesign .hero-report-preview .tbl tbody td {
 }
 
 @media (max-width: 900px) {
-  .avr-service-grid {
+  .avr-service-grid,
+  .avr-method-grid {
     grid-template-columns: 1fr;
   }
 

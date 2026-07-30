@@ -26,7 +26,7 @@ async function stubTurnstileAndApi(page, { submitResponse } = {}) {
       body: {
         ok: true,
         requestId: "IAV-20260729-DEADBEEF",
-        selectedService: "age_verification",
+        requestedServices: ["age_verification"],
         itemCount: 1,
         contactEmail: "jane@example.com",
         expectedResponseWindow: "within 1–2 business days"

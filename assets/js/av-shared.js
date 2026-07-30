@@ -31,7 +31,97 @@
     "repair_professional"
   ];
 
-  var REQUESTED_SERVICES = ["age_verification", "full_valuation", "unsure"];
+  /* Work-order services: three concrete, selectable services plus "unsure".
+   * "All of the Above" is a UI shortcut only — it is never itself a stored
+   * value. See toggleRequestedService()/isAllOfTheAboveSelected() below for
+   * the shared selection rules so the client and any future consumer can't
+   * drift out of sync on this behavior. */
+  var CONCRETE_SERVICES = ["age_verification", "item_pricing_valuation", "item_list_collection"];
+  var REQUESTED_SERVICE_VALUES = CONCRETE_SERVICES.concat(["unsure"]);
+
+  var INFORMATION_METHODS = ["enter_items_now", "upload_or_paste_list", "list_needs_collection"];
+
+  var MAX_PASTED_LIST_LENGTH = 20000;
+
+  /**
+   * Pure reducer for the requested-services checkbox-card group. `selected`
+   * is the current array of stored values (any of CONCRETE_SERVICES plus,
+   * exclusively, "unsure"); `toggledValue` is the card just clicked, either
+   * one of CONCRETE_SERVICES, "unsure", or the "all" shortcut. Returns the
+   * new selection array — never containing "all" itself.
+   *
+   * Rules (all product-approved):
+   *  - Selecting "unsure" clears every concrete service.
+   *  - Selecting any concrete service clears "unsure".
+   *  - Selecting "all" selects exactly the three concrete services and
+   *    clears "unsure"; selecting it again (once all three are already
+   *    selected) deselects all three.
+   *  - Manually deselecting one concrete service just removes that one
+   *    value — isAllOfTheAboveSelected() naturally goes false since it's
+   *    derived from the current selection, not tracked separately.
+   *
+   * @param {string[]} selected
+   * @param {string} toggledValue
+   * @returns {string[]}
+   */
+  function toggleRequestedService(selected, toggledValue) {
+    var current = Array.isArray(selected) ? selected.slice() : [];
+
+    function has(value) {
+      return current.indexOf(value) !== -1;
+    }
+    function remove(value) {
+      var index = current.indexOf(value);
+      if (index !== -1) {
+        current.splice(index, 1);
+      }
+    }
+
+    if (toggledValue === "unsure") {
+      return has("unsure") ? [] : ["unsure"];
+    }
+
+    if (toggledValue === "all") {
+      var allSelected = CONCRETE_SERVICES.every(has);
+      return allSelected ? [] : CONCRETE_SERVICES.slice();
+    }
+
+    if (CONCRETE_SERVICES.indexOf(toggledValue) === -1) {
+      return current;
+    }
+
+    if (has(toggledValue)) {
+      remove(toggledValue);
+    } else {
+      remove("unsure");
+      current.push(toggledValue);
+    }
+
+    return current;
+  }
+
+  /**
+   * @param {string[]} selected
+   * @returns {boolean} true only when all three concrete services are selected
+   */
+  function isAllOfTheAboveSelected(selected) {
+    var current = Array.isArray(selected) ? selected : [];
+    return CONCRETE_SERVICES.every((value) => current.indexOf(value) !== -1);
+  }
+
+  /**
+   * The Age-Verification-specific limitations acknowledgement is only shown
+   * and required when Age Verification is requested without Item Pricing /
+   * Valuation also being requested — once pricing/valuation is in scope, the
+   * "no pricing decisions" language would be actively wrong.
+   *
+   * @param {string[]} requestedServices
+   * @returns {boolean}
+   */
+  function requiresAgeVerificationLimitationsAck(requestedServices) {
+    var current = Array.isArray(requestedServices) ? requestedServices : [];
+    return current.indexOf("age_verification") !== -1 && current.indexOf("item_pricing_valuation") === -1;
+  }
 
   /* Single source of truth for the category <select> option values, so the
    * DecodeMyItem key mapping below can never drift out of sync with the
@@ -194,7 +284,10 @@
     RESULT_STATUSES: RESULT_STATUSES,
     CUSTOMER_TYPES: CUSTOMER_TYPES,
     PROFESSIONAL_CUSTOMER_TYPES: PROFESSIONAL_CUSTOMER_TYPES,
-    REQUESTED_SERVICES: REQUESTED_SERVICES,
+    CONCRETE_SERVICES: CONCRETE_SERVICES,
+    REQUESTED_SERVICE_VALUES: REQUESTED_SERVICE_VALUES,
+    INFORMATION_METHODS: INFORMATION_METHODS,
+    MAX_PASTED_LIST_LENGTH: MAX_PASTED_LIST_LENGTH,
     CATEGORY_OPTIONS: CATEGORY_OPTIONS,
     MAX_PARAM_LENGTH: MAX_PARAM_LENGTH,
     sanitizeQueryValue: sanitizeQueryValue,
@@ -204,6 +297,9 @@
     getReferralIntroCopy: getReferralIntroCopy,
     isProfessionalCustomerType: isProfessionalCustomerType,
     mapDecodeMyItemCategory: mapDecodeMyItemCategory,
+    toggleRequestedService: toggleRequestedService,
+    isAllOfTheAboveSelected: isAllOfTheAboveSelected,
+    requiresAgeVerificationLimitationsAck: requiresAgeVerificationLimitationsAck,
     generateRequestId: generateRequestId
   };
 
