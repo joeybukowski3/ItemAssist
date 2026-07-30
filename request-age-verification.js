@@ -41,16 +41,9 @@
   var lastSubmissionAt = 0;
   var hasTrackedFormStart = false;
 
-  var CATEGORY_OPTIONS = [
-    "Television / Home Electronics",
-    "Computer / Tablet",
-    "Major Household Appliance",
-    "Small Kitchen Appliance",
-    "Furniture / Household Goods",
-    "Power Tool",
-    "Lawn Equipment",
-    "Other"
-  ];
+  // Single source of truth lives in AVShared so the DecodeMyItem category
+  // mapping can never drift out of sync with these option values.
+  var CATEGORY_OPTIONS = AVShared.CATEGORY_OPTIONS;
 
   var referral = AVShared.parseReferralParams(new URLSearchParams(window.location.search));
   var isReferral = AVShared.isDecodeMyItemReferral(referral);
@@ -531,8 +524,15 @@
     var brandInput = firstItemBlock.querySelector('input[name$="_brand"]');
     var modelInput = firstItemBlock.querySelector('input[name$="_model"]');
 
-    if (referral.category && Array.from(categorySelect.options).some((opt) => opt.value === referral.category)) {
-      categorySelect.value = referral.category;
+    // DecodeMyItem sends its own internal category keys (electronics,
+    // appliances, hvac, waterHeaters), not this form's option values —
+    // mapDecodeMyItemCategory() translates between them. Unknown/unmapped
+    // keys resolve to "", which correctly leaves the field unselected
+    // instead of forcing an incorrect value. The select stays fully
+    // user-editable either way.
+    var mappedCategory = AVShared.mapDecodeMyItemCategory(referral.category);
+    if (mappedCategory) {
+      categorySelect.value = mappedCategory;
     }
     if (referral.brand) {
       brandInput.value = referral.brand;

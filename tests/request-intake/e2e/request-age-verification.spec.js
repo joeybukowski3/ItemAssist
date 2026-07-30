@@ -28,7 +28,11 @@ test.describe("direct visit", () => {
 test.describe("DecodeMyItem referral", () => {
   test("resolved status shows the correct banner copy and prefills brand/model/category", async ({ page }) => {
     await stubTurnstileAndApi(page);
-    await page.goto("/request-age-verification.html?source=decodemyitem&result_status=resolved&brand=Sony&model=XBR-65X900F&category=Television%20%2F%20Home%20Electronics&result_id=RES-123");
+    // "category=electronics" is DecodeMyItem's real internal key (not a
+    // form option label) -- this exercises the actual cross-site contract,
+    // not a coincidentally-matching literal string. See "category mapping"
+    // describe block below for full key coverage.
+    await page.goto("/request-age-verification.html?source=decodemyitem&result_status=resolved&brand=Sony&model=XBR-65X900F&category=electronics&result_id=RES-123");
 
     await expect(page.locator("#avr-referral-banner")).toBeVisible();
     await expect(page.locator("#avr-referral-copy")).toContainText("automated age estimate");
@@ -39,6 +43,10 @@ test.describe("DecodeMyItem referral", () => {
     await expect(firstItem.locator('input[name$="_model"]')).toHaveValue("XBR-65X900F");
     await expect(firstItem.locator('select[name$="_category"]')).toHaveValue("Television / Home Electronics");
     await expect(firstItem.locator('input[type="text"][name$="_serial"]')).toHaveValue("");
+
+    // The select must remain a normal, user-editable control -- not locked
+    // to the prefilled value.
+    await expect(firstItem.locator('select[name$="_category"]')).toBeEnabled();
   });
 
   test("ambiguous status shows the correct banner copy", async ({ page }) => {
@@ -71,6 +79,62 @@ test.describe("DecodeMyItem referral", () => {
     await page.goto("/request-age-verification.html?brand=Sony&result_status=resolved");
 
     await expect(page.locator("#avr-referral-banner")).toBeHidden();
+  });
+});
+
+test.describe("DecodeMyItem category prefill mapping", () => {
+  for (const [key, expectedOption] of [
+    ["electronics", "Television / Home Electronics"],
+    ["appliances", "Major Household Appliance"],
+    ["hvac", "HVAC Equipment"],
+    ["waterHeaters", "Water Heater"]
+  ]) {
+    test(`category=${key} maps to "${expectedOption}"`, async ({ page }) => {
+      await stubTurnstileAndApi(page);
+      await page.goto(`/request-age-verification.html?source=decodemyitem&result_status=resolved&category=${encodeURIComponent(key)}`);
+
+      const categorySelect = page.locator(".avr-item-card").first().locator('select[name$="_category"]');
+      await expect(categorySelect).toHaveValue(expectedOption);
+      await expect(categorySelect).toBeEnabled();
+    });
+  }
+
+  test("an unknown category key leaves the field unselected instead of forcing a value", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html?source=decodemyitem&result_status=resolved&category=furniture");
+
+    const categorySelect = page.locator(".avr-item-card").first().locator('select[name$="_category"]');
+    await expect(categorySelect).toHaveValue("");
+    await expect(categorySelect).toBeEnabled();
+  });
+
+  test("without source=decodemyitem, a category param is never applied -- direct-visitor behavior is unchanged", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html?category=electronics");
+
+    await expect(page.locator("#avr-referral-banner")).toBeHidden();
+    const categorySelect = page.locator(".avr-item-card").first().locator('select[name$="_category"]');
+    await expect(categorySelect).toHaveValue("");
+  });
+
+  test("the mapped category can still be changed by the user", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html?source=decodemyitem&result_status=resolved&category=hvac");
+
+    const categorySelect = page.locator(".avr-item-card").first().locator('select[name$="_category"]');
+    await expect(categorySelect).toHaveValue("HVAC Equipment");
+
+    await categorySelect.selectOption("Power Tool");
+    await expect(categorySelect).toHaveValue("Power Tool");
+  });
+
+  test("a category value that already exactly matches a valid option label is passed through unchanged", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto(`/request-age-verification.html?source=decodemyitem&result_status=resolved&category=${encodeURIComponent("Water Heater")}`);
+
+    const categorySelect = page.locator(".avr-item-card").first().locator('select[name$="_category"]');
+    await expect(categorySelect).toHaveValue("Water Heater");
+    await expect(categorySelect).toBeEnabled();
   });
 });
 
