@@ -7418,6 +7418,14 @@ body.homepage-redesign .hero-report-preview .tbl tbody td {
   text-align: center;
 }
 
+.avr-compact-logo {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 0.4rem;
+  border-radius: var(--r-md);
+}
+
 .avr-compact-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -7769,6 +7777,76 @@ body.homepage-redesign .hero-report-preview .tbl tbody td {
   .avr-item-row-details {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+/* ---------- Section-card visual grouping ---------- */
+
+.avr-section-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--white);
+  padding: 0.7rem 0.9rem 0.85rem !important;
+  margin-bottom: 0.7rem;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.avr-section-card legend {
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.avr-section-card legend::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--navy);
+  flex-shrink: 0;
+}
+
+.avr-section-card.avr-section-invalid {
+  border-color: var(--amber);
+  background: var(--amber-bg);
+}
+
+.avr-subsection-heading {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-head);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.4rem;
+}
+
+/* ---------- Field-level and section-level validation feedback ---------- */
+
+.avr-field-invalid {
+  border-color: var(--amber) !important;
+  background-color: var(--amber-bg) !important;
+}
+
+.avr-checkbox-row.avr-field-invalid {
+  background: var(--amber-bg);
+  border: 1px solid var(--amber);
+  border-radius: var(--r);
+  padding: 0.3rem 0.5rem;
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+}
+
+.avr-field-error-msg {
+  margin: 0.2rem 0 0;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--amber);
+  line-height: 1.35;
+}
+
+.avr-field-error-msg[hidden] {
+  display: none;
 }
 
 .avr-ack-fieldset {

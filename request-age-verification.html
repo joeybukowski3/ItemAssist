@@ -91,6 +91,7 @@
           </div>
         </div>
 
+        <img src="assets/itemassist-logo.svg" alt="Item Assist" class="avr-compact-logo" width="40" height="40">
         <div class="avr-compact-eyebrow"><span class="home-hero-kicker-dot"></span> Human-reviewed item research</div>
         <h1 class="avr-compact-title">Submit a Work Order Request</h1>
         <p class="avr-compact-sub">One item or a full inventory that doesn&rsquo;t exist yet &mdash; Item Assist personally reviews every request and confirms scope, pricing, and turnaround before any paid work begins.</p>
@@ -117,13 +118,14 @@
             <ul id="avr-error-list"></ul>
           </div>
 
-          <fieldset class="avr-fieldset avr-fieldset--compact">
+          <fieldset class="avr-fieldset avr-fieldset--compact avr-section-card">
             <legend>Contact Information</legend>
 
             <div class="form-row form-row--3col">
               <div class="form-group">
                 <label for="avr-full-name">Contact name</label>
                 <input type="text" id="avr-full-name" name="full_name" autocomplete="name">
+                <p class="avr-field-error-msg" id="avr-full-name-error" hidden></p>
               </div>
               <div class="form-group">
                 <label for="avr-email">Email <span class="form-opt" id="avr-email-optional">(email or phone required)</span></label>
@@ -134,9 +136,10 @@
                 <input type="tel" id="avr-phone" name="phone" autocomplete="tel">
               </div>
             </div>
+            <p class="avr-field-error-msg" id="avr-contact-method-error" hidden></p>
           </fieldset>
 
-          <fieldset class="avr-fieldset avr-fieldset--compact">
+          <fieldset class="avr-fieldset avr-fieldset--compact avr-section-card">
             <legend>Requested Services</legend>
 
             <div class="avr-service-list" role="group" aria-label="Requested services">
@@ -176,14 +179,16 @@
                 </span>
               </label>
             </div>
+            <p class="avr-field-error-msg" id="avr-services-error" hidden></p>
           </fieldset>
 
-          <fieldset class="avr-fieldset avr-fieldset--compact">
+          <fieldset class="avr-fieldset avr-fieldset--compact avr-section-card">
             <legend>Work Order Description</legend>
 
             <div class="form-group">
               <label for="avr-reason">Brief description of the assignment</label>
               <textarea id="avr-reason" name="work_order_description" rows="2" placeholder="Briefly describe what you need (claim documentation, replacement decision, item list collection, etc.)"></textarea>
+              <p class="avr-field-error-msg" id="avr-reason-error" hidden></p>
             </div>
 
             <details class="avr-optional-details">
@@ -215,6 +220,7 @@
                 <div class="form-group" id="avr-company-group">
                   <label for="avr-company">Company <span class="form-opt" id="avr-company-optional">(optional)</span></label>
                   <input type="text" id="avr-company" name="company" autocomplete="organization">
+                  <p class="avr-field-error-msg" id="avr-company-error" hidden></p>
                 </div>
               </div>
               <div class="form-row">
@@ -250,7 +256,7 @@
             </details>
           </fieldset>
 
-          <fieldset class="avr-fieldset avr-fieldset--compact">
+          <fieldset class="avr-fieldset avr-fieldset--compact avr-section-card">
             <legend>How are you providing the item information?</legend>
 
             <div class="avr-method-list" role="radiogroup" aria-label="Item information method">
@@ -267,8 +273,10 @@
                 <span class="avr-method-row-name">Have Item Assist obtain the list</span>
               </label>
             </div>
+            <p class="avr-field-error-msg" id="avr-method-error" hidden></p>
 
             <div class="avr-method-content" id="avr-method-content-upload_or_paste_list" hidden>
+              <h3 class="avr-subsection-heading">Supporting Files / Item List</h3>
               <p class="form-help" id="avr-upload-limit-copy">Upload up to 2 files, with a maximum combined size of 3.5 MB.</p>
               <p class="form-help form-help--tight">Have a larger item list or supporting file? Submit a brief description of the assignment instead. Item Assist will follow up with you directly to arrange delivery of the full documents.</p>
               <div class="form-row">
@@ -292,6 +300,7 @@
                 <input type="checkbox" id="avr-will-provide-later" name="will_provide_list_later">
                 <span>I will provide the full item list after Item Assist contacts me.</span>
               </label>
+              <p class="avr-field-error-msg" id="avr-upload-paste-error" hidden></p>
 
               <div class="form-row">
                 <div class="form-group">
@@ -318,6 +327,7 @@
                 <div class="form-group">
                   <label for="avr-tp-name">Contact person or organization</label>
                   <input type="text" id="avr-tp-name" name="third_party_contact_name">
+                  <p class="avr-field-error-msg" id="avr-tp-name-error" hidden></p>
                 </div>
                 <div class="form-group">
                   <label for="avr-tp-relationship">Relationship to assignment <span class="form-opt">(optional)</span></label>
@@ -335,6 +345,7 @@
                   <input type="email" id="avr-tp-email" name="third_party_email">
                 </div>
               </div>
+              <p class="avr-field-error-msg" id="avr-tp-contact-method-error" hidden></p>
 
               <div class="form-row">
                 <div class="form-group">
@@ -357,24 +368,27 @@
                 <textarea id="avr-tp-instructions" name="third_party_contact_instructions" rows="2"></textarea>
               </div>
 
-              <label class="avr-checkbox-row avr-checkbox-row--tight">
+              <label class="avr-checkbox-row avr-checkbox-row--tight" id="avr-tp-authorization-row">
                 <input type="checkbox" id="avr-tp-authorization-ack" name="third_party_authorization_ack">
                 <span>I confirm that I am authorized to provide this contact information and to request that Item Assist contact this person regarding the assignment.</span>
               </label>
+              <p class="avr-field-error-msg" id="avr-tp-authorization-error" hidden></p>
               <p class="form-help">This authorization permits assignment-related contact only. It does not authorize paid work.</p>
             </div>
           </fieldset>
 
-          <fieldset class="avr-fieldset avr-fieldset--compact avr-ack-fieldset">
+          <fieldset class="avr-fieldset avr-fieldset--compact avr-ack-fieldset avr-section-card">
             <legend>Authorization</legend>
-            <label class="avr-checkbox-row">
+            <label class="avr-checkbox-row" id="avr-universal-ack-row">
               <input type="checkbox" id="avr-universal-ack" name="universal_ack">
               <span>I understand that submitting this request does not authorize paid work and that Item Assist will confirm the scope, pricing, turnaround, and next steps before beginning.</span>
             </label>
+            <p class="avr-field-error-msg" id="avr-universal-ack-error" hidden></p>
             <label class="avr-checkbox-row" id="avr-av-limitations-row">
               <input type="checkbox" id="avr-limitations-ack" name="limitations_ack">
               <span>I understand the service limitations described above, including that Professional Age Verification does not include replacement pricing, LKQ selection, RCV/ACV calculations, formal appraisal, manufacturer certification, or insurance coverage decisions.</span>
             </label>
+            <p class="avr-field-error-msg" id="avr-limitations-ack-error" hidden></p>
           </fieldset>
 
           <div class="form-turnstile" id="avr-turnstile" data-turnstile-container></div>
