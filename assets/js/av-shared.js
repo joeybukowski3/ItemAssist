@@ -33,6 +33,76 @@
 
   var REQUESTED_SERVICES = ["age_verification", "full_valuation", "unsure"];
 
+  /* Single source of truth for the category <select> option values, so the
+   * DecodeMyItem key mapping below can never drift out of sync with the
+   * options actually rendered on the page (that drift is exactly what left
+   * category unmapped before this fix). */
+  var CATEGORY_OPTIONS = [
+    "Television / Home Electronics",
+    "Computer / Tablet",
+    "Major Household Appliance",
+    "Small Kitchen Appliance",
+    "HVAC Equipment",
+    "Water Heater",
+    "Furniture / Household Goods",
+    "Power Tool",
+    "Lawn Equipment",
+    "Other"
+  ];
+
+  /*
+   * DecodeMyItem sends its own stable internal category keys (electronics,
+   * appliances, hvac, waterHeaters) — a different taxonomy than this form's
+   * human-readable option values. This is the only place that translation
+   * happens; DecodeMyItem's key format and URL contract are untouched.
+   *
+   * Judgment calls worth a second look:
+   *  - "electronics" covers everything from TVs to phones on the
+   *    DecodeMyItem side; there's no single matching option here, so it
+   *    maps to the closest broad bucket ("Television / Home Electronics").
+   *    The category select remains user-editable, so a computer/tablet
+   *    item can be corrected in one click.
+   *  - "hvac" and "waterHeaters" each have a dedicated option ("HVAC
+   *    Equipment" / "Water Heater") rather than being folded into "Other"
+   *    or "Major Household Appliance" — those are distinct enough
+   *    categories in insurance/replacement contexts to warrant their own
+   *    selectable value.
+   */
+  var DECODE_MY_ITEM_CATEGORY_MAP = {
+    electronics: "Television / Home Electronics",
+    appliances: "Major Household Appliance",
+    hvac: "HVAC Equipment",
+    waterHeaters: "Water Heater"
+  };
+
+  /**
+   * Maps a DecodeMyItem internal category key to one of this form's
+   * category <select> option values. If the incoming value already exactly
+   * matches a valid CATEGORY_OPTIONS label, it is passed through unchanged
+   * (covers callers that already send a human-readable label instead of a
+   * DecodeMyItem key). Returns "" for unknown/empty values — callers must
+   * treat "" as "leave the field unselected", never force a value. Every
+   * mapped value is guaranteed to be a real, current option in
+   * CATEGORY_OPTIONS (guarded below), so a future edit to either list can
+   * never silently reintroduce this bug.
+   *
+   * @param {string} categoryKey
+   * @returns {string}
+   */
+  function mapDecodeMyItemCategory(categoryKey) {
+    if (CATEGORY_OPTIONS.indexOf(categoryKey) !== -1) {
+      return categoryKey;
+    }
+
+    var mapped = DECODE_MY_ITEM_CATEGORY_MAP[categoryKey];
+
+    if (!mapped || CATEGORY_OPTIONS.indexOf(mapped) === -1) {
+      return "";
+    }
+
+    return mapped;
+  }
+
   function sanitizeQueryValue(value, maxLength) {
     var limit = typeof maxLength === "number" ? maxLength : MAX_PARAM_LENGTH;
 
@@ -125,6 +195,7 @@
     CUSTOMER_TYPES: CUSTOMER_TYPES,
     PROFESSIONAL_CUSTOMER_TYPES: PROFESSIONAL_CUSTOMER_TYPES,
     REQUESTED_SERVICES: REQUESTED_SERVICES,
+    CATEGORY_OPTIONS: CATEGORY_OPTIONS,
     MAX_PARAM_LENGTH: MAX_PARAM_LENGTH,
     sanitizeQueryValue: sanitizeQueryValue,
     isValidResultStatus: isValidResultStatus,
@@ -132,6 +203,7 @@
     isDecodeMyItemReferral: isDecodeMyItemReferral,
     getReferralIntroCopy: getReferralIntroCopy,
     isProfessionalCustomerType: isProfessionalCustomerType,
+    mapDecodeMyItemCategory: mapDecodeMyItemCategory,
     generateRequestId: generateRequestId
   };
 
