@@ -79,8 +79,8 @@
   </nav>
 
   <main id="main">
-    <section class="avr-hero">
-      <div class="avr-hero-inner">
+    <section class="avr-compact-header">
+      <div class="avr-compact-header-inner">
         <div id="avr-referral-banner" class="avr-referral-banner" hidden>
           <span class="avr-referral-banner-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"></path></svg>
@@ -91,14 +91,320 @@
           </div>
         </div>
 
-        <div class="home-hero-kicker"><span class="home-hero-kicker-dot"></span> Human-reviewed item research</div>
-        <h1 class="avr-hero-title">Submit a Work Order Request</h1>
-        <p class="avr-hero-sub">Whether you have one item or a full inventory that doesn&rsquo;t exist yet, Item Assist can help. Request Professional Age Verification, Item Pricing / Valuation, or Item List Collection &mdash; a real person reviews every submission and confirms scope, pricing, and turnaround before any paid work begins.</p>
-        <div class="avr-hero-ctas">
-          <a href="#avr-form" class="btn-primary">Submit a Work Order Request</a>
-          <a href="https://itemassist.com/services.html#age-verification" class="btn-secondary">Learn About Full Valuation Reports</a>
+        <div class="avr-compact-eyebrow"><span class="home-hero-kicker-dot"></span> Human-reviewed item research</div>
+        <h1 class="avr-compact-title">Submit a Work Order Request</h1>
+        <p class="avr-compact-sub">One item or a full inventory that doesn&rsquo;t exist yet &mdash; Item Assist personally reviews every request and confirms scope, pricing, and turnaround before any paid work begins.</p>
+        <div class="avr-compact-chips" aria-label="Submission trust signals">
+          <span class="trust-signal">No charge to submit</span>
+          <span class="trust-signal">Human-reviewed before delivery</span>
+          <span class="trust-signal">No coverage or settlement decisions</span>
         </div>
-        <p class="avr-trust-line">There is no charge to submit a work order. Item Assist will review the information and contact you before any paid work begins.</p>
+      </div>
+    </section>
+
+    <section class="avr-form-section" id="avr-form">
+      <div class="avr-form-card avr-form-card--compact">
+        <p class="avr-compact-notice">No charge to submit. Item Assist reviews the scope and confirms pricing before paid work begins. Volume and coordination pricing may apply to larger assignments.</p>
+
+        <form id="avr-intake-form" novalidate>
+          <div class="form-honeypot" aria-hidden="true">
+            <label for="avr-website">Website</label>
+            <input type="text" id="avr-website" name="website" tabindex="-1" autocomplete="off">
+          </div>
+
+          <div id="avr-error-summary" class="avr-error-summary" role="alert" hidden tabindex="-1">
+            <p><strong>Please fix the following before submitting:</strong></p>
+            <ul id="avr-error-list"></ul>
+          </div>
+
+          <fieldset class="avr-fieldset avr-fieldset--compact">
+            <legend>Contact Information</legend>
+
+            <div class="form-row form-row--3col">
+              <div class="form-group">
+                <label for="avr-full-name">Contact name</label>
+                <input type="text" id="avr-full-name" name="full_name" autocomplete="name">
+              </div>
+              <div class="form-group">
+                <label for="avr-email">Email <span class="form-opt" id="avr-email-optional">(email or phone required)</span></label>
+                <input type="email" id="avr-email" name="email" autocomplete="email">
+              </div>
+              <div class="form-group">
+                <label for="avr-phone">Phone <span class="form-opt" id="avr-phone-optional">(email or phone required)</span></label>
+                <input type="tel" id="avr-phone" name="phone" autocomplete="tel">
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="avr-fieldset avr-fieldset--compact">
+            <legend>Requested Services</legend>
+
+            <div class="avr-service-list" role="group" aria-label="Requested services">
+              <label class="avr-service-row" data-service-card="age_verification">
+                <input type="checkbox" id="avr-service-age_verification" name="requested_services" value="age_verification" data-service-checkbox>
+                <span class="avr-service-row-text">
+                  <span class="avr-service-row-name">Age Verification</span>
+                  <span class="avr-service-row-desc">Best supportable manufacture year with supporting sources.</span>
+                </span>
+              </label>
+              <label class="avr-service-row" data-service-card="item_pricing_valuation">
+                <input type="checkbox" id="avr-service-item_pricing_valuation" name="requested_services" value="item_pricing_valuation" data-service-checkbox>
+                <span class="avr-service-row-text">
+                  <span class="avr-service-row-name">Item Pricing / Valuation</span>
+                  <span class="avr-service-row-desc">Replacement research, current pricing, and RCV/ACV support.</span>
+                </span>
+              </label>
+              <label class="avr-service-row" data-service-card="item_list_collection">
+                <input type="checkbox" id="avr-service-item_list_collection" name="requested_services" value="item_list_collection" data-service-checkbox>
+                <span class="avr-service-row-text">
+                  <span class="avr-service-row-name">Item List Collection</span>
+                  <span class="avr-service-row-desc">Item Assist contacts someone to obtain the item list.</span>
+                </span>
+              </label>
+              <label class="avr-service-row avr-service-row--shortcut" data-service-card="all">
+                <input type="checkbox" id="avr-service-all" data-service-shortcut="all">
+                <span class="avr-service-row-text">
+                  <span class="avr-service-row-name">All of the Above</span>
+                  <span class="avr-service-row-desc">Selects all three services above.</span>
+                </span>
+              </label>
+              <label class="avr-service-row" data-service-card="unsure">
+                <input type="checkbox" id="avr-service-unsure" name="requested_services" value="unsure" data-service-checkbox>
+                <span class="avr-service-row-text">
+                  <span class="avr-service-row-name">Unsure &mdash; Help Me Determine the Scope</span>
+                  <span class="avr-service-row-desc">Item Assist reviews and recommends the right fit.</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="avr-fieldset avr-fieldset--compact">
+            <legend>Work Order Description</legend>
+
+            <div class="form-group">
+              <label for="avr-reason">Brief description of the assignment</label>
+              <textarea id="avr-reason" name="work_order_description" rows="2" placeholder="Briefly describe what you need (claim documentation, replacement decision, item list collection, etc.)"></textarea>
+            </div>
+
+            <details class="avr-optional-details">
+              <summary>Optional work-order details</summary>
+              <div class="form-row form-row--3col">
+                <div class="form-group">
+                  <label for="avr-preferred-contact">Preferred contact <span class="form-opt">(optional)</span></label>
+                  <select id="avr-preferred-contact" name="preferred_contact_method">
+                    <option value="">Select one</option>
+                    <option value="email">Email</option>
+                    <option value="phone">Phone</option>
+                    <option value="either">Either</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="avr-customer-type">Submitting as <span class="form-opt">(optional)</span></label>
+                  <select id="avr-customer-type" name="customer_type">
+                    <option value="">Select one</option>
+                    <option value="insurance_carrier">Insurance carrier</option>
+                    <option value="insurance_adjuster">Insurance adjuster</option>
+                    <option value="independent_adjuster">Independent adjuster</option>
+                    <option value="restoration_or_claims_vendor">Restoration or claims vendor</option>
+                    <option value="property_manager">Property manager</option>
+                    <option value="repair_professional">Repair professional</option>
+                    <option value="homeowner_or_consumer">Homeowner or consumer</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group" id="avr-company-group">
+                  <label for="avr-company">Company <span class="form-opt" id="avr-company-optional">(optional)</span></label>
+                  <input type="text" id="avr-company" name="company" autocomplete="organization">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="avr-claim-reference">Claim or reference number <span class="form-opt">(optional)</span></label>
+                  <input type="text" id="avr-claim-reference" name="claim_reference">
+                </div>
+                <div class="form-group">
+                  <label for="avr-insured-name">Insured or policyholder name <span class="form-opt">(optional)</span></label>
+                  <input type="text" id="avr-insured-name" name="insured_or_policyholder_name">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="avr-completion-date">Requested deadline <span class="form-opt">(optional)</span></label>
+                  <input type="date" id="avr-completion-date" name="requested_completion_date">
+                </div>
+                <div class="form-group">
+                  <label for="avr-billing-contact">Billing contact <span class="form-opt">(optional)</span></label>
+                  <input type="text" id="avr-billing-contact" name="billing_contact">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="avr-po-required">Purchase-order requirements <span class="form-opt">(optional)</span></label>
+                  <input type="text" id="avr-po-required" name="po_required">
+                </div>
+                <div class="form-group">
+                  <label for="avr-special-reporting">Special reporting requirements <span class="form-opt">(optional)</span></label>
+                  <input type="text" id="avr-special-reporting" name="special_reporting_requirements">
+                </div>
+              </div>
+            </details>
+          </fieldset>
+
+          <fieldset class="avr-fieldset avr-fieldset--compact">
+            <legend>How are you providing the item information?</legend>
+
+            <div class="avr-method-list" role="radiogroup" aria-label="Item information method">
+              <label class="avr-method-row" data-method-row="upload_or_paste_list">
+                <input type="radio" id="avr-method-upload_or_paste_list" name="information_method" value="upload_or_paste_list">
+                <span class="avr-method-row-name">Upload, paste, or provide later</span>
+              </label>
+              <label class="avr-method-row" data-method-row="enter_items_now">
+                <input type="radio" id="avr-method-enter_items_now" name="information_method" value="enter_items_now">
+                <span class="avr-method-row-name">Manually enter item details</span>
+              </label>
+              <label class="avr-method-row" data-method-row="list_needs_collection">
+                <input type="radio" id="avr-method-list_needs_collection" name="information_method" value="list_needs_collection">
+                <span class="avr-method-row-name">Have Item Assist obtain the list</span>
+              </label>
+            </div>
+
+            <div class="avr-method-content" id="avr-method-content-upload_or_paste_list" hidden>
+              <p class="form-help" id="avr-upload-limit-copy">Upload up to 2 files, with a maximum combined size of 3.5 MB.</p>
+              <p class="form-help form-help--tight">Have a larger item list or supporting file? Submit a brief description of the assignment instead. Item Assist will follow up with you directly to arrange delivery of the full documents.</p>
+              <div class="form-row">
+                <div class="form-group form-group--file">
+                  <label for="avr-shared-doc-1">File <span class="form-opt">(optional)</span></label>
+                  <input type="file" id="avr-shared-doc-1" name="shared_document_1" accept=".pdf,.xlsx,.csv,.docx,.txt,.jpg,.jpeg,.png">
+                </div>
+                <div class="form-group form-group--file">
+                  <label for="avr-shared-doc-2">File <span class="form-opt">(optional)</span></label>
+                  <input type="file" id="avr-shared-doc-2" name="shared_document_2" accept=".pdf,.xlsx,.csv,.docx,.txt,.jpg,.jpeg,.png">
+                </div>
+              </div>
+              <p class="form-help form-help--tight">PDF, XLSX, CSV, DOCX, TXT, JPG, JPEG, or PNG only. 2MB max per file, 3.5MB max combined.</p>
+
+              <div class="form-group">
+                <label for="avr-pasted-list">Or paste your item list <span class="form-opt">(optional)</span></label>
+                <textarea id="avr-pasted-list" name="pasted_item_list" rows="2" placeholder="Paste a list of items here (one per line, or however it's organized)."></textarea>
+              </div>
+
+              <label class="avr-checkbox-row avr-checkbox-row--tight">
+                <input type="checkbox" id="avr-will-provide-later" name="will_provide_list_later">
+                <span>I will provide the full item list after Item Assist contacts me.</span>
+              </label>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="avr-estimated-item-count">Estimated item count <span class="form-opt">(optional)</span></label>
+                  <input type="number" id="avr-estimated-item-count" name="estimated_item_count" min="0" step="1">
+                </div>
+                <div class="form-group">
+                  <label for="avr-work-instructions">Work instructions <span class="form-opt">(optional)</span></label>
+                  <input type="text" id="avr-work-instructions" name="work_instructions">
+                </div>
+              </div>
+            </div>
+
+            <div class="avr-method-content" id="avr-method-content-enter_items_now" hidden>
+              <p class="form-help">Add each item that needs research. Only a brief description is required.</p>
+              <div id="avr-items-list" class="avr-items-grid"></div>
+              <button type="button" id="avr-add-item" class="btn-secondary avr-add-item-btn">+ Add Another Item</button>
+            </div>
+
+            <div class="avr-method-content" id="avr-method-content-list_needs_collection" hidden>
+              <p class="form-help">Provide contact information for the insured, policyholder, contractor, or other party Item Assist should reach out to.</p>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="avr-tp-name">Contact person or organization</label>
+                  <input type="text" id="avr-tp-name" name="third_party_contact_name">
+                </div>
+                <div class="form-group">
+                  <label for="avr-tp-relationship">Relationship to assignment <span class="form-opt">(optional)</span></label>
+                  <input type="text" id="avr-tp-relationship" name="third_party_relationship" placeholder="Insured, policyholder, contractor, etc.">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="avr-tp-phone">Phone <span class="form-opt" id="avr-tp-phone-optional">(email or phone required)</span></label>
+                  <input type="tel" id="avr-tp-phone" name="third_party_phone">
+                </div>
+                <div class="form-group">
+                  <label for="avr-tp-email">Email <span class="form-opt" id="avr-tp-email-optional">(email or phone required)</span></label>
+                  <input type="email" id="avr-tp-email" name="third_party_email">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="avr-tp-preferred-contact">Preferred contact <span class="form-opt">(optional)</span></label>
+                  <select id="avr-tp-preferred-contact" name="third_party_preferred_contact_method">
+                    <option value="">Select one</option>
+                    <option value="email">Email</option>
+                    <option value="phone">Phone</option>
+                    <option value="either">Either</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="avr-tp-scope">Known categories / estimated scope <span class="form-opt">(optional)</span></label>
+                  <input type="text" id="avr-tp-scope" name="third_party_known_scope">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="avr-tp-instructions">Contact instructions <span class="form-opt">(optional)</span></label>
+                <textarea id="avr-tp-instructions" name="third_party_contact_instructions" rows="2"></textarea>
+              </div>
+
+              <label class="avr-checkbox-row avr-checkbox-row--tight">
+                <input type="checkbox" id="avr-tp-authorization-ack" name="third_party_authorization_ack">
+                <span>I confirm that I am authorized to provide this contact information and to request that Item Assist contact this person regarding the assignment.</span>
+              </label>
+              <p class="form-help">This authorization permits assignment-related contact only. It does not authorize paid work.</p>
+            </div>
+          </fieldset>
+
+          <fieldset class="avr-fieldset avr-fieldset--compact avr-ack-fieldset">
+            <legend>Authorization</legend>
+            <label class="avr-checkbox-row">
+              <input type="checkbox" id="avr-universal-ack" name="universal_ack">
+              <span>I understand that submitting this request does not authorize paid work and that Item Assist will confirm the scope, pricing, turnaround, and next steps before beginning.</span>
+            </label>
+            <label class="avr-checkbox-row" id="avr-av-limitations-row">
+              <input type="checkbox" id="avr-limitations-ack" name="limitations_ack">
+              <span>I understand the service limitations described above, including that Professional Age Verification does not include replacement pricing, LKQ selection, RCV/ACV calculations, formal appraisal, manufacturer certification, or insurance coverage decisions.</span>
+            </label>
+          </fieldset>
+
+          <div class="form-turnstile" id="avr-turnstile" data-turnstile-container></div>
+          <button type="submit" class="form-submit" id="avr-submit-btn">Submit Work Order Request &rarr;</button>
+          <div class="form-status" id="avr-form-status" aria-live="polite"></div>
+        </form>
+
+        <div id="avr-confirmation" class="avr-confirmation" hidden tabindex="-1">
+          <h2>Your request has been received.</h2>
+          <p>Item Assist will review the submitted information and contact you to confirm scope, pricing, turnaround, and authorization before beginning any paid research.</p>
+          <dl class="avr-confirmation-details">
+            <div><dt>Request ID</dt><dd id="avr-confirm-id"></dd></div>
+            <div><dt>Requested services</dt><dd id="avr-confirm-service"></dd></div>
+            <div><dt>Item count</dt><dd id="avr-confirm-items"></dd></div>
+            <div><dt>Contact email</dt><dd id="avr-confirm-email"></dd></div>
+            <div><dt>Expected response window</dt><dd id="avr-confirm-window"></dd></div>
+          </dl>
+          <div class="avr-confirmation-ctas">
+            <a href="https://itemassist.com/" class="btn-secondary">Back to Item Assist</a>
+            <a href="https://itemassist.com/services.html#age-verification" class="btn-primary">Learn About Full Valuation Reports</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="avr-section avr-pricing-detail-section" aria-labelledby="avr-pricing-detail-heading">
+      <div class="avr-section-inner">
+        <div class="section-kicker centered">Pricing Details</div>
+        <h2 id="avr-pricing-detail-heading" class="section-heading centered">How Pricing Works</h2>
+        <p class="section-sub centered">Professional Age Verification typically starts at $35 for one item ($25 review fee + $10/item). Full valuation and larger assignments are priced after reviewing the scope; volume pricing may be available. Assignments requiring item-list collection or coordination may involve an additional charge, explained and approved before work begins.</p>
       </div>
     </section>
 
@@ -238,340 +544,6 @@
         <div class="avr-upsell-ctas">
           <a href="https://itemassist.com/services.html#age-verification" class="btn-secondary" data-analytics="item_pricing_valuation_upsell_clicked">Learn About Full Valuation Reports</a>
           <a href="#avr-form" class="btn-primary" id="avr-upsell-submit-cta">Submit a Work Order Request</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="avr-form-section" id="avr-form">
-      <div class="avr-form-card">
-        <div class="avr-form-intro">
-          <h2>Submit a Work Order Request</h2>
-          <p class="avr-pricing-highlight">Professional Age Verification typically starts at $35 for one item: a $25 professional review fee plus $10 per item.</p>
-          <p class="avr-pricing-highlight-secondary">Full valuation and larger assignments are priced after reviewing the scope. Volume pricing may be available.</p>
-          <p class="form-disclaimer">Assignments requiring Item Assist to collect an item list or coordinate with another party may involve an additional charge. Any additional charge will be explained and approved before work begins.</p>
-          <p class="form-disclaimer avr-universal-submission-note">There is no charge to submit a work order. Submission does not authorize paid work. Item Assist will personally review the request and confirm the scope, pricing, turnaround, and next steps before beginning.</p>
-          <div class="trust-signal-row" aria-label="Submission trust signals">
-            <span class="trust-signal">No charge to submit</span>
-            <span class="trust-signal">Human-reviewed before delivery</span>
-            <span class="trust-signal">No coverage or settlement decisions</span>
-          </div>
-        </div>
-
-        <form id="avr-intake-form" novalidate>
-          <div class="form-honeypot" aria-hidden="true">
-            <label for="avr-website">Website</label>
-            <input type="text" id="avr-website" name="website" tabindex="-1" autocomplete="off">
-          </div>
-
-          <div id="avr-error-summary" class="avr-error-summary" role="alert" hidden tabindex="-1">
-            <p><strong>Please fix the following before submitting:</strong></p>
-            <ul id="avr-error-list"></ul>
-          </div>
-
-          <fieldset class="avr-fieldset">
-            <legend>Contact Information</legend>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="avr-full-name">Contact name</label>
-                <input type="text" id="avr-full-name" name="full_name" autocomplete="name">
-              </div>
-              <div class="form-group">
-                <label for="avr-email">Email <span class="form-opt" id="avr-email-optional">(email or phone required)</span></label>
-                <input type="email" id="avr-email" name="email" autocomplete="email">
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="avr-phone">Phone <span class="form-opt" id="avr-phone-optional">(email or phone required)</span></label>
-                <input type="tel" id="avr-phone" name="phone" autocomplete="tel">
-              </div>
-              <div class="form-group">
-                <label for="avr-preferred-contact">Preferred contact method <span class="form-opt">(optional)</span></label>
-                <select id="avr-preferred-contact" name="preferred_contact_method">
-                  <option value="">Select one</option>
-                  <option value="email">Email</option>
-                  <option value="phone">Phone</option>
-                  <option value="either">Either</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="avr-customer-type">Submitting as <span class="form-opt">(optional)</span></label>
-                <select id="avr-customer-type" name="customer_type">
-                  <option value="">Select one</option>
-                  <option value="insurance_carrier">Insurance carrier</option>
-                  <option value="insurance_adjuster">Insurance adjuster</option>
-                  <option value="independent_adjuster">Independent adjuster</option>
-                  <option value="restoration_or_claims_vendor">Restoration or claims vendor</option>
-                  <option value="property_manager">Property manager</option>
-                  <option value="repair_professional">Repair professional</option>
-                  <option value="homeowner_or_consumer">Homeowner or consumer</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div class="form-group" id="avr-company-group">
-                <label for="avr-company">Company or organization <span class="form-opt" id="avr-company-optional">(optional)</span></label>
-                <input type="text" id="avr-company" name="company" autocomplete="organization">
-              </div>
-            </div>
-          </fieldset>
-
-          <fieldset class="avr-fieldset">
-            <legend>Requested Services</legend>
-            <p class="form-help">Select every service that applies. Not sure? Choose &ldquo;Unsure&rdquo; and Item Assist will recommend the right fit.</p>
-
-            <div class="avr-service-grid" role="group" aria-label="Requested services">
-              <label class="avr-service-card" data-service-card="age_verification">
-                <input type="checkbox" id="avr-service-age_verification" name="requested_services" value="age_verification" data-service-checkbox>
-                <div class="avr-service-card-body">
-                  <h3>Age Verification</h3>
-                  <p>Human review of model and serial information, best supportable manufacture year or model era, confidence explanation, and supporting sources.</p>
-                </div>
-              </label>
-              <label class="avr-service-card" data-service-card="item_pricing_valuation">
-                <input type="checkbox" id="avr-service-item_pricing_valuation" name="requested_services" value="item_pricing_valuation" data-service-checkbox>
-                <div class="avr-service-card-body">
-                  <h3>Item Pricing / Valuation</h3>
-                  <p>Like-kind-and-quality replacement research, current pricing, and RCV/ACV support.</p>
-                </div>
-              </label>
-              <label class="avr-service-card" data-service-card="item_list_collection">
-                <input type="checkbox" id="avr-service-item_list_collection" name="requested_services" value="item_list_collection" data-service-checkbox>
-                <div class="avr-service-card-body">
-                  <h3>Item List Collection</h3>
-                  <p>Item Assist contacts an insured, policyholder, contractor, or other designated party to obtain the item information needed for research or pricing.</p>
-                </div>
-              </label>
-              <label class="avr-service-card avr-service-card--shortcut" data-service-card="all">
-                <input type="checkbox" id="avr-service-all" data-service-shortcut="all">
-                <div class="avr-service-card-body">
-                  <h3>All of the Above</h3>
-                  <p>Selects Age Verification, Item Pricing / Valuation, and Item List Collection together.</p>
-                </div>
-              </label>
-              <label class="avr-service-card" data-service-card="unsure">
-                <input type="checkbox" id="avr-service-unsure" name="requested_services" value="unsure" data-service-checkbox>
-                <div class="avr-service-card-body">
-                  <h3>Unsure &mdash; Help Me Determine the Scope</h3>
-                  <p>Submit the work order and Item Assist will review the request and recommend the appropriate service.</p>
-                </div>
-              </label>
-            </div>
-          </fieldset>
-
-          <fieldset class="avr-fieldset">
-            <legend>Work Order Description</legend>
-
-            <div class="form-group">
-              <label for="avr-reason">Brief description of the assignment</label>
-              <textarea id="avr-reason" name="work_order_description" placeholder="Briefly describe what you need (claim documentation, replacement decision, item list collection, etc.)"></textarea>
-            </div>
-
-            <details class="avr-optional-details">
-              <summary>Optional professional details</summary>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="avr-claim-reference">Claim or reference number <span class="form-opt">(optional)</span></label>
-                  <input type="text" id="avr-claim-reference" name="claim_reference">
-                </div>
-                <div class="form-group">
-                  <label for="avr-insured-name">Insured or policyholder name <span class="form-opt">(optional)</span></label>
-                  <input type="text" id="avr-insured-name" name="insured_or_policyholder_name">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="avr-completion-date">Requested deadline / completion date <span class="form-opt">(optional)</span></label>
-                  <input type="date" id="avr-completion-date" name="requested_completion_date">
-                </div>
-                <div class="form-group">
-                  <label for="avr-billing-contact">Billing contact <span class="form-opt">(optional)</span></label>
-                  <input type="text" id="avr-billing-contact" name="billing_contact">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="avr-po-required">Purchase-order requirements <span class="form-opt">(optional)</span></label>
-                  <input type="text" id="avr-po-required" name="po_required">
-                </div>
-                <div class="form-group">
-                  <label for="avr-special-reporting">Special reporting requirements <span class="form-opt">(optional)</span></label>
-                  <input type="text" id="avr-special-reporting" name="special_reporting_requirements">
-                </div>
-              </div>
-            </details>
-          </fieldset>
-
-          <fieldset class="avr-fieldset">
-            <legend>How Will You Provide the Item Information?</legend>
-
-            <div class="avr-method-grid" role="radiogroup" aria-label="Item information method">
-              <label class="avr-method-card" data-method-card="enter_items_now">
-                <input type="radio" id="avr-method-enter_items_now" name="information_method" value="enter_items_now">
-                <div class="avr-method-card-body">
-                  <h3>Enter Items Now</h3>
-                  <p>For one item or a manageable number of items.</p>
-                </div>
-              </label>
-              <label class="avr-method-card" data-method-card="upload_or_paste_list">
-                <input type="radio" id="avr-method-upload_or_paste_list" name="information_method" value="upload_or_paste_list">
-                <div class="avr-method-card-body">
-                  <h3>Upload or Paste an Item List</h3>
-                  <p>For larger assignments or existing inventories.</p>
-                </div>
-              </label>
-              <label class="avr-method-card" data-method-card="list_needs_collection">
-                <input type="radio" id="avr-method-list_needs_collection" name="information_method" value="list_needs_collection">
-                <div class="avr-method-card-body">
-                  <h3>Item List Still Needs to Be Collected</h3>
-                  <p>Item Assist will obtain the item list from another party.</p>
-                </div>
-              </label>
-            </div>
-          </fieldset>
-
-          <fieldset class="avr-fieldset avr-conditional-fieldset" id="avr-path-enter-items" hidden>
-            <legend>Items</legend>
-            <p class="form-help">Add each item that needs research. Only a brief description is required &mdash; brand, model, and serial number can be added if known. The first item is pre-filled automatically when arriving from a DecodeMyItem result.</p>
-
-            <div id="avr-items-list"></div>
-
-            <button type="button" id="avr-add-item" class="btn-secondary avr-add-item-btn">+ Add Another Item</button>
-          </fieldset>
-
-          <fieldset class="avr-fieldset avr-conditional-fieldset" id="avr-path-upload-paste" hidden>
-            <legend>Item List</legend>
-
-            <div class="form-group">
-              <label for="avr-pasted-list">Paste your item list <span class="form-opt">(optional)</span></label>
-              <textarea id="avr-pasted-list" name="pasted_item_list" rows="8" placeholder="Paste a list of items here (one per line, or however it's organized)."></textarea>
-            </div>
-
-            <label class="avr-checkbox-row">
-              <input type="checkbox" id="avr-will-provide-later" name="will_provide_list_later">
-              <span>I will provide the full item list after Item Assist contacts me.</span>
-            </label>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="avr-estimated-item-count">Estimated item count <span class="form-opt">(optional)</span></label>
-                <input type="number" id="avr-estimated-item-count" name="estimated_item_count" min="0" step="1">
-              </div>
-              <div class="form-group">
-                <label for="avr-work-instructions">Work instructions <span class="form-opt">(optional)</span></label>
-                <input type="text" id="avr-work-instructions" name="work_instructions">
-              </div>
-            </div>
-          </fieldset>
-
-          <fieldset class="avr-fieldset avr-conditional-fieldset" id="avr-path-collection" hidden>
-            <legend>Item List Collection Contact</legend>
-            <p class="form-help">Provide contact information for the insured, policyholder, contractor, or other party Item Assist should reach out to.</p>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="avr-tp-name">Contact person or organization</label>
-                <input type="text" id="avr-tp-name" name="third_party_contact_name">
-              </div>
-              <div class="form-group">
-                <label for="avr-tp-relationship">Relationship to assignment <span class="form-opt">(optional)</span></label>
-                <input type="text" id="avr-tp-relationship" name="third_party_relationship" placeholder="Insured, policyholder, contractor, etc.">
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="avr-tp-phone">Phone <span class="form-opt" id="avr-tp-phone-optional">(email or phone required)</span></label>
-                <input type="tel" id="avr-tp-phone" name="third_party_phone">
-              </div>
-              <div class="form-group">
-                <label for="avr-tp-email">Email <span class="form-opt" id="avr-tp-email-optional">(email or phone required)</span></label>
-                <input type="email" id="avr-tp-email" name="third_party_email">
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="avr-tp-preferred-contact">Preferred contact method <span class="form-opt">(optional)</span></label>
-                <select id="avr-tp-preferred-contact" name="third_party_preferred_contact_method">
-                  <option value="">Select one</option>
-                  <option value="email">Email</option>
-                  <option value="phone">Phone</option>
-                  <option value="either">Either</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="avr-tp-scope">Known item categories or estimated scope <span class="form-opt">(optional)</span></label>
-                <input type="text" id="avr-tp-scope" name="third_party_known_scope">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="avr-tp-instructions">Contact instructions <span class="form-opt">(optional)</span></label>
-              <textarea id="avr-tp-instructions" name="third_party_contact_instructions"></textarea>
-            </div>
-
-            <label class="avr-checkbox-row">
-              <input type="checkbox" id="avr-tp-authorization-ack" name="third_party_authorization_ack">
-              <span>I confirm that I am authorized to provide this contact information and to request that Item Assist contact this person regarding the assignment.</span>
-            </label>
-            <p class="form-help">This authorization permits assignment-related contact only. It does not authorize paid work.</p>
-          </fieldset>
-
-          <fieldset class="avr-fieldset avr-conditional-fieldset" id="avr-path-files" hidden>
-            <legend>Supporting Files</legend>
-            <p class="form-help" id="avr-upload-limit-copy">Upload up to 2 files, with a maximum combined size of 3.5 MB.</p>
-            <p class="form-help">Have a larger item list or supporting file? Submit a brief description of the assignment instead. Item Assist will follow up with you directly to arrange delivery of the full documents.</p>
-            <div class="form-row">
-              <div class="form-group form-group--file">
-                <label for="avr-shared-doc-1">Supporting file 1 <span class="form-opt">(optional)</span></label>
-                <input type="file" id="avr-shared-doc-1" name="shared_document_1" accept=".pdf,.xlsx,.csv,.docx,.txt,.jpg,.jpeg,.png">
-              </div>
-              <div class="form-group form-group--file">
-                <label for="avr-shared-doc-2">Supporting file 2 <span class="form-opt">(optional)</span></label>
-                <input type="file" id="avr-shared-doc-2" name="shared_document_2" accept=".pdf,.xlsx,.csv,.docx,.txt,.jpg,.jpeg,.png">
-              </div>
-            </div>
-            <p class="form-help">PDF, XLSX, CSV, DOCX, TXT, JPG, JPEG, or PNG only. 2MB maximum per file, 3.5MB maximum combined (up to 2 files).</p>
-          </fieldset>
-
-          <fieldset class="avr-fieldset avr-ack-fieldset">
-            <legend>Authorization</legend>
-            <label class="avr-checkbox-row">
-              <input type="checkbox" id="avr-universal-ack" name="universal_ack">
-              <span>I understand that submitting this request does not authorize paid work and that Item Assist will confirm the scope, pricing, turnaround, and next steps before beginning.</span>
-            </label>
-            <label class="avr-checkbox-row" id="avr-av-limitations-row">
-              <input type="checkbox" id="avr-limitations-ack" name="limitations_ack">
-              <span>I understand the service limitations described above, including that Professional Age Verification does not include replacement pricing, LKQ selection, RCV/ACV calculations, formal appraisal, manufacturer certification, or insurance coverage decisions.</span>
-            </label>
-          </fieldset>
-
-          <div class="form-turnstile" id="avr-turnstile" data-turnstile-container></div>
-          <button type="submit" class="form-submit" id="avr-submit-btn">Submit Work Order Request &rarr;</button>
-          <div class="form-status" id="avr-form-status" aria-live="polite"></div>
-
-          <p class="form-disclaimer">Age-verification findings are research-based estimates using submitted serial information, model records, and publicly available sources. Results are not manufacturer certification, a formal appraisal, or an insurance coverage decision. Public records may be incomplete, and an exact manufacture date may not always be available. The client controls final depreciation or ACV decisions where applicable.</p>
-        </form>
-
-        <div id="avr-confirmation" class="avr-confirmation" hidden tabindex="-1">
-          <h2>Your request has been received.</h2>
-          <p>Item Assist will review the submitted information and contact you to confirm scope, pricing, turnaround, and authorization before beginning any paid research.</p>
-          <dl class="avr-confirmation-details">
-            <div><dt>Request ID</dt><dd id="avr-confirm-id"></dd></div>
-            <div><dt>Requested services</dt><dd id="avr-confirm-service"></dd></div>
-            <div><dt>Item count</dt><dd id="avr-confirm-items"></dd></div>
-            <div><dt>Contact email</dt><dd id="avr-confirm-email"></dd></div>
-            <div><dt>Expected response window</dt><dd id="avr-confirm-window"></dd></div>
-          </dl>
-          <div class="avr-confirmation-ctas">
-            <a href="https://itemassist.com/" class="btn-secondary">Back to Item Assist</a>
-            <a href="https://itemassist.com/services.html#age-verification" class="btn-primary">Learn About Full Valuation Reports</a>
-          </div>
         </div>
       </div>
     </section>
