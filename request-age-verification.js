@@ -27,21 +27,17 @@
   var companyInput = document.getElementById("avr-company");
   var companyOptionalLabel = document.getElementById("avr-company-optional");
 
-  var emailInput = document.getElementById("avr-email");
-  var phoneInput = document.getElementById("avr-phone");
-
-  var methodRadios = Array.from(document.querySelectorAll('input[name="information_method"]'));
-  var pathFieldsets = {
-    enter_items_now: document.getElementById("avr-path-enter-items"),
-    upload_or_paste_list: document.getElementById("avr-path-upload-paste"),
-    list_needs_collection: document.getElementById("avr-path-collection")
-  };
-  var filesFieldset = document.getElementById("avr-path-files");
-
   var itemsList = document.getElementById("avr-items-list");
   var addItemButton = document.getElementById("avr-add-item");
   var itemCounter = 0;
   var itemCount = 0;
+
+  var methodRadios = Array.from(document.querySelectorAll('input[name="information_method"]'));
+  var methodContentBlocks = {
+    upload_or_paste_list: document.getElementById("avr-method-content-upload_or_paste_list"),
+    enter_items_now: document.getElementById("avr-method-content-enter_items_now"),
+    list_needs_collection: document.getElementById("avr-method-content-list_needs_collection")
+  };
 
   var pastedListInput = document.getElementById("avr-pasted-list");
   var willProvideLaterCheckbox = document.getElementById("avr-will-provide-later");
@@ -109,22 +105,22 @@
     form.appendChild(input);
   }
 
-  /* ---------- Requested-services multi-select (checkbox-card group) ---------- */
+  /* ---------- Requested-services multi-select (checkbox rows) ---------- */
   function syncServiceUi() {
     serviceCheckboxes.forEach((checkbox) => {
       var isChecked = selectedServices.indexOf(checkbox.value) !== -1;
       checkbox.checked = isChecked;
-      var card = checkbox.closest("[data-service-card]");
-      if (card) {
-        card.classList.toggle("is-selected", isChecked);
+      var row = checkbox.closest("[data-service-card]");
+      if (row) {
+        row.classList.toggle("is-selected", isChecked);
       }
     });
 
     var allSelected = AVShared.isAllOfTheAboveSelected(selectedServices);
     serviceAllShortcut.checked = allSelected;
-    var allCard = serviceAllShortcut.closest("[data-service-card]");
-    if (allCard) {
-      allCard.classList.toggle("is-selected", allSelected);
+    var allRow = serviceAllShortcut.closest("[data-service-card]");
+    if (allRow) {
+      allRow.classList.toggle("is-selected", allSelected);
     }
 
     syncAgeVerificationLimitationsAck();
@@ -172,91 +168,84 @@
     companyOptionalLabel.style.display = isProfessional ? "none" : "";
   }
 
-  /* ---------- Information-method progressive disclosure ---------- */
+  /* ---------- Explicit information-method selection ----------
+   * informationMethod is set directly by the radio the user picks -- never
+   * inferred from which content happens to be filled in. The three values
+   * (upload_or_paste_list / enter_items_now / list_needs_collection) are
+   * exactly the backend enum/schema/validation has always used; only the
+   * client-side control changed. */
   function currentInformationMethod() {
     var checked = methodRadios.find((radio) => radio.checked);
     return checked ? checked.value : "";
   }
 
-  function setInformationMethod(method) {
-    Object.keys(pathFieldsets).forEach((key) => {
-      pathFieldsets[key].hidden = key !== method;
+  function selectInformationMethod(method, options) {
+    methodRadios.forEach((radio) => {
+      var isChecked = radio.value === method;
+      radio.checked = isChecked;
+      var row = radio.closest("[data-method-row]");
+      if (row) {
+        row.classList.toggle("is-selected", isChecked);
+      }
     });
 
-    filesFieldset.hidden = method !== "enter_items_now" && method !== "upload_or_paste_list";
+    Object.keys(methodContentBlocks).forEach((key) => {
+      methodContentBlocks[key].hidden = key !== method;
+    });
 
-    // Switching paths must never leave stale validation errors from the
-    // previously-active path on screen.
+    var seededItemBlock = null;
+    if (method === "enter_items_now" && itemsList.children.length === 0) {
+      seededItemBlock = addItem();
+    }
+
+    // Switching methods must never leave stale validation errors from the
+    // previously-active method on screen.
     showErrorSummary([]);
 
-    track("information_method_selected", { source: referral.source || "direct", method: method });
+    if (!(options && options.silent)) {
+      track("information_method_selected", { source: referral.source || "direct", method: method });
+    }
+
+    return seededItemBlock;
   }
 
   methodRadios.forEach((radio) => {
     radio.addEventListener("change", () => {
-      setInformationMethod(radio.value);
+      selectInformationMethod(radio.value);
     });
   });
 
-  /* ---------- Dynamic item blocks ---------- */
+  /* ---------- Dense-grid item rows ---------- */
   function buildCategoryOptionsHtml() {
     return (
-      '<option value="">Select a category (optional)</option>' +
+      '<option value="">Category (optional)</option>' +
       CATEGORY_OPTIONS.map((label) => `<option value="${label}">${label}</option>`).join("")
     );
   }
 
   function createItemBlock(index) {
     var wrapper = document.createElement("div");
-    wrapper.className = "avr-item-card";
+    wrapper.className = "avr-item-row";
     wrapper.setAttribute("data-item-index", String(index));
     wrapper.innerHTML = `
-      <div class="avr-item-card-header">
-        <h3>Item <span class="avr-item-number"></span></h3>
-        <button type="button" class="avr-remove-item" aria-label="Remove this item">Remove Item</button>
+      <div class="avr-item-row-main">
+        <span class="avr-item-number-badge"></span>
+        <input type="text" class="avr-item-description" id="avr-item-${index}-description" name="item_${index}_description" placeholder="Item description">
+        <select class="avr-item-category" id="avr-item-${index}-category" name="item_${index}_category">${buildCategoryOptionsHtml()}</select>
+        <button type="button" class="avr-remove-item" aria-label="Remove this item">&times;</button>
       </div>
-      <div class="form-group">
-        <label for="avr-item-${index}-description">Item description</label>
-        <input type="text" id="avr-item-${index}-description" name="item_${index}_description" placeholder="e.g. Living room television">
+      <div class="avr-item-row-details">
+        <input type="text" name="item_${index}_brand" placeholder="Brand (optional)">
+        <input type="text" name="item_${index}_model" placeholder="Model (optional)">
+        <input type="text" id="avr-item-${index}-serial" name="item_${index}_serial" placeholder="Serial (optional)">
+        <label class="avr-item-no-serial">
+          <input type="checkbox" name="item_${index}_no_serial" class="avr-no-serial-checkbox">
+          <span>No serial</span>
+        </label>
+        <input type="text" name="item_${index}_approximate_age" placeholder="Approx. age (optional)">
+        <input type="text" name="item_${index}_requested_research" placeholder="Requested research (optional)">
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="avr-item-${index}-category">Category <span class="form-opt">(optional)</span></label>
-          <select id="avr-item-${index}-category" name="item_${index}_category">${buildCategoryOptionsHtml()}</select>
-        </div>
-        <div class="form-group">
-          <label for="avr-item-${index}-brand">Brand <span class="form-opt">(optional)</span></label>
-          <input type="text" id="avr-item-${index}-brand" name="item_${index}_brand">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="avr-item-${index}-model">Model <span class="form-opt">(optional)</span></label>
-          <input type="text" id="avr-item-${index}-model" name="item_${index}_model">
-        </div>
-        <div class="form-group">
-          <label for="avr-item-${index}-serial">Serial number <span class="form-opt">(optional)</span></label>
-          <input type="text" id="avr-item-${index}-serial" name="item_${index}_serial" placeholder="If known">
-        </div>
-      </div>
-      <label class="avr-checkbox-row avr-no-serial-row">
-        <input type="checkbox" name="item_${index}_no_serial" class="avr-no-serial-checkbox">
-        <span>I do not have a readable serial number.</span>
-      </label>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="avr-item-${index}-approx-age">Approximate age <span class="form-opt">(optional)</span></label>
-          <input type="text" id="avr-item-${index}-approx-age" name="item_${index}_approximate_age" placeholder="e.g. About 5 years">
-        </div>
-        <div class="form-group">
-          <label for="avr-item-${index}-research">Requested research <span class="form-opt">(optional)</span></label>
-          <input type="text" id="avr-item-${index}-research" name="item_${index}_requested_research">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="avr-item-${index}-notes">Item-specific notes <span class="form-opt">(optional)</span></label>
-        <textarea id="avr-item-${index}-notes" name="item_${index}_notes"></textarea>
-      </div>
+      <textarea name="item_${index}_notes" class="avr-item-notes" placeholder="Notes (optional)" rows="1"></textarea>
     `;
 
     var noSerialCheckbox = wrapper.querySelector(".avr-no-serial-checkbox");
@@ -277,10 +266,14 @@
   }
 
   function renumberItems() {
-    var cards = Array.from(itemsList.querySelectorAll(".avr-item-card"));
-    cards.forEach((card, position) => {
-      card.querySelector(".avr-item-number").textContent = String(position + 1);
-      card.querySelector(".avr-remove-item").hidden = cards.length <= 1;
+    // Removing every row is valid here (unlike the old always-at-least-
+    // one-item design): informationMethod is set explicitly by the radio
+    // selection, not derived from item count, so zero items under "Manually
+    // enter item details" just means validateForm() reports missing
+    // descriptions -- the remove button is never hidden.
+    var rows = Array.from(itemsList.querySelectorAll(".avr-item-row"));
+    rows.forEach((row, position) => {
+      row.querySelector(".avr-item-number-badge").textContent = String(position + 1);
     });
   }
 
@@ -299,10 +292,6 @@
   }
 
   function removeItem(wrapper, index) {
-    if (itemsList.querySelectorAll(".avr-item-card").length <= 1) {
-      return;
-    }
-
     wrapper.remove();
     itemCount -= 1;
     renumberItems();
@@ -362,21 +351,18 @@
     if (selectedServices.length === 0) messages.push("Please select at least one requested service.");
     if (!reason.value.trim()) messages.push("Please briefly describe the work order.");
 
-    var informationMethod = currentInformationMethod();
-    if (!informationMethod) {
-      messages.push("Please select how you will provide the item information.");
-    }
-
     if (!universalAck.checked) messages.push("Please confirm the authorization statement.");
     if (avLimitationsAck.required && !avLimitationsAck.checked) messages.push("Please confirm the service-limitations statement.");
 
+    var informationMethod = currentInformationMethod();
+    if (!informationMethod) {
+      messages.push("Please select how you are providing the item information.");
+    }
+
     if (informationMethod === "enter_items_now") {
-      var itemCards = Array.from(itemsList.querySelectorAll(".avr-item-card"));
-      if (itemCards.length === 0) {
-        messages.push("At least one item is required.");
-      }
-      itemCards.forEach((card, position) => {
-        var descriptionEl = card.querySelector('input[name$="_description"]');
+      var itemRows = Array.from(itemsList.querySelectorAll(".avr-item-row"));
+      itemRows.forEach((row, position) => {
+        var descriptionEl = row.querySelector('input[name$="_description"]');
         if (!descriptionEl.value.trim()) {
           messages.push(`Item ${position + 1}: please provide a brief description.`);
         }
@@ -505,16 +491,18 @@
       return;
     }
 
+    var informationMethod = currentInformationMethod();
+
     var formData = new FormData(form);
     formData.set("turnstileToken", turnstileToken);
-    formData.set("information_method", currentInformationMethod());
+    formData.set("information_method", informationMethod);
     formData.set("universal_ack", universalAck.checked ? "on" : "");
     formData.set("limitations_ack", avLimitationsAck.required && avLimitationsAck.checked ? "on" : "");
     formData.set("will_provide_list_later", willProvideLaterCheckbox.checked ? "on" : "");
     formData.set("third_party_authorization_ack", tpAuthorizationAck.checked ? "on" : "");
 
-    Array.from(itemsList.querySelectorAll(".avr-item-card")).forEach((card) => {
-      var noSerialCheckbox = card.querySelector(".avr-no-serial-checkbox");
+    Array.from(itemsList.querySelectorAll(".avr-item-row")).forEach((row) => {
+      var noSerialCheckbox = row.querySelector(".avr-no-serial-checkbox");
       var name = noSerialCheckbox.getAttribute("name");
       formData.set(name, noSerialCheckbox.checked ? "on" : "");
     });
@@ -540,14 +528,14 @@
         source: referral.source || "direct",
         result_status: referral.resultStatus || "",
         requested_services: selectedServices.join(","),
-        information_method: currentInformationMethod(),
+        information_method: informationMethod,
         item_count: payload.itemCount
       });
 
       showConfirmation(payload);
     } catch (error) {
       setStatus(error.message || "We couldn't send your request. Please try again.", "error");
-      track("work_order_submission_error", { information_method: currentInformationMethod() });
+      track("work_order_submission_error", { information_method: informationMethod });
       if (typeof window.turnstile !== "undefined" && turnstileWidgetId !== null) {
         window.turnstile.reset(turnstileWidgetId);
       }
@@ -605,14 +593,11 @@
   if (isReferral) {
     setSelectedServices(AVShared.toggleRequestedService(selectedServices, "age_verification"), { silent: true });
 
-    var referralMethodRadio = document.getElementById("avr-method-enter_items_now");
-    referralMethodRadio.checked = true;
-    setInformationMethod("enter_items_now");
-  }
-
-  var firstItemBlock = addItem();
-
-  if (isReferral) {
+    // DecodeMyItem always implies exactly one known item, so "Manually enter
+    // item details" is selected automatically -- still fully changeable by
+    // the user either way. selectInformationMethod() seeds the first empty
+    // item row itself; reuse it rather than adding a second one.
+    var firstItemBlock = selectInformationMethod("enter_items_now", { silent: true });
     var categorySelect = firstItemBlock.querySelector('select[name$="_category"]');
     var brandInput = firstItemBlock.querySelector('input[name$="_brand"]');
     var modelInput = firstItemBlock.querySelector('input[name$="_model"]');
@@ -637,6 +622,10 @@
     if (referral.brand || referral.model) {
       descriptionInput.value = [referral.brand, referral.model].filter(Boolean).join(" ");
     }
+  } else {
+    // Direct visitors default to the lowest-friction method -- still a
+    // real, changeable selection, not an implicit fallback.
+    selectInformationMethod("upload_or_paste_list", { silent: true });
   }
 
   waitForTurnstile()

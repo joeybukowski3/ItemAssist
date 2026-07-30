@@ -7402,10 +7402,393 @@ body.homepage-redesign .hero-report-preview .tbl tbody td {
   outline-offset: 2px;
 }
 
+/* ==========================================================================
+ * Compact work-order intake layout
+ * ========================================================================== */
+
+.avr-compact-header {
+  padding: 1rem var(--px) 0.85rem;
+  background: linear-gradient(180deg, var(--bg-soft), var(--white));
+  border-bottom: 1px solid var(--border);
+}
+
+.avr-compact-header-inner {
+  max-width: 780px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.avr-compact-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--navy);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.avr-compact-title {
+  font-family: var(--font-display, 'Outfit', var(--font));
+  font-size: clamp(1.35rem, 1.2rem + 0.8vw, 1.8rem);
+  font-weight: 700;
+  color: var(--text-head);
+  margin: 0 0 0.25rem;
+  line-height: 1.15;
+}
+
+.avr-compact-sub {
+  font-size: 0.88rem;
+  color: var(--text-body);
+  line-height: 1.4;
+  margin: 0 0 0.6rem;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.avr-compact-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+/* ---------- Compact requested-services list ---------- */
+
+.avr-service-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.avr-service-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.avr-service-row:hover {
+  border-color: var(--slate-light);
+}
+
+.avr-service-row:focus-within {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.avr-service-row.is-selected {
+  background: var(--green-bg);
+  border-color: var(--green);
+  box-shadow: 0 0 0 1px var(--green) inset;
+}
+
+.avr-service-row input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.avr-service-row-text {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.avr-service-row-name {
+  font-weight: 600;
+  font-size: 0.86rem;
+  color: var(--text-head);
+  white-space: nowrap;
+}
+
+.avr-service-row-desc {
+  font-size: 0.76rem;
+  color: var(--text-body);
+  line-height: 1.3;
+}
+
+.avr-service-row--shortcut {
+  border-style: dashed;
+}
+
+/* ---------- Compact form card / fieldset spacing ---------- */
+
+.avr-form-card--compact {
+  padding: 1.25rem 1.5rem;
+}
+
+.avr-compact-notice {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--navy);
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md);
+  padding: 0.5rem 0.75rem;
+  margin: 0 0 0.85rem;
+  line-height: 1.4;
+}
+
+.avr-fieldset--compact {
+  padding-top: 0.5rem;
+}
+
+.avr-fieldset--compact legend {
+  font-size: 0.88rem;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
+}
+
+.avr-fieldset--compact .form-row,
+.avr-method-content .form-row {
+  gap: 0.5rem;
+}
+
+.form-row--3col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 768px) {
+  .form-row--3col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-row--3col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.avr-fieldset--compact .form-group,
+.avr-method-content .form-group {
+  margin-bottom: 0.3rem;
+  gap: 0.15rem;
+}
+
+.avr-fieldset--compact .form-group label,
+.avr-method-content .form-group label {
+  font-size: 0.76rem;
+}
+
+.avr-fieldset--compact .form-group input,
+.avr-fieldset--compact .form-group select,
+.avr-fieldset--compact .form-group textarea,
+.avr-method-content .form-group input,
+.avr-method-content .form-group select,
+.avr-method-content .form-group textarea {
+  padding: 6px 10px;
+}
+
+.avr-fieldset--compact textarea,
+.avr-method-content textarea {
+  min-height: 36px;
+}
+
+.avr-fieldset--compact .form-help,
+.avr-method-content .form-help {
+  margin: 0.15rem 0 0.3rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.form-help--tight {
+  margin: 0.1rem 0 0.25rem;
+}
+
+.avr-checkbox-row--tight {
+  margin-bottom: 0.5rem;
+}
+
+.form-disclaimer--tight {
+  font-size: 0.78rem;
+  margin-top: 0.75rem;
+}
+
+/* ---------- Explicit information-method selector ---------- */
+
+.avr-method-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.35rem;
+}
+
+.avr-method-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.avr-method-row:hover {
+  border-color: var(--slate-light);
+}
+
+.avr-method-row:focus-within {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.avr-method-row.is-selected {
+  background: var(--bg-soft);
+  border-color: var(--navy);
+  box-shadow: 0 0 0 1px var(--navy) inset;
+}
+
+.avr-method-row input[type="radio"] {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.avr-method-row-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text-head);
+}
+
+.avr-method-content {
+  border-top: 1px solid var(--border-soft);
+  padding-top: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+/* ---------- Compact manual item-entry content ---------- */
+
+.avr-items-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.avr-item-row {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-soft);
+}
+
+.avr-item-row-main {
+  display: grid;
+  grid-template-columns: 1.6rem 1fr 200px auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.avr-item-number-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.avr-item-row-main input,
+.avr-item-row-main select {
+  font-size: 0.88rem;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--white);
+  color: var(--text-head);
+}
+
+.avr-item-row-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.avr-item-row-details input {
+  font-size: 0.82rem;
+  padding: 5px 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r);
+  background: var(--white);
+  color: var(--text-body);
+}
+
+.avr-item-no-serial {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--text-body);
+  white-space: nowrap;
+}
+
+.avr-item-no-serial input {
+  width: 14px;
+  height: 14px;
+}
+
+.avr-item-notes {
+  width: 100%;
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+  padding: 5px 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r);
+  background: var(--white);
+  color: var(--text-body);
+  resize: vertical;
+  min-height: 32px;
+}
+
+@media (max-width: 700px) {
+  .avr-item-row-main {
+    grid-template-columns: 1.6rem 1fr auto;
+  }
+
+  .avr-item-row-main select {
+    grid-column: 1 / -1;
+  }
+
+  .avr-item-row-details {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 .avr-ack-fieldset {
   background: var(--bg-soft);
   border-radius: var(--r-md);
-  padding: 1rem 1.25rem !important;
+  padding: 0.5rem 0.85rem !important;
+}
+
+.avr-form-card--compact .form-turnstile {
+  margin: 0.2rem 0 0.4rem;
+}
+
+.avr-form-card--compact .avr-checkbox-row {
+  margin-bottom: 0.4rem;
+  font-size: 0.82rem;
+}
+
+.avr-method-content .form-group--file input[type="file"] {
+  padding: 0.3rem 0;
+  font-size: 0.8rem;
 }
 
 .avr-estimate {
