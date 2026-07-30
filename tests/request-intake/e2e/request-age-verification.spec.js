@@ -110,6 +110,191 @@ test.describe("explicit information-method selection", () => {
   });
 });
 
+test.describe("section-card visual grouping", () => {
+  test("the branded header shows the Item Assist logo above the heading", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    await expect(page.locator(".avr-compact-logo")).toBeVisible();
+    await expect(page.locator(".avr-compact-title")).toHaveText("Submit a Work Order Request");
+  });
+
+  test("each major section is a distinct bordered card", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    const sectionCards = page.locator(".avr-section-card");
+    await expect(sectionCards).toHaveCount(5);
+
+    for (const legendText of [
+      "Contact Information",
+      "Requested Services",
+      "Work Order Description",
+      "How are you providing the item information?",
+      "Authorization"
+    ]) {
+      await expect(page.locator(".avr-section-card legend", { hasText: legendText })).toBeVisible();
+    }
+  });
+
+  test("Supporting Files / Item List has its own visible sub-heading inside the method card", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+
+    await expect(page.locator(".avr-subsection-heading")).toHaveText("Supporting Files / Item List");
+  });
+});
+
+test.describe("field- and section-level validation feedback", () => {
+  test("missing contact name highlights the field, shows an inline message, and highlights the Contact Information section", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.check("#avr-method-list_needs_collection");
+    await page.fill("#avr-tp-name", "John Insured");
+    await page.fill("#avr-tp-email", "john@example.com");
+    await page.check("#avr-tp-authorization-ack");
+    await page.fill("#avr-full-name", "");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-full-name")).toHaveClass(/avr-field-invalid/);
+    await expect(page.locator("#avr-full-name-error")).toBeVisible();
+    await expect(page.locator("#avr-full-name-error")).toContainText("Contact name is required");
+    const contactSection = page.locator("#avr-full-name").locator("xpath=ancestor::fieldset[contains(@class,'avr-section-card')]");
+    await expect(contactSection).toHaveClass(/avr-section-invalid/);
+  });
+
+  test("fixing the contact name live-clears its invalid state without a second submit", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.check("#avr-method-list_needs_collection");
+    await page.fill("#avr-tp-name", "John Insured");
+    await page.fill("#avr-tp-email", "john@example.com");
+    await page.check("#avr-tp-authorization-ack");
+    await page.fill("#avr-full-name", "");
+
+    await page.click("#avr-submit-btn");
+    await expect(page.locator("#avr-full-name")).toHaveClass(/avr-field-invalid/);
+
+    await page.fill("#avr-full-name", "Jane Smith");
+
+    await expect(page.locator("#avr-full-name")).not.toHaveClass(/avr-field-invalid/);
+    await expect(page.locator("#avr-full-name-error")).toBeHidden();
+  });
+
+  test("no email and no phone highlights both fields with a shared inline message", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.fill("#avr-email", "");
+    await page.check("#avr-will-provide-later");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-email")).toHaveClass(/avr-field-invalid/);
+    await expect(page.locator("#avr-phone")).toHaveClass(/avr-field-invalid/);
+    await expect(page.locator("#avr-contact-method-error")).toContainText(/email address or a phone number/);
+  });
+
+  test("no requested service selected softly highlights the Requested Services section", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await page.fill("#avr-full-name", "Jane Smith");
+    await page.fill("#avr-email", "jane@example.com");
+    await page.fill("#avr-reason", "Need a supportable age estimate.");
+    await page.check("#avr-universal-ack");
+    await page.check("#avr-will-provide-later");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-services-error")).toBeVisible();
+    const servicesSection = page.locator("#avr-services-error").locator("xpath=ancestor::fieldset[contains(@class,'avr-section-card')]");
+    await expect(servicesSection).toHaveClass(/avr-section-invalid/);
+  });
+
+  test("missing work-order description highlights the textarea with an inline message", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.fill("#avr-reason", "");
+    await page.check("#avr-will-provide-later");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-reason")).toHaveClass(/avr-field-invalid/);
+    await expect(page.locator("#avr-reason-error")).toContainText("briefly describe the work order");
+  });
+
+  test("missing the universal acknowledgement highlights the checkbox row", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await page.fill("#avr-full-name", "Jane Smith");
+    await page.fill("#avr-email", "jane@example.com");
+    await page.check("#avr-service-age_verification");
+    await page.fill("#avr-reason", "Need a supportable age estimate.");
+    await page.check("#avr-will-provide-later");
+    await page.check("#avr-limitations-ack");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-universal-ack-row")).toHaveClass(/avr-field-invalid/);
+    await expect(page.locator("#avr-universal-ack-error")).toBeVisible();
+  });
+
+  test("an invalid active information-method section (no file/paste/provide-later) highlights that content", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-upload-paste-error")).toBeVisible();
+    await expect(page.locator("#avr-pasted-list")).toHaveClass(/avr-field-invalid/);
+  });
+
+  test("a required field hidden inside the collapsed Optional work-order details disclosure auto-opens it when invalid", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillUniversalFields(page);
+    await page.check("#avr-will-provide-later");
+    await openOptionalWorkOrderDetails(page);
+    await page.selectOption("#avr-customer-type", "insurance_adjuster");
+    // Close the disclosure again to simulate the user having collapsed it
+    // before submitting with the now-required company field still empty.
+    await page.click(".avr-optional-details summary");
+    await expect(page.locator(".avr-optional-details")).not.toHaveAttribute("open", "");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator(".avr-optional-details")).toHaveAttribute("open", "");
+    await expect(page.locator("#avr-company")).toHaveClass(/avr-field-invalid/);
+    await expect(page.locator("#avr-company-error")).toBeVisible();
+  });
+
+  test("on failed submit, the first invalid field receives focus", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await page.check("#avr-will-provide-later");
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator("#avr-full-name")).toBeFocused();
+  });
+
+  test("submitting a fully valid form shows no field- or section-level invalid styling", async ({ page }) => {
+    await stubTurnstileAndApi(page);
+    await page.goto("/request-age-verification.html");
+    await fillRequiredContactFields(page);
+
+    await page.click("#avr-submit-btn");
+
+    await expect(page.locator(".avr-field-invalid")).toHaveCount(0);
+    await expect(page.locator(".avr-section-invalid")).toHaveCount(0);
+  });
+});
+
 test.describe("DecodeMyItem referral", () => {
   test('resolved status shows the correct banner copy, preselects Age Verification, selects "Manually enter item details," and prefills brand/model/category', async ({ page }) => {
     await stubTurnstileAndApi(page);

@@ -198,8 +198,10 @@
       seededItemBlock = addItem();
     }
 
-    // Switching methods must never leave stale validation errors from the
-    // previously-active method on screen.
+    // Switching methods must never leave stale validation errors (summary,
+    // field highlighting, or section highlighting) from the previously-
+    // active method on screen.
+    clearAllFieldInvalidState();
     showErrorSummary([]);
 
     if (!(options && options.silent)) {
@@ -234,6 +236,7 @@
         <select class="avr-item-category" id="avr-item-${index}-category" name="item_${index}_category">${buildCategoryOptionsHtml()}</select>
         <button type="button" class="avr-remove-item" aria-label="Remove this item">&times;</button>
       </div>
+      <p class="avr-field-error-msg" id="avr-item-${index}-description-error" hidden></p>
       <div class="avr-item-row-details">
         <input type="text" name="item_${index}_brand" placeholder="Brand (optional)">
         <input type="text" name="item_${index}_model" placeholder="Model (optional)">
@@ -269,8 +272,8 @@
     // Removing every row is valid here (unlike the old always-at-least-
     // one-item design): informationMethod is set explicitly by the radio
     // selection, not derived from item count, so zero items under "Manually
-    // enter item details" just means validateForm() reports missing
-    // descriptions -- the remove button is never hidden.
+    // enter item details" just means collectValidationIssues() reports
+    // missing descriptions -- the remove button is never hidden.
     var rows = Array.from(itemsList.querySelectorAll(".avr-item-row"));
     rows.forEach((row, position) => {
       row.querySelector(".avr-item-number-badge").textContent = String(position + 1);
@@ -308,8 +311,78 @@
       errorList.appendChild(li);
     });
     errorSummary.hidden = messages.length === 0;
-    if (messages.length > 0) {
+  }
+
+  /**
+   * Applies the soft "invalid" treatment to one or more fields: tinted
+   * border/background, aria-invalid, the enclosing .avr-section-card (if
+   * any) gets a matching soft highlight, and if the field lives inside a
+   * collapsed <details> (e.g. company inside "Optional work-order
+   * details"), that disclosure is opened so the highlighted field is
+   * actually visible rather than hidden.
+   *
+   * @param {Array<HTMLElement|null|undefined>} elements
+   * @param {string} message
+   * @param {HTMLElement|null} errorEl dedicated inline message element
+   */
+  function setFieldInvalid(elements, message, errorEl) {
+    (elements || []).forEach((el) => {
+      if (!el) {
+        return;
+      }
+      el.classList.add("avr-field-invalid");
+      el.setAttribute("aria-invalid", "true");
+
+      var detailsAncestor = el.closest("details");
+      if (detailsAncestor && !detailsAncestor.open) {
+        detailsAncestor.open = true;
+      }
+
+      var sectionCard = el.closest(".avr-section-card");
+      if (sectionCard) {
+        sectionCard.classList.add("avr-section-invalid");
+      }
+    });
+
+    if (errorEl) {
+      errorEl.textContent = message;
+      errorEl.hidden = false;
+    }
+  }
+
+  function clearAllFieldInvalidState() {
+    Array.from(form.querySelectorAll(".avr-field-invalid")).forEach((el) => {
+      el.classList.remove("avr-field-invalid");
+      el.removeAttribute("aria-invalid");
+    });
+    Array.from(form.querySelectorAll(".avr-section-invalid")).forEach((el) => {
+      el.classList.remove("avr-section-invalid");
+    });
+    Array.from(form.querySelectorAll(".avr-field-error-msg")).forEach((el) => {
+      el.hidden = true;
+      el.textContent = "";
+    });
+  }
+
+  /** Renders both the flat #avr-error-summary list and the per-field/
+   * per-section soft highlighting from the same structured issue list, so
+   * the two views can never drift out of sync with each other. */
+  function renderValidationIssues(issues) {
+    clearAllFieldInvalidState();
+    issues.forEach((issue) => setFieldInvalid(issue.elements, issue.message, issue.errorEl));
+    showErrorSummary(issues.map((issue) => issue.message));
+  }
+
+  function focusFirstInvalidField(issues) {
+    var firstWithElement = issues.find((issue) => issue.elements && issue.elements[0]);
+    if (!firstWithElement) {
       errorSummary.focus();
+      return;
+    }
+    var target = firstWithElement.elements[0];
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (typeof target.focus === "function") {
+      target.focus({ preventScroll: true });
     }
   }
 
@@ -328,35 +401,80 @@
     return AVFileRules.validateFileSet(allFiles);
   }
 
-  function validateForm() {
-    var messages = [];
+  /**
+   * Returns structured validation issues -- each with the field(s) to
+   * soft-highlight, the message shown both in the error summary and inline
+   * under the field/section, and (optionally) the dedicated inline error
+   * element to populate.
+   *
+   * @returns {Array<{elements: HTMLElement[], message: string, errorEl: HTMLElement|null}>}
+   */
+  function collectValidationIssues() {
+    var issues = [];
 
     var fullName = form.querySelector("#avr-full-name");
     var email = form.querySelector("#avr-email");
     var phone = form.querySelector("#avr-phone");
     var reason = form.querySelector("#avr-reason");
 
-    if (!fullName.value.trim()) messages.push("Contact name is required.");
+    if (!fullName.value.trim()) {
+      issues.push({ elements: [fullName], message: "Contact name is required.", errorEl: document.getElementById("avr-full-name-error") });
+    }
 
     var hasEmail = Boolean(email.value.trim());
     var hasPhone = Boolean(phone.value.trim());
     if (!hasEmail && !hasPhone) {
-      messages.push("Please provide an email address or a phone number.");
+      issues.push({
+        elements: [email, phone],
+        message: "Please provide an email address or a phone number.",
+        errorEl: document.getElementById("avr-contact-method-error")
+      });
     } else if (hasEmail && !email.checkValidity()) {
-      messages.push("Please enter a valid email address.");
+      issues.push({ elements: [email], message: "Please enter a valid email address.", errorEl: document.getElementById("avr-contact-method-error") });
     }
 
-    if (companyInput.required && !companyInput.value.trim()) messages.push("Company or organization is required for this customer type.");
+    if (companyInput.required && !companyInput.value.trim()) {
+      issues.push({
+        elements: [companyInput],
+        message: "Company or organization is required for this customer type.",
+        errorEl: document.getElementById("avr-company-error")
+      });
+    }
 
-    if (selectedServices.length === 0) messages.push("Please select at least one requested service.");
-    if (!reason.value.trim()) messages.push("Please briefly describe the work order.");
+    if (selectedServices.length === 0) {
+      issues.push({
+        elements: [serviceCheckboxes[0]],
+        message: "Please select at least one requested service.",
+        errorEl: document.getElementById("avr-services-error")
+      });
+    }
 
-    if (!universalAck.checked) messages.push("Please confirm the authorization statement.");
-    if (avLimitationsAck.required && !avLimitationsAck.checked) messages.push("Please confirm the service-limitations statement.");
+    if (!reason.value.trim()) {
+      issues.push({ elements: [reason], message: "Please briefly describe the work order.", errorEl: document.getElementById("avr-reason-error") });
+    }
+
+    if (!universalAck.checked) {
+      issues.push({
+        elements: [document.getElementById("avr-universal-ack-row") || universalAck],
+        message: "Please confirm the authorization statement.",
+        errorEl: document.getElementById("avr-universal-ack-error")
+      });
+    }
+    if (avLimitationsAck.required && !avLimitationsAck.checked) {
+      issues.push({
+        elements: [avLimitationsAckRow],
+        message: "Please confirm the service-limitations statement.",
+        errorEl: document.getElementById("avr-limitations-ack-error")
+      });
+    }
 
     var informationMethod = currentInformationMethod();
     if (!informationMethod) {
-      messages.push("Please select how you are providing the item information.");
+      issues.push({
+        elements: methodRadios,
+        message: "Please select how you are providing the item information.",
+        errorEl: document.getElementById("avr-method-error")
+      });
     }
 
     if (informationMethod === "enter_items_now") {
@@ -364,7 +482,11 @@
       itemRows.forEach((row, position) => {
         var descriptionEl = row.querySelector('input[name$="_description"]');
         if (!descriptionEl.value.trim()) {
-          messages.push(`Item ${position + 1}: please provide a brief description.`);
+          issues.push({
+            elements: [descriptionEl],
+            message: `Item ${position + 1}: please provide a brief description.`,
+            errorEl: row.querySelector(".avr-field-error-msg")
+          });
         }
       });
     }
@@ -374,30 +496,46 @@
       var hasUploadedFile = Array.from(form.querySelectorAll('input[type="file"]')).some((input) => (input.files || []).length > 0);
       var willProvideLater = willProvideLaterCheckbox.checked;
       if (!hasPastedText && !hasUploadedFile && !willProvideLater) {
-        messages.push("Please upload a file, paste your item list, or confirm you will provide it after Item Assist contacts you.");
+        issues.push({
+          elements: [pastedListInput],
+          message: "Please upload a file, paste your item list, or confirm you will provide it after Item Assist contacts you.",
+          errorEl: document.getElementById("avr-upload-paste-error")
+        });
       }
     }
 
     if (informationMethod === "list_needs_collection") {
       if (!tpNameInput.value.trim()) {
-        messages.push("Please provide the contact person or organization for item list collection.");
+        issues.push({
+          elements: [tpNameInput],
+          message: "Please provide the contact person or organization for item list collection.",
+          errorEl: document.getElementById("avr-tp-name-error")
+        });
       }
       var tpHasPhone = Boolean(tpPhoneInput.value.trim());
       var tpHasEmail = Boolean(tpEmailInput.value.trim());
       if (!tpHasPhone && !tpHasEmail) {
-        messages.push("Please provide an email address or a phone number for the item list collection contact.");
+        issues.push({
+          elements: [tpPhoneInput, tpEmailInput],
+          message: "Please provide an email address or a phone number for the item list collection contact.",
+          errorEl: document.getElementById("avr-tp-contact-method-error")
+        });
       }
       if (!tpAuthorizationAck.checked) {
-        messages.push("Please confirm you are authorized to provide this contact and request contact on the assignment.");
+        issues.push({
+          elements: [document.getElementById("avr-tp-authorization-row") || tpAuthorizationAck],
+          message: "Please confirm you are authorized to provide this contact and request contact on the assignment.",
+          errorEl: document.getElementById("avr-tp-authorization-error")
+        });
       }
     }
 
     var fileError = collectFileErrors();
     if (fileError) {
-      messages.push(fileError);
+      issues.push({ elements: [], message: fileError, errorEl: null });
     }
 
-    return messages;
+    return issues;
   }
 
   /* ---------- Turnstile ---------- */
@@ -471,14 +609,15 @@
       return;
     }
 
-    var validationMessages = validateForm();
-    if (validationMessages.length > 0) {
-      showErrorSummary(validationMessages);
+    var validationIssues = collectValidationIssues();
+    if (validationIssues.length > 0) {
+      renderValidationIssues(validationIssues);
       setStatus("Please fix the highlighted fields and try again.", "error");
+      focusFirstInvalidField(validationIssues);
       return;
     }
 
-    showErrorSummary([]);
+    renderValidationIssues([]);
 
     if (!turnstileReady || typeof window.turnstile === "undefined") {
       setStatus("Spam protection is still loading. Please wait a moment and try again.", "error");
@@ -564,6 +703,19 @@
       track("work_order_form_started", { source: referral.source || "direct" });
     }
   });
+
+  // Live-clear soft validation highlighting as the user fixes fields --
+  // only once an error summary is actually showing (i.e. after a failed
+  // submit attempt), so nothing is highlighted pre-emptively before the
+  // user has ever tried to submit.
+  function liveClearValidationHighlighting() {
+    if (errorSummary.hidden) {
+      return;
+    }
+    renderValidationIssues(collectValidationIssues());
+  }
+  form.addEventListener("input", liveClearValidationHighlighting);
+  form.addEventListener("change", liveClearValidationHighlighting);
 
   document.querySelectorAll('[data-analytics="item_pricing_valuation_upsell_clicked"]').forEach((el) => {
     el.addEventListener("click", () => {
