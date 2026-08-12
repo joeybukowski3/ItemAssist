@@ -1034,6 +1034,17 @@ nav {
   align-items: stretch;
 }
 
+#svc-pricing-tiers .pricing-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#svc-pricing-tiers .pricing-card--featured {
+  padding-top: 2.25rem;
+}
+
 .pricing-card {
   background: var(--white);
   border: 1px solid var(--border);
@@ -1555,6 +1566,7 @@ footer {
   /* Grids */
   .cards-grid   { grid-template-columns: 1fr; max-width: 480px; margin-left: auto; margin-right: auto; }
   .pricing-grid { grid-template-columns: 1fr; max-width: 440px; margin-left: auto; margin-right: auto; }
+  #svc-pricing-tiers .pricing-grid { grid-template-columns: 1fr; max-width: 440px; }
   .process-inner { grid-template-columns: 1fr; gap: 3rem; }
   .contact-grid  { grid-template-columns: 1fr; gap: 2.5rem; }
   .form-row      { grid-template-columns: 1fr; }
@@ -4813,6 +4825,15 @@ body.homepage-redesign .home-hero-sub {
   max-width: 470px;
 }
 
+body.homepage-redesign .home-hero-audience {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--slate-mid, var(--slate));
+  font-weight: 600;
+  margin: -14px 0 20px;
+  max-width: 470px;
+}
+
 body.homepage-redesign .home-hero-price {
   max-width: 470px;
   margin: -10px 0 20px;
@@ -5509,6 +5530,30 @@ body.homepage-redesign .trust-grid-three {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+body.homepage-redesign .similar-examples-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-width: var(--home-max-w);
+  margin: 0 auto 32px;
+  padding: 0;
+}
+
+body.homepage-redesign .similar-examples-list li {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--bg-soft);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-body);
+}
+
+body.homepage-redesign .similar-examples-list li strong {
+  color: var(--text-head);
+}
+
 body.homepage-redesign .pricing-risk-section {
   padding-top: 56px;
 }
@@ -5776,6 +5821,84 @@ body.homepage-redesign .turnaround-note p + p {
 body.homepage-redesign .pricing-grid-single {
   grid-template-columns: minmax(0, 960px);
   justify-content: center;
+}
+
+body.homepage-redesign .pricing-grid-two {
+  grid-template-columns: minmax(0, 320px) minmax(0, 640px);
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: stretch;
+}
+
+body.homepage-redesign .consultation-pricing-card {
+  padding: 28px 24px;
+  background: var(--bg-soft);
+}
+
+body.homepage-redesign .consultation-pricing-card .pc-tier {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+body.homepage-redesign .consultation-pricing-card .pc-price {
+  margin: 6px 0 14px;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-head);
+}
+
+body.homepage-redesign .consultation-pricing-card .pc-price span {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--slate);
+}
+
+body.homepage-redesign .consultation-pricing-card .pc-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-body);
+  margin-bottom: 12px;
+}
+
+body.homepage-redesign .pc-examples {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+body.homepage-redesign .pc-examples li {
+  padding-left: 18px;
+  position: relative;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-body);
+}
+
+body.homepage-redesign .pc-examples li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+body.homepage-redesign .pc-note {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--slate);
+  margin-bottom: 18px;
 }
 
 body.homepage-redesign .pricing-card {
@@ -6459,8 +6582,12 @@ body.homepage-redesign .how-card:nth-child(3) { animation: fadeUp 0.5s ease-out 
     max-width: 400px;
     margin: 0 auto;
   }
+  body.homepage-redesign .pricing-grid-two {
+    max-width: 400px;
+  }
   body.homepage-redesign .trust-grid { grid-template-columns: 1fr; }
   body.homepage-redesign .trust-grid-three { grid-template-columns: 1fr; }
+  body.homepage-redesign .similar-examples-list { grid-template-columns: 1fr; }
   body.homepage-redesign .research-scope-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   body.homepage-redesign .pricing-detail-grid { grid-template-columns: 1fr; }
   body.homepage-redesign .deliverables-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
