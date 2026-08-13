@@ -76,7 +76,7 @@
     /* ── Scoped styling for the LKQ guide page ── */
     .lkq-article-hero {
       background: var(--bg-page);
-      padding: 3.5rem var(--px) 3rem;
+      padding: 2.75rem var(--px) 2rem;
     }
     .lkq-article-hero-inner {
       max-width: 760px;
@@ -88,28 +88,33 @@
       color: var(--text-head);
       line-height: 1.18;
       letter-spacing: -0.025em;
-      margin-bottom: 1rem;
+      margin-bottom: 0.85rem;
     }
     .lkq-article-hero-sub {
       font-size: 1.0625rem;
       color: var(--slate-mid);
-      line-height: 1.7;
+      line-height: 1.6;
+      max-width: 640px;
     }
-    .lkq-scope-note {
-      margin-top: 1.5rem;
+    .lkq-scope-pill {
+      display: inline-flex;
+      align-items: flex-start;
+      gap: 0.45rem;
+      margin-top: 1.1rem;
       background: var(--white);
       border: 1px solid var(--border);
-      border-radius: var(--r-lg);
-      padding: 1.125rem 1.25rem;
-      font-size: 0.9375rem;
-      line-height: 1.65;
-      color: var(--text-body);
+      border-radius: 999px;
+      padding: 0.5rem 1rem;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      color: var(--slate-mid);
     }
-    .lkq-scope-note strong { color: var(--text-head); }
+    .lkq-scope-pill svg { flex-shrink: 0; margin-top: 0.15rem; color: var(--navy); }
+    .lkq-scope-pill strong { color: var(--text-head); font-weight: 600; }
 
     .lkq-article-body {
       background: var(--white);
-      padding: 3.5rem 0;
+      padding: 2.75rem 0;
     }
     .lkq-article-body + .lkq-article-body { padding-top: 0; }
     .lkq-content-col {
@@ -124,74 +129,102 @@
       color: var(--text-head);
       letter-spacing: -0.02em;
       line-height: 1.25;
-      margin: 0 0 1rem;
+      margin: 0 0 0.85rem;
     }
     .lkq-content-col > h2:not(:first-child) { margin-top: 0; }
     .lkq-faq-col h2 { text-align: center; }
     .lkq-content-col p {
       font-size: 1rem;
       color: var(--text-body);
-      line-height: 1.8;
-      margin-bottom: 1.125rem;
+      line-height: 1.75;
+      margin-bottom: 1rem;
     }
     .lkq-content-col ul {
-      margin: 0 0 1.125rem;
+      margin: 0 0 1rem;
       padding-left: 1.25rem;
       color: var(--text-body);
-      line-height: 1.75;
+      line-height: 1.7;
     }
-    .lkq-content-col ul li { margin-bottom: 0.5rem; }
+    .lkq-content-col ul li { margin-bottom: 0.4rem; }
     .lkq-content-col ol {
-      margin: 0 0 1.125rem;
+      margin: 0 0 1rem;
       padding-left: 1.25rem;
       color: var(--text-body);
-      line-height: 1.75;
+      line-height: 1.7;
     }
-    .lkq-content-col ol li { margin-bottom: 0.6rem; }
+    .lkq-content-col ol li { margin-bottom: 0.5rem; }
 
     .lkq-pullquote {
       background: var(--bg-soft);
       border-left: 3px solid var(--navy);
       border-radius: 0 var(--r-md) var(--r-md) 0;
-      padding: 1.1rem 1.35rem;
-      margin: 0 0 1.5rem;
+      padding: 1rem 1.25rem;
+      margin: 0 0 1.25rem;
       font-size: 1.0625rem;
       font-weight: 600;
       color: var(--text-head);
-      line-height: 1.55;
+      line-height: 1.5;
     }
 
     .lkq-section-alt {
       background: var(--bg-soft);
     }
 
-    /* ── Similar vs Comparable explainer ── */
+    /* ── Icon primitives ── */
+    .lkq-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--navy);
+    }
+    .lkq-icon svg { width: 100%; height: 100%; }
+    .lkq-icon--green { color: var(--green); }
+
+    /* ── Similar ≠ Comparable explainer ── */
     .lkq-simcomp-module {
       background: var(--white);
-      padding: 3.5rem 0;
+      padding: 2.75rem 0;
     }
     .lkq-simcomp-inner {
       max-width: var(--max-w);
       margin: 0 auto;
       padding: 0 var(--px);
     }
+    .lkq-simcomp-heading-wrap {
+      max-width: 640px;
+      margin: 0 auto 1.75rem;
+      text-align: center;
+    }
+    .lkq-simcomp-heading-wrap h2 { margin-bottom: 0.4rem; }
+    .lkq-simcomp-heading-wrap p {
+      font-size: 0.9375rem;
+      color: var(--slate-mid);
+      line-height: 1.6;
+    }
     .lkq-simcomp-card {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       gap: 2rem;
-      align-items: center;
+      align-items: start;
       background: var(--bg-soft);
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
       box-shadow: var(--shadow);
-      padding: 2.25rem 2.5rem;
+      padding: 2rem 2.25rem;
     }
     .lkq-simcomp-side {
       display: flex;
       flex-direction: column;
-      gap: 0.6rem;
+      gap: 0.85rem;
     }
-    .lkq-simcomp-side--right { text-align: right; align-items: flex-end; }
+    .lkq-simcomp-side--right { align-items: flex-end; }
+    .lkq-simcomp-label-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .lkq-simcomp-side--right .lkq-simcomp-label-row { align-items: flex-end; text-align: right; }
     .lkq-simcomp-label {
       font-size: 0.75rem;
       font-weight: 700;
@@ -200,22 +233,45 @@
     }
     .lkq-simcomp-label--similar { color: var(--slate-mid); }
     .lkq-simcomp-label--comparable { color: var(--green); }
-    .lkq-simcomp-copy {
-      font-size: 0.9375rem;
-      color: var(--text-body);
-      line-height: 1.65;
-      max-width: 260px;
+    .lkq-simcomp-subtext {
+      font-size: 0.8125rem;
+      color: var(--slate-light);
+      line-height: 1.4;
     }
-    .lkq-simcomp-side--right .lkq-simcomp-copy { margin-left: auto; }
+    .lkq-trait-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .lkq-trait-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.875rem;
+      color: var(--text-body);
+      line-height: 1.3;
+    }
+    .lkq-simcomp-side--right .lkq-trait-list li { flex-direction: row-reverse; text-align: right; }
+    .lkq-trait-list .lkq-icon { width: 18px; height: 18px; }
     .lkq-simcomp-visual {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.5rem;
+      padding-top: 0.5rem;
+    }
+    .lkq-simcomp-arrows {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--slate-light);
     }
     .lkq-simcomp-photo-frame {
-      width: 128px;
-      height: 168px;
+      width: 116px;
+      height: 152px;
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
@@ -233,23 +289,25 @@
     }
     .lkq-simcomp-photo-caption {
       font-size: 0.6875rem;
-      color: var(--slate-light);
+      font-weight: 600;
+      color: var(--navy);
       text-align: center;
       max-width: 150px;
       line-height: 1.4;
     }
-    .lkq-simcomp-vs {
-      font-size: 0.6875rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--slate-light);
+    .lkq-simcomp-takeaway {
+      margin: 1.5rem auto 0;
+      max-width: 640px;
+      text-align: center;
+      font-size: 0.9375rem;
+      color: var(--text-body);
+      line-height: 1.6;
     }
+    .lkq-simcomp-takeaway strong { color: var(--text-head); }
     @media (max-width: 760px) {
       .lkq-simcomp-card {
         grid-template-columns: 1fr;
-        text-align: center;
-        padding: 1.75rem 1.5rem;
+        padding: 1.5rem 1.25rem;
         gap: 1.5rem;
       }
       .lkq-simcomp-side,
@@ -257,13 +315,20 @@
         align-items: center;
         text-align: center;
       }
-      .lkq-simcomp-side--right .lkq-simcomp-copy { margin-left: 0; }
+      .lkq-simcomp-side--right .lkq-simcomp-label-row { align-items: center; text-align: center; }
+      .lkq-trait-list li,
+      .lkq-simcomp-side--right .lkq-trait-list li {
+        flex-direction: row;
+        justify-content: center;
+        text-align: left;
+      }
+      .lkq-simcomp-arrows { transform: rotate(90deg); }
     }
 
     /* ── Refrigerator comparison module ── */
     .lkq-fridge-module {
       background: var(--bg-page);
-      padding: 4rem 0;
+      padding: 3rem 0;
     }
     .lkq-fridge-inner {
       max-width: var(--max-w);
@@ -271,25 +336,34 @@
       padding: 0 var(--px);
     }
     .lkq-fridge-heading-wrap {
-      max-width: 760px;
-      margin: 0 auto 1rem;
+      max-width: 700px;
+      margin: 0 auto 0.5rem;
       text-align: center;
     }
-    .lkq-fridge-heading-wrap h2 { margin-bottom: 0.75rem; }
+    .lkq-fridge-heading-wrap h2 { margin-bottom: 0.5rem; }
     .lkq-fridge-heading-wrap p {
       font-size: 1rem;
       color: var(--slate-mid);
-      line-height: 1.75;
+      line-height: 1.6;
+    }
+    .lkq-fridge-scope-note {
+      max-width: 700px;
+      margin: 0.6rem auto 0;
+      text-align: center;
+      font-size: 0.8125rem;
+      font-style: italic;
+      color: var(--slate-light);
+      line-height: 1.55;
     }
     .lkq-fridge-date {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      margin: 1.25rem auto 0;
+      margin: 1rem auto 0;
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: 999px;
-      padding: 0.45rem 0.9rem;
+      padding: 0.4rem 0.85rem;
       font-size: 0.8125rem;
       font-weight: 600;
       color: var(--navy);
@@ -298,12 +372,12 @@
 
     /* Price scale */
     .lkq-price-scale {
-      margin: 2.5rem 0 1rem;
+      margin: 2rem 0 0.75rem;
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
       box-shadow: var(--shadow);
-      padding: 2.75rem 2rem 1.75rem;
+      padding: 2.25rem 2rem 1.5rem;
     }
     .lkq-price-scale-track {
       position: relative;
@@ -348,29 +422,37 @@
       top: -5px;
     }
     .lkq-price-point-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
       font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: var(--slate-mid);
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.3rem;
     }
     .lkq-price-point--mid .lkq-price-point-label {
       color: var(--green);
     }
     .lkq-price-point-amt {
-      font-size: 1.25rem;
+      font-size: 1.5rem;
       font-weight: 700;
+      letter-spacing: -0.02em;
       color: var(--text-head);
     }
     .lkq-price-point--mid .lkq-price-point-amt { color: var(--navy); }
     .lkq-price-point-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
       margin-top: 0.35rem;
       font-size: 0.8125rem;
       color: var(--slate-mid);
       max-width: 190px;
-      line-height: 1.45;
+      line-height: 1.4;
     }
+    .lkq-price-point-tag .lkq-icon { width: 13px; height: 13px; color: var(--slate-light); }
     .lkq-price-point-badge {
       display: inline-flex;
       align-items: center;
@@ -387,11 +469,11 @@
     }
     .lkq-price-point-badge svg { width: 11px; height: 11px; }
     .lkq-price-scale-note {
-      margin-top: 2rem;
+      margin-top: 1.5rem;
       text-align: center;
       font-size: 0.875rem;
       color: var(--slate-mid);
-      line-height: 1.6;
+      line-height: 1.55;
     }
 
     /* Product cards */
@@ -399,17 +481,17 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1.25rem;
-      margin-top: 2rem;
+      margin-top: 1.75rem;
       align-items: start;
     }
     .lkq-product-card {
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
-      padding: 1.5rem;
+      padding: 1.35rem;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.65rem;
     }
     .lkq-product-card--mid {
       border: 2px solid var(--green);
@@ -445,7 +527,26 @@
     .lkq-product-desc {
       font-size: 0.8125rem;
       color: var(--slate-mid);
-      line-height: 1.55;
+      line-height: 1.5;
+    }
+    .lkq-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+    .lkq-chip {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--slate);
+      background: var(--bg-soft);
+      border: 1px solid var(--border-soft);
+      border-radius: 999px;
+      padding: 0.2rem 0.55rem;
+    }
+    .lkq-product-card--mid .lkq-chip {
+      background: var(--green-bg);
+      color: #14532d;
+      border-color: transparent;
     }
     .lkq-product-meta {
       display: flex;
@@ -453,27 +554,32 @@
       align-items: baseline;
       gap: 0.5rem;
       margin-top: auto;
-      padding-top: 0.75rem;
+      padding-top: 0.65rem;
       border-top: 1px solid var(--border-soft);
     }
     .lkq-product-retailer {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
       font-size: 0.8125rem;
       font-weight: 600;
       color: var(--navy);
     }
+    .lkq-product-retailer .lkq-icon { width: 13px; height: 13px; }
     .lkq-product-price {
-      font-size: 1.125rem;
+      font-size: 1.375rem;
       font-weight: 700;
+      letter-spacing: -0.02em;
       color: var(--text-head);
     }
     .lkq-product-card--mid .lkq-product-price { color: var(--green); }
     .lkq-product-micro {
       font-size: 0.8125rem;
       color: var(--slate-mid);
-      line-height: 1.55;
+      line-height: 1.5;
       background: var(--bg-soft);
       border-radius: var(--r);
-      padding: 0.6rem 0.75rem;
+      padding: 0.55rem 0.7rem;
     }
     .lkq-product-card--mid .lkq-product-micro {
       background: var(--green-bg);
@@ -482,7 +588,7 @@
 
     /* Comparison checklist */
     .lkq-compare-wrap {
-      margin-top: 3rem;
+      margin-top: 2.25rem;
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
@@ -496,7 +602,7 @@
     }
     .lkq-compare-table thead tr { background: var(--navy); }
     .lkq-compare-table th {
-      padding: 0.8rem 1rem;
+      padding: 0.75rem 1rem;
       text-align: left;
       font-size: 0.75rem;
       font-weight: 600;
@@ -509,10 +615,10 @@
       text-align: center;
     }
     .lkq-compare-table td {
-      padding: 0.75rem 1rem;
+      padding: 0.65rem 1rem;
       border-bottom: 1px solid var(--border);
       color: var(--text-body);
-      line-height: 1.5;
+      line-height: 1.45;
     }
     .lkq-compare-table td:first-child {
       font-weight: 600;
@@ -523,6 +629,9 @@
     .lkq-compare-table .lkq-yes { color: var(--green); font-weight: 700; }
     .lkq-compare-table .lkq-no { color: var(--slate-light); }
     .lkq-compare-divider td {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
       background: var(--bg-soft) !important;
       font-size: 0.6875rem;
       font-weight: 700;
@@ -531,6 +640,7 @@
       color: var(--slate-mid);
       padding: 0.5rem 1rem;
     }
+    .lkq-compare-divider .lkq-icon { width: 13px; height: 13px; }
     .lkq-compare-table col.lkq-col-mid { background: var(--green-bg); }
     .lkq-compare-table td.lkq-col-mid,
     .lkq-compare-table th.lkq-col-mid {
@@ -538,40 +648,122 @@
     }
 
     .lkq-takeaway {
-      margin-top: 2rem;
+      margin-top: 1.75rem;
       background: var(--navy-deep);
       border-radius: var(--r-xl);
-      padding: 1.75rem 2rem;
+      padding: 1.5rem 1.75rem;
       color: rgba(255,255,255,0.9);
-      font-size: 1rem;
-      line-height: 1.75;
+      font-size: 0.9375rem;
+      line-height: 1.65;
     }
     .lkq-takeaway strong { color: var(--white); }
+
+    /* ── 5-step research process strip ── */
+    .lkq-process-module {
+      background: var(--white);
+      padding: 2.75rem 0;
+    }
+    .lkq-process-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--px);
+    }
+    .lkq-process-heading-wrap {
+      max-width: 640px;
+      margin: 0 auto 1.75rem;
+      text-align: center;
+    }
+    .lkq-process-heading-wrap h2 { margin-bottom: 0.35rem; }
+    .lkq-process-heading-wrap p {
+      font-size: 0.9375rem;
+      color: var(--slate-mid);
+      line-height: 1.55;
+    }
+    .lkq-process-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      position: relative;
+    }
+    .lkq-process-step {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 0.75rem;
+    }
+    .lkq-process-step::after {
+      content: "";
+      position: absolute;
+      top: 21px;
+      left: calc(50% + 30px);
+      width: calc(100% - 60px);
+      height: 2px;
+      background: var(--border);
+    }
+    .lkq-process-step:last-child::after { display: none; }
+    .lkq-process-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+      position: relative;
+      z-index: 1;
+    }
+    .lkq-process-icon svg { width: 19px; height: 19px; }
+    .lkq-process-step h3 {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--text-head);
+      margin-bottom: 0.3rem;
+    }
+    .lkq-process-step p {
+      font-size: 0.8125rem;
+      color: var(--slate-mid);
+      line-height: 1.45;
+    }
+    @media (max-width: 760px) {
+      .lkq-process-strip {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        max-width: 340px;
+        margin: 0 auto;
+      }
+      .lkq-process-step { padding: 0; }
+      .lkq-process-step::after { display: none; }
+    }
 
     /* Discontinued steps */
     .lkq-disc-steps {
       list-style: none;
       counter-reset: lkq-step;
-      margin: 1.5rem 0 0;
+      margin: 1.25rem 0 0;
       padding: 0;
       display: flex;
       flex-direction: column;
-      gap: 0.9rem;
+      gap: 0.75rem;
     }
     .lkq-disc-steps li {
       counter-increment: lkq-step;
       position: relative;
       padding-left: 2.5rem;
       color: var(--text-body);
-      line-height: 1.65;
+      line-height: 1.55;
+      font-size: 0.9375rem;
     }
     .lkq-disc-steps li::before {
       content: counter(lkq-step);
       position: absolute;
       left: 0;
       top: 0;
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       background: var(--navy);
       color: var(--white);
@@ -586,15 +778,15 @@
     .lkq-doc-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.6rem 1.5rem;
-      margin: 1.5rem 0;
+      gap: 0.5rem 1.5rem;
+      margin: 1.25rem 0;
     }
     .lkq-doc-grid li {
       list-style: none;
       position: relative;
       padding-left: 1.5rem;
       color: var(--text-body);
-      line-height: 1.6;
+      line-height: 1.55;
       font-size: 0.9375rem;
     }
     .lkq-doc-grid li::before {
@@ -613,11 +805,10 @@
       background: var(--bg-soft);
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
-      padding: 1.5rem 1.75rem;
+      padding: 1.25rem 1.5rem;
       margin-top: 1rem;
     }
-    .lkq-boundary p { margin-bottom: 0.75rem; }
-    .lkq-boundary ul { margin-bottom: 0; }
+    .lkq-boundary p { margin-bottom: 0; }
 
     /* FAQ */
     .lkq-faq-col {
@@ -626,12 +817,12 @@
       padding: 0 var(--px);
     }
     .lkq-faq-container {
-      margin-top: 2rem;
+      margin-top: 1.5rem;
       background: var(--white);
       border: 1.5px solid var(--navy);
       border-radius: var(--r-xl);
       box-shadow: var(--shadow);
-      padding: 0.25rem 1.5rem;
+      padding: 0.15rem 1.5rem;
     }
     .lkq-faq-item {
       border-bottom: 1px solid var(--border-soft);
@@ -639,8 +830,8 @@
     .lkq-faq-item:last-child { border-bottom: none; }
     .lkq-faq-item summary {
       cursor: pointer;
-      min-height: 3.25rem;
-      padding: 1.1rem 0;
+      min-height: 3rem;
+      padding: 0.95rem 0;
       font-size: 1rem;
       font-weight: 600;
       color: var(--text-head);
@@ -666,11 +857,11 @@
     }
     .lkq-faq-item[open] summary::after { content: "\2212"; }
     .lkq-faq-item p {
-      padding: 0 0 1.25rem;
+      padding: 0 0 1.1rem;
       max-width: 68ch;
       font-size: 0.9375rem;
       color: var(--text-body);
-      line-height: 1.7;
+      line-height: 1.65;
     }
 
     /* Explore / service links */
@@ -678,13 +869,13 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
-      margin-top: 1.5rem;
+      margin-top: 1.25rem;
     }
     .lkq-explore-card {
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
-      padding: 1.25rem 1.4rem;
+      padding: 1.15rem 1.35rem;
       transition: box-shadow 0.2s, border-color 0.2s;
     }
     .lkq-explore-card:hover { box-shadow: var(--shadow-md); border-color: var(--slate-light); }
@@ -692,12 +883,12 @@
       font-size: 0.9375rem;
       font-weight: 700;
       color: var(--text-head);
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.3rem;
     }
     .lkq-explore-card p {
       font-size: 0.8125rem;
       color: var(--slate-mid);
-      line-height: 1.55;
+      line-height: 1.5;
       margin-bottom: 0.5rem;
     }
     .lkq-explore-card span {
@@ -707,39 +898,51 @@
     }
 
     .lkq-service-note {
-      margin-top: 1.5rem;
+      margin-top: 1.25rem;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1.25rem;
+      gap: 1.1rem;
       align-items: stretch;
     }
     .lkq-service-chip {
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
-      padding: 1.5rem;
+      padding: 1.35rem;
       display: flex;
       flex-direction: column;
       transition: box-shadow 0.2s;
     }
     .lkq-service-chip:hover { box-shadow: var(--shadow-md); }
+    .lkq-service-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--bg-soft);
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+    }
+    .lkq-service-icon svg { width: 17px; height: 17px; }
     .lkq-service-chip strong {
       display: block;
       color: var(--text-head);
       font-size: 1rem;
       font-weight: 700;
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.3rem;
     }
     .lkq-service-chip span {
       font-size: 0.875rem;
       color: var(--slate-mid);
-      line-height: 1.55;
+      line-height: 1.5;
       margin-bottom: 0.5rem;
     }
     .lkq-service-price {
       font-size: 0.8125rem;
       color: var(--slate-mid);
-      margin-bottom: 1rem;
+      margin-bottom: 0.85rem;
     }
     .lkq-service-price b {
       display: block;
@@ -764,7 +967,7 @@
     }
 
     @media (max-width: 768px) {
-      .lkq-price-scale { padding: 2rem 1.25rem 1.5rem; }
+      .lkq-price-scale { padding: 1.75rem 1.25rem 1.25rem; }
       .lkq-price-scale-track { display: none; }
       .lkq-price-scale-points {
         grid-template-columns: 1fr;
@@ -780,14 +983,14 @@
         display: block; width: 100%;
       }
       .lkq-compare-table tr {
-        padding: 0.85rem 1rem;
+        padding: 0.8rem 1rem;
         border-bottom: 1px solid var(--border);
         display: grid;
         grid-template-columns: 1fr auto auto auto;
         gap: 0.35rem 0.6rem;
         align-items: baseline;
       }
-      .lkq-compare-table tr.lkq-compare-divider { display: block; padding: 0.6rem 1rem; }
+      .lkq-compare-table tr.lkq-compare-divider { display: block; padding: 0.55rem 1rem; }
       .lkq-compare-table td { border-bottom: none; padding: 0; }
       .lkq-compare-table td:first-child {
         grid-column: 1 / -1;
@@ -804,11 +1007,12 @@
     }
 
     @media (max-width: 640px) {
-      .lkq-fridge-module { padding: 3rem 0; }
-      .lkq-simcomp-module { padding: 2.75rem 0; }
-      .lkq-article-hero { padding: 2.75rem var(--px) 2.25rem; }
-      .lkq-article-body { padding: 2.75rem 0; }
-      .lkq-faq-container { padding: 0.25rem 1.1rem; }
+      .lkq-fridge-module { padding: 2.25rem 0; }
+      .lkq-simcomp-module { padding: 2rem 0; }
+      .lkq-process-module { padding: 2rem 0; }
+      .lkq-article-hero { padding: 2rem var(--px) 1.75rem; }
+      .lkq-article-body { padding: 2rem 0; }
+      .lkq-faq-container { padding: 0.15rem 1.1rem; }
     }
   </style>
 </head>
@@ -842,88 +1046,78 @@
     <section class="lkq-article-hero" id="top">
       <div class="lkq-article-hero-inner">
         <h1>What "Like Kind and Quality" Means for Household Contents</h1>
-        <p class="lkq-article-hero-sub">"Like kind and quality" (LKQ) is a phrase commonly used when discussing replacement comparisons in property and contents claims. For household items such as electronics, appliances, and furniture, the practical research challenge is determining which current product is genuinely comparable to the original &mdash; not simply similar in brand, category, or size.</p>
-        <div class="lkq-scope-note">
-          <strong>This page covers product-comparison research, not policy interpretation.</strong> It explains how Item Assist approaches comparable-replacement research for household contents. Item Assist does not determine what any particular insurance policy requires, interpret policy language, or make coverage decisions.
-        </div>
-      </div>
-    </section>
-
-    <section class="lkq-article-body">
-      <div class="lkq-content-col">
-        <h2>What Does "Like Kind and Quality" Mean?</h2>
-        <p>In product-research terms, LKQ work involves identifying the original item and evaluating available current products against the characteristics that materially affect comparability and value. That means researching what the original item actually was &mdash; its brand, category, size, capacity, features, and product tier &mdash; and then comparing currently available products against those same characteristics.</p>
-        <p>This page focuses on that research process. It does not offer legal or policy interpretations, and it should not be read as a definition of what any specific insurance policy, contract, or jurisdiction requires.</p>
-      </div>
-    </section>
-
-    <section class="lkq-article-body lkq-section-alt">
-      <div class="lkq-content-col">
-        <h2>Similar Products Are Not Always Comparable</h2>
-        <p class="lkq-pullquote">Similar is a starting point, not a conclusion.</p>
-        <p>A retailer search or search-engine result can return a product that matches the original item on brand, category, and size while overlooking the specifications, features, model tier, or performance characteristics that materially affect replacement price. Two refrigerators from the same manufacturer, in the same size class, can differ by hundreds of dollars because one includes a beverage center, a convertible drawer, or a higher-tier design that the other does not.</p>
-        <p>The goal of comparable-replacement research is to move past that surface-level match and identify a <strong>supportable comparable</strong> &mdash; a <strong>reasonable current replacement</strong> supported by <strong>value-relevant specifications</strong>, a <strong>documented comparison</strong>, and the <strong>available evidence</strong>. In many cases, more than one candidate could reasonably be considered comparable; the research process is about identifying which option the evidence best supports, not asserting a single objectively "correct" answer.</p>
-      </div>
-    </section>
-
-    <section class="lkq-article-body">
-      <div class="lkq-content-col">
-        <h2>What Actually Matters When Comparing Household Items?</h2>
-        <p>Not every specification carries equal weight for every category. The characteristics below are common starting points, but which ones actually drive value depends on the type of item being researched.</p>
-        <ul>
-          <li><strong>Product category and original functionality</strong> &mdash; what the item was designed to do</li>
-          <li><strong>Brand relevance</strong> &mdash; whether brand meaningfully affects quality, price, or perception for that category</li>
-          <li><strong>Size and dimensions</strong> &mdash; footprint, capacity class, or fit-for-purpose constraints</li>
-          <li><strong>Capacity</strong> &mdash; storage volume, load capacity, or output relevant to the item type</li>
-          <li><strong>Feature set</strong> &mdash; the specific functions and conveniences included</li>
-          <li><strong>Performance characteristics</strong> &mdash; efficiency, power, speed, or output relevant to the category</li>
-          <li><strong>Model tier</strong> &mdash; where the product sits within a manufacturer's lineup</li>
-          <li><strong>Technology generation</strong> &mdash; how current the underlying technology or design is</li>
-          <li><strong>Current availability</strong> &mdash; whether the product, or something functionally equivalent, is still sold</li>
-          <li><strong>Discontinued status</strong> &mdash; whether direct replacement requires identifying a modern equivalent instead</li>
-        </ul>
+        <p class="lkq-article-hero-sub">"Like kind and quality" (LKQ) is a phrase commonly used when comparing replacements in property and contents claims. For household items, the practical challenge is determining which current product is genuinely comparable &mdash; not simply similar in brand, category, or size.</p>
+        <span class="lkq-scope-pill">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span><strong>Research, not policy interpretation.</strong> Item Assist explains comparable-replacement research; it does not interpret policy language or determine coverage.</span>
+        </span>
       </div>
     </section>
 
     <section class="lkq-simcomp-module" aria-labelledby="simcomp-heading">
       <div class="lkq-simcomp-inner">
-        <h2 id="simcomp-heading" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Similar vs. Comparable</h2>
+        <div class="lkq-simcomp-heading-wrap">
+          <h2 id="simcomp-heading">Similar &ne; Comparable</h2>
+          <p>A product can match the original item on brand, category, and size while missing the specifications that actually drive replacement value.</p>
+        </div>
         <div class="lkq-simcomp-card">
           <div class="lkq-simcomp-side">
-            <span class="lkq-simcomp-label lkq-simcomp-label--similar">Similar</span>
-            <p class="lkq-simcomp-copy">Same brand, similar size, type, and broad feature family.</p>
+            <div class="lkq-simcomp-label-row">
+              <span class="lkq-simcomp-label lkq-simcomp-label--similar">Looks Similar</span>
+              <span class="lkq-simcomp-subtext">These traits narrow the search.</span>
+            </div>
+            <ul class="lkq-trait-list">
+              <li><span class="lkq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3.24L3 3v6.59a2 2 0 0 0 .59 1.41l9.59 9.59a2 2 0 0 0 2.82 0l4.59-4.59a2 2 0 0 0 0-2.82Z"/><circle cx="7.5" cy="7.5" r="1"/></svg></span>Samsung brand</li>
+              <li><span class="lkq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/></svg></span>French-door style</li>
+              <li><span class="lkq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 6H3M3 6l3-3M3 6l3 3M3 18h18M21 18l-3-3M21 18l-3 3"/></svg></span>~36-inch width</li>
+              <li><span class="lkq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span>Stainless finish</li>
+              <li><span class="lkq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M3.27 6.96 12 12l8.73-5.04M12 22.08V12"/></svg></span>Large capacity</li>
+              <li><span class="lkq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 4v16M4 9h5"/></svg></span>Smart features</li>
+            </ul>
           </div>
 
           <div class="lkq-simcomp-visual">
+            <div class="lkq-simcomp-arrows" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+              <span style="font-size:0.6875rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">vs.</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
             <div class="lkq-simcomp-photo-frame">
-              <!-- Product photo slot: replace src with a licensed/first-party product image
-                   of the Samsung RF32CG5300SR when one is available. Falls back to a
-                   line-art rendering so the section never shows a broken image. -->
               <img
                 src="assets/products/samsung-rf32cg5300sr.jpg"
                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2096%20128%22%3E%3Crect%20x%3D%222%22%20y%3D%222%22%20width%3D%2292%22%20height%3D%22124%22%20rx%3D%229%22%20fill%3D%22%23f8fafc%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222.5%22%2F%3E%3Cline%20x1%3D%222%22%20y1%3D%2242%22%20x2%3D%2294%22%20y2%3D%2242%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222.5%22%2F%3E%3Cline%20x1%3D%2248%22%20y1%3D%222%22%20x2%3D%2248%22%20y2%3D%2242%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222.5%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2216%22%20width%3D%224%22%20height%3D%2220%22%20rx%3D%222%22%20fill%3D%22%231e3a5f%22%2F%3E%3Crect%20x%3D%2282%22%20y%3D%2216%22%20width%3D%224%22%20height%3D%2220%22%20rx%3D%222%22%20fill%3D%22%231e3a5f%22%2F%3E%3Crect%20x%3D%2260%22%20y%3D%2210%22%20width%3D%2222%22%20height%3D%2218%22%20rx%3D%223%22%20fill%3D%22%23dbeafe%22%2F%3E%3Ccircle%20cx%3D%2267%22%20cy%3D%2219%22%20r%3D%222%22%20fill%3D%22%232563eb%22%2F%3E%3Ccircle%20cx%3D%2275%22%20cy%3D%2219%22%20r%3D%222%22%20fill%3D%22%232563eb%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2260%22%20width%3D%224%22%20height%3D%2258%22%20rx%3D%222%22%20fill%3D%22%231e3a5f%22%2F%3E%3C%2Fsvg%3E';"
                 alt="Samsung RF32CG5300SR French-door refrigerator, the illustrative supportable comparable"
-                width="128" height="168" loading="lazy">
+                width="116" height="152" loading="lazy">
             </div>
-            <span class="lkq-simcomp-photo-caption">Samsung RF32CG5300SR &mdash; illustrative comparable</span>
-            <span class="lkq-simcomp-vs">vs.</span>
+            <span class="lkq-simcomp-photo-caption">Original-item research</span>
           </div>
 
           <div class="lkq-simcomp-side lkq-simcomp-side--right">
-            <span class="lkq-simcomp-label lkq-simcomp-label--comparable">Comparable</span>
-            <p class="lkq-simcomp-copy">Requires matching the original item's relevant features, quality, and specifications &mdash; not just selecting something that looks close.</p>
+            <div class="lkq-simcomp-label-row">
+              <span class="lkq-simcomp-label lkq-simcomp-label--comparable">Actually Comparable</span>
+              <span class="lkq-simcomp-subtext">These details can materially affect value.</span>
+            </div>
+            <ul class="lkq-trait-list">
+              <li><span class="lkq-icon lkq-icon--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6M12 2c-2 3-3 5-3 8a3 3 0 0 0 6 0c0-3-1-5-3-8Z"/><path d="M6 22h12M9 18h6v4H9z"/></svg></span>Beverage / water system</li>
+              <li><span class="lkq-icon lkq-icon--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9v6M18 9v6"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg></span>Ice configuration</li>
+              <li><span class="lkq-icon lkq-icon--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg></span>Door configuration</li>
+              <li><span class="lkq-icon lkq-icon--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M4 12h16"/></svg></span>FlexZone / convertible storage</li>
+              <li><span class="lkq-icon lkq-icon--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z"/></svg></span>Premium model tier</li>
+              <li><span class="lkq-icon lkq-icon--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h4l3-9 4 18 3-9h6"/></svg></span>Technology / features</li>
+            </ul>
           </div>
         </div>
+        <p class="lkq-simcomp-takeaway"><strong>Similar is a starting point, not a conclusion.</strong> Comparable-replacement research looks at the characteristics that actually affect function, quality, and price.</p>
       </div>
     </section>
 
     <section class="lkq-fridge-module lkq-section-alt" aria-labelledby="fridge-example-heading">
       <div class="lkq-fridge-inner">
         <div class="lkq-fridge-heading-wrap">
-          <h2 id="fridge-example-heading">Example: Similar on the Surface, Different in Value</h2>
-          <p>A broad product search can return several refrigerators that seem close on brand, size, and style &mdash; but the most supportable comparable may sit between a lower-featured option and a premium-featured option. Looking at the specifications that actually affect value helps explain why.</p>
-          <p style="margin-top:0.75rem;"><em>This is an illustrative research example, not a determination about any actual insurance claim.</em> It assumes an original refrigerator with a mid-tier feature profile &mdash; French-door layout, dual ice maker, and a beverage center, but without a convertible drawer or premium 4-door design. That assumed profile is what makes the middle candidate the illustrative supportable choice below; a different original item could point to a different candidate entirely.</p>
+          <h2 id="fridge-example-heading">Three Similar Refrigerators. Three Different Prices.</h2>
+          <p>A broad product search can return several refrigerators that seem close on brand, size, and style &mdash; but the most supportable comparable often sits between a lower-featured option and a premium-featured one.</p>
         </div>
+        <p class="lkq-fridge-scope-note">Illustrative research example only, not a determination about any actual claim &mdash; assumes an original French-door refrigerator with dual ice and a beverage center, but no convertible drawer or premium 4-door design.</p>
 
         <div class="lkq-fridge-date-wrap">
           <span class="lkq-fridge-date">
@@ -938,12 +1132,12 @@
             <div class="lkq-price-point lkq-price-point--low">
               <span class="lkq-price-point-label">Lower-priced candidate</span>
               <span class="lkq-price-point-amt">$1,699.99</span>
-              <span class="lkq-price-point-tag">Samsung RF32CG5100SR/AA &mdash; Best Buy</span>
+              <span class="lkq-price-point-tag"><span class="lkq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M3 9l2-6h14l2 6"/></svg></span>Samsung RF32CG5100SR/AA &mdash; Best Buy</span>
             </div>
             <div class="lkq-price-point lkq-price-point--mid">
               <span class="lkq-price-point-label">Most Supportable Comparable &mdash; Example</span>
               <span class="lkq-price-point-amt">$1,799.99</span>
-              <span class="lkq-price-point-tag">Samsung RF32CG5300SR &mdash; Lowe's</span>
+              <span class="lkq-price-point-tag"><span class="lkq-icon lkq-icon--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M3 9l2-6h14l2 6"/></svg></span>Samsung RF32CG5300SR &mdash; Lowe's</span>
               <span class="lkq-price-point-badge">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 13 4 4 10-10"/></svg>
                 Illustrative pick
@@ -952,7 +1146,7 @@
             <div class="lkq-price-point lkq-price-point--high">
               <span class="lkq-price-point-label">Premium candidate</span>
               <span class="lkq-price-point-amt">$2,299.99</span>
-              <span class="lkq-price-point-tag">Samsung Bespoke RF29BB8600QL &mdash; Lowe's</span>
+              <span class="lkq-price-point-tag"><span class="lkq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M3 9l2-6h14l2 6"/></svg></span>Samsung Bespoke RF29BB8600QL &mdash; Lowe's</span>
             </div>
           </div>
           <p class="lkq-price-scale-note">The supportable comparable is not automatically the cheapest or the most expensive option &mdash; it's the one the evidence best supports.</p>
@@ -962,9 +1156,14 @@
           <article class="lkq-product-card">
             <span class="lkq-product-label">Lower-priced candidate</span>
             <h3 class="lkq-product-name">Samsung RF32CG5100SR/AA</h3>
-            <p class="lkq-product-desc">Samsung 32 cu. ft. 3-Door French Door Smart Refrigerator with Dual Auto Ice Maker. Approximately 36-inch width, standard depth, stainless/fingerprint-resistant finish, smart functionality. No beverage center, no FlexZone drawer, not the premium 4-door Bespoke configuration.</p>
+            <p class="lkq-product-desc">32 cu. ft. 3-Door French Door Smart Refrigerator with Dual Auto Ice Maker. ~36-inch width, standard depth, stainless finish.</p>
+            <div class="lkq-chip-row">
+              <span class="lkq-chip">3-Door</span>
+              <span class="lkq-chip">Dual Ice</span>
+              <span class="lkq-chip">Smart</span>
+            </div>
             <div class="lkq-product-meta">
-              <span class="lkq-product-retailer">Best Buy &middot; SKU 6546219</span>
+              <span class="lkq-product-retailer"><span class="lkq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M3 9l2-6h14l2 6"/></svg></span>Best Buy &middot; SKU 6546219</span>
               <span class="lkq-product-price">$1,699.99</span>
             </div>
             <p class="lkq-product-micro">Similar core size and configuration, but fewer value-driving convenience/premium features.</p>
@@ -976,20 +1175,30 @@
               Most Supportable Comparable &mdash; Example
             </span>
             <h3 class="lkq-product-name">Samsung RF32CG5300SR</h3>
-            <p class="lkq-product-desc">Samsung Mega Capacity ~32 cu. ft. Smart French Door Refrigerator with Dual Ice Maker and Beverage Center. Approximately 36-inch width, standard depth, fingerprint-resistant stainless steel, 3-door configuration. No FlexZone drawer, not the premium 4-door Bespoke configuration.</p>
+            <p class="lkq-product-desc">Mega Capacity ~32 cu. ft. Smart French Door Refrigerator with Dual Ice Maker and Beverage Center. 3-door configuration.</p>
+            <div class="lkq-chip-row">
+              <span class="lkq-chip">3-Door</span>
+              <span class="lkq-chip">Dual Ice</span>
+              <span class="lkq-chip">Beverage Center</span>
+            </div>
             <div class="lkq-product-meta">
-              <span class="lkq-product-retailer">Lowe's &middot; Item #5407418</span>
+              <span class="lkq-product-retailer"><span class="lkq-icon lkq-icon--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M3 9l2-6h14l2 6"/></svg></span>Lowe's &middot; Item #5407418</span>
               <span class="lkq-product-price">$1,799.99</span>
             </div>
-            <p class="lkq-product-micro">Retains the relevant core characteristics while adding the feature set assumed in this illustrative original-item scenario, without moving into the premium tier.</p>
+            <p class="lkq-product-micro">Retains the relevant core characteristics while adding the feature set assumed in this scenario, without moving into the premium tier.</p>
           </article>
 
           <article class="lkq-product-card">
             <span class="lkq-product-label">Higher-priced premium candidate</span>
             <h3 class="lkq-product-name">Samsung Bespoke RF29BB8600QL</h3>
-            <p class="lkq-product-desc">Samsung Bespoke ~29 cu. ft. 4-Door French Door Refrigerator with Beverage Center, Dual Ice Maker, and FlexZone. Approximately 36-inch width, standard depth, fingerprint-resistant stainless steel, AutoFill Water Pitcher, FlexZone drawer with multiple temperature settings, Bespoke premium model tier.</p>
+            <p class="lkq-product-desc">Bespoke ~29 cu. ft. 4-Door French Door Refrigerator with Beverage Center, Dual Ice Maker, and FlexZone.</p>
+            <div class="lkq-chip-row">
+              <span class="lkq-chip">4-Door</span>
+              <span class="lkq-chip">FlexZone</span>
+              <span class="lkq-chip">Bespoke Tier</span>
+            </div>
             <div class="lkq-product-meta">
-              <span class="lkq-product-retailer">Lowe's &middot; Item #5044180</span>
+              <span class="lkq-product-retailer"><span class="lkq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M3 9l2-6h14l2 6"/></svg></span>Lowe's &middot; Item #5044180</span>
               <span class="lkq-product-price">$2,299.99</span>
             </div>
             <p class="lkq-product-micro">Still broadly similar, but premium features and model tier push the price materially higher.</p>
@@ -1011,7 +1220,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr class="lkq-compare-divider"><td colspan="4">Shared across all three</td></tr>
+                <tr class="lkq-compare-divider"><td colspan="4"><span class="lkq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>Shared across all three</td></tr>
                 <tr>
                   <td data-label="Characteristic">Samsung brand</td>
                   <td data-label="Lower-Priced" class="lkq-yes">&check;</td>
@@ -1060,7 +1269,7 @@
                   <td data-label="Supportable Comparable" class="lkq-yes lkq-col-mid">&check;</td>
                   <td data-label="Premium" class="lkq-yes">&check;</td>
                 </tr>
-                <tr class="lkq-compare-divider"><td colspan="4">Less-obvious differentiators</td></tr>
+                <tr class="lkq-compare-divider"><td colspan="4"><span class="lkq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h4l3-9 4 18 3-9h6"/></svg></span>Meaningful differences</td></tr>
                 <tr>
                   <td data-label="Characteristic">Beverage Center / AutoFill water</td>
                   <td data-label="Lower-Priced" class="lkq-no">&mdash;</td>
@@ -1097,11 +1306,47 @@
         </div>
 
         <div class="lkq-takeaway">
-          <p style="margin-bottom:0.75rem;">The goal of comparable-replacement research is not to choose the cheapest or most expensive result. It is to identify the most supportable current option based on the original item's value-relevant characteristics and the evidence available.</p>
-          <p style="margin-bottom:0;">In a real assignment, the original item's specifications &mdash; not this illustration &mdash; would determine which of these three candidates, if any, was actually appropriate. A different original refrigerator could point to the lower-priced or premium candidate instead.</p>
+          <p style="margin-bottom:0.6rem;">The goal is not to choose the cheapest or most expensive result &mdash; it's to identify the most supportable current option based on the original item's value-relevant characteristics and the evidence available.</p>
+          <p style="margin-bottom:0;">In a real assignment, the original item's specifications &mdash; not this illustration &mdash; would determine which candidate, if any, was actually appropriate.</p>
         </div>
 
-        <p style="margin-top:1.25rem; font-size:0.8125rem; color:var(--slate-mid); line-height:1.6;">Retail prices are shown as a dated research snapshot for illustration only. Prices, promotions, and availability can change. Product features and current pricing should be reverified when performing an actual replacement comparison.</p>
+        <p style="margin-top:1rem; font-size:0.8125rem; color:var(--slate-mid); line-height:1.55;">Retail prices are shown as a dated research snapshot for illustration only. Prices, promotions, and availability can change and should be reverified for an actual replacement comparison.</p>
+      </div>
+    </section>
+
+    <section class="lkq-process-module" aria-labelledby="process-heading">
+      <div class="lkq-process-inner">
+        <div class="lkq-process-heading-wrap">
+          <h2 id="process-heading">How the Research Process Works</h2>
+          <p>Whether or not the original model is still sold, comparable-replacement research follows the same five-step sequence.</p>
+        </div>
+        <div class="lkq-process-strip">
+          <div class="lkq-process-step">
+            <span class="lkq-process-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+            <h3>Identify</h3>
+            <p>Original brand/model/item</p>
+          </div>
+          <div class="lkq-process-step">
+            <span class="lkq-process-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg></span>
+            <h3>Research</h3>
+            <p>Age, specs, original function</p>
+          </div>
+          <div class="lkq-process-step">
+            <span class="lkq-process-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4h10M11 12h10M11 20h10"/><circle cx="4" cy="4" r="1.5"/><circle cx="4" cy="12" r="1.5"/><circle cx="4" cy="20" r="1.5"/></svg></span>
+            <h3>Prioritize</h3>
+            <p>Value-driving characteristics</p>
+          </div>
+          <div class="lkq-process-step">
+            <span class="lkq-process-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><path d="M3 17h8M13 13v8M17 13v8M13 17h8"/></svg></span>
+            <h3>Compare</h3>
+            <p>Evaluate current products</p>
+          </div>
+          <div class="lkq-process-step">
+            <span class="lkq-process-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 15h6M9 11h2"/></svg></span>
+            <h3>Document</h3>
+            <p>Retailer, price, date, assumptions</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1154,12 +1399,14 @@
         <p>Item Assist provides product identification, specification comparison, current replacement research, and pricing documentation for household contents. Research is human-reviewed, sourced from current retail listings, and delivered with the assumptions and confidence notes behind each selected comparison.</p>
         <div class="lkq-service-note">
           <div class="lkq-service-chip">
+            <span class="lkq-service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg></span>
             <strong>Item Consultation</strong>
             <span>For one focused item or replacement question.</span>
             <span class="lkq-service-price">Starting at <b>$25</b></span>
             <a href="https://itemassist.com/#contact" class="btn-primary">Book Consultation</a>
           </div>
           <div class="lkq-service-chip">
+            <span class="lkq-service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></span>
             <strong>Contents Research</strong>
             <span>For broader or multi-item assignments requiring organized documentation.</span>
             <span class="lkq-service-price">Starting at <b>$75</b></span>
