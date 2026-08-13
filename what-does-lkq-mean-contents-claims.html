@@ -641,6 +641,7 @@
       padding: 0.5rem 1rem;
     }
     .lkq-compare-divider .lkq-icon { width: 13px; height: 13px; }
+    .lkq-compare-table .lkq-lbl-abbr { display: none; }
     .lkq-compare-table col.lkq-col-mid { background: var(--green-bg); }
     .lkq-compare-table td.lkq-col-mid,
     .lkq-compare-table th.lkq-col-mid {
@@ -978,31 +979,57 @@
       .lkq-price-point::before { display: none; }
       .lkq-price-point-tag { max-width: none; }
 
-      .lkq-compare-table thead { display: none; }
-      .lkq-compare-table, .lkq-compare-table tbody, .lkq-compare-table tr, .lkq-compare-table td {
-        display: block; width: 100%;
+      /* Compact comparison matrix — keep the 4-column grid, never stack into records */
+      .lkq-compare-table {
+        table-layout: fixed;
+        font-size: 0.8125rem;
       }
-      .lkq-compare-table tr {
-        padding: 0.8rem 1rem;
-        border-bottom: 1px solid var(--border);
-        display: grid;
-        grid-template-columns: 1fr auto auto auto;
-        gap: 0.35rem 0.6rem;
-        align-items: baseline;
+      .lkq-compare-table .lkq-lbl-full { display: none; }
+      .lkq-compare-table .lkq-lbl-abbr { display: inline; }
+      .lkq-compare-table th {
+        padding: 0.5rem 0.3rem;
+        font-size: 0.625rem;
+        letter-spacing: 0.01em;
+        line-height: 1.25;
       }
-      .lkq-compare-table tr.lkq-compare-divider { display: block; padding: 0.55rem 1rem; }
-      .lkq-compare-table td { border-bottom: none; padding: 0; }
+      .lkq-compare-table td { padding: 0.5rem 0.3rem; }
+      .lkq-compare-table td:not(:first-child) {
+        font-size: 0.75rem;
+        overflow-wrap: anywhere;
+      }
+      .lkq-compare-table th:first-child,
       .lkq-compare-table td:first-child {
-        grid-column: 1 / -1;
-        font-size: 0.9375rem;
-        margin-bottom: 0.15rem;
+        width: 46%;
+        padding-left: 0.7rem;
+        padding-right: 0.5rem;
+        font-size: 0.8125rem;
+        hyphens: auto;
       }
-      .lkq-compare-table td:not(:first-child)::before {
-        content: attr(data-label) ": ";
+      .lkq-compare-table th:nth-child(2),
+      .lkq-compare-table td:nth-child(2) { width: 16%; }
+      .lkq-compare-table th:nth-child(3),
+      .lkq-compare-table td:nth-child(3) { width: 20%; }
+      .lkq-compare-table th:nth-child(4),
+      .lkq-compare-table td:nth-child(4) { width: 18%; padding-right: 0.45rem; }
+      /* Keep the ✓ / — glyphs large, but let short text values stay small enough to wrap cleanly */
+      .lkq-compare-table .lkq-yes,
+      .lkq-compare-table .lkq-no { font-size: 0.9375rem; }
+      .lkq-compare-table td .lkq-lbl-abbr {
         font-size: 0.6875rem;
         font-weight: 600;
-        text-transform: uppercase;
-        color: var(--slate-mid);
+        line-height: 1.3;
+      }
+      /* Full-width section dividers: table-cell keeps colspan working at narrow widths */
+      .lkq-compare-divider td {
+        display: table-cell;
+        width: auto;
+        padding: 0.45rem 0.7rem;
+        font-size: 0.625rem;
+      }
+      .lkq-compare-divider .lkq-icon {
+        display: inline-block;
+        vertical-align: -2px;
+        margin-right: 0.35rem;
       }
     }
 
@@ -1214,8 +1241,8 @@
               <thead>
                 <tr>
                   <th scope="col">Characteristic</th>
-                  <th scope="col">Lower-Priced</th>
-                  <th scope="col" class="lkq-col-mid">Supportable Comparable</th>
+                  <th scope="col"><span class="lkq-lbl-full">Lower-Priced</span><span class="lkq-lbl-abbr">Lower</span></th>
+                  <th scope="col" class="lkq-col-mid"><span class="lkq-lbl-full">Supportable Comparable</span><span class="lkq-lbl-abbr">Comparable</span></th>
                   <th scope="col">Premium</th>
                 </tr>
               </thead>
@@ -1293,12 +1320,6 @@
                   <td data-label="Lower-Priced" class="lkq-no">&mdash;</td>
                   <td data-label="Supportable Comparable" class="lkq-no lkq-col-mid">&mdash;</td>
                   <td data-label="Premium" class="lkq-yes">&check;</td>
-                </tr>
-                <tr>
-                  <td data-label="Characteristic">Premium convenience/design features</td>
-                  <td data-label="Lower-Priced" class="lkq-no">&mdash;</td>
-                  <td data-label="Supportable Comparable" class="lkq-no lkq-col-mid">Beverage Center only</td>
-                  <td data-label="Premium" class="lkq-yes">Beverage Center + FlexZone</td>
                 </tr>
               </tbody>
             </table>
