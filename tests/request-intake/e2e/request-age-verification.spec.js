@@ -1,4 +1,4 @@
-const { test, expect } = require("@playwright/test");
+const { test, expect } = require("./fixtures.js");
 const { stubTurnstileAndApi } = require("./helpers.js");
 
 test.beforeEach(async ({}, testInfo) => {
