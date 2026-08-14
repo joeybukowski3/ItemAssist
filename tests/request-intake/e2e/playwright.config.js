@@ -11,6 +11,7 @@ module.exports = defineConfig({
   reporter: [["list"]],
   use: {
     baseURL: `http://localhost:${PORT}`,
+    serviceWorkers: "block",
     trace: "retain-on-failure"
   },
   webServer: {
