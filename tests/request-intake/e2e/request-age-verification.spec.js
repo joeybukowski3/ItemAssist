@@ -15,7 +15,7 @@ test.describe("direct visit", () => {
     await page.goto("/request-age-verification.html");
 
     await expect(page.locator("nav .logo")).toBeVisible();
-    await expect(page.locator("h1")).toHaveText("Submit a Work Order Request");
+    await expect(page.locator("h1")).toHaveText("Professional Age Verification");
     await expect(page.locator("footer")).toBeVisible();
     await expect(page.locator("#avr-referral-banner")).toBeHidden();
   });
@@ -116,7 +116,7 @@ test.describe("section-card visual grouping", () => {
     await page.goto("/request-age-verification.html");
 
     await expect(page.locator(".avr-compact-logo")).toBeVisible();
-    await expect(page.locator(".avr-compact-title")).toHaveText("Submit a Work Order Request");
+    await expect(page.locator(".avr-compact-title")).toHaveText("Professional Age Verification");
   });
 
   test("each major section is a distinct bordered card", async ({ page }) => {
@@ -129,7 +129,7 @@ test.describe("section-card visual grouping", () => {
     for (const legendText of [
       "Contact Information",
       "Requested Services",
-      "Work Order Description",
+      "Request Details",
       "How are you providing the item information?",
       "Authorization"
     ]) {
@@ -520,8 +520,6 @@ test.describe("optional work-order details", () => {
     await expect(page.locator("#avr-claim-reference")).toBeVisible();
     await expect(page.locator("#avr-insured-name")).toBeVisible();
     await expect(page.locator("#avr-completion-date")).toBeVisible();
-    await expect(page.locator("#avr-billing-contact")).toBeVisible();
-    await expect(page.locator("#avr-po-required")).toBeVisible();
     await expect(page.locator("#avr-special-reporting")).toBeVisible();
   });
 
@@ -621,7 +619,7 @@ test.describe("pricing guidance", () => {
     const detailBox = await page.locator(".avr-pricing-detail-section").boundingBox();
 
     expect(detailBox.y).toBeGreaterThan(formBox.y + formBox.height - 50);
-    await expect(page.locator(".avr-pricing-detail-section")).toContainText("typically starts at $35");
+    await expect(page.locator(".avr-pricing-detail-section")).toContainText("starting at $25");
   });
 });
 

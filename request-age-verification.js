@@ -8,7 +8,7 @@
 
   var SERVICE_LABELS = {
     age_verification: "Age Verification",
-    item_pricing_valuation: "Item Pricing / Valuation",
+    item_pricing_valuation: "Item Consultation",
     item_list_collection: "Item List Collection",
     unsure: "Unsure — Help Me Determine the Scope"
   };
