@@ -1,0 +1,128 @@
+{
+  "example_notice": "ILLUSTRATIVE DATA SHAPE ONLY. Products, scores, prices, and availability are not live market facts.",
+  "research_run_id": "example-refrigerator-run-001",
+  "category": "refrigerator",
+  "scoring_config_version": "concept-refrigerator-v0-unvalidated",
+  "original_user_input": "Illustrative LG French-door refrigerator with a verified 36-inch installation opening",
+  "research_confidence": {
+    "identity": 0.55,
+    "specification_extraction": 0.72,
+    "note": "Research confidence is separate from every candidate LKQ score."
+  },
+  "original_product": {
+    "id": "example-refrigerator-original-001",
+    "category": "refrigerator",
+    "brand": { "value": "LG", "status": "user_supplied", "source_id": "src-user-description" },
+    "manufacturer": { "value": "LG", "status": "inferred", "source_id": "src-user-description" },
+    "model_number": { "value": null, "status": "unverified", "source_id": null },
+    "product_name": { "value": "French-door refrigerator", "status": "user_supplied", "source_id": "src-user-description" },
+    "release_year": { "value": null, "status": "unverified", "source_id": null },
+    "discontinued": { "value": null, "status": "unverified", "source_id": null },
+    "status": "illustrative_identity_incomplete",
+    "positioning": { "value": "upper_mainstream", "status": "user_supplied", "source_id": "src-scenario" },
+    "original_msrp": null,
+    "observed_price": null,
+    "price_source": null,
+    "price_observed_at": null,
+    "source_urls": [],
+    "verification_status": "incomplete_illustrative",
+    "confidence": 0.55,
+    "category_attributes": {
+      "configuration": { "value": "french_door_bottom_freezer", "status": "user_supplied", "source_id": "src-user-description" },
+      "width_inches": { "value": 35.75, "status": "unverified", "source_id": null },
+      "height_inches": { "value": null, "status": "unverified", "source_id": null },
+      "depth_inches": { "value": null, "status": "unverified", "source_id": null },
+      "depth_class": { "value": "standard_depth", "status": "user_supplied", "source_id": "src-scenario" },
+      "total_capacity_cuft": { "value": 30, "status": "user_supplied", "source_id": "src-scenario" },
+      "door_count": { "value": 3, "status": "user_supplied", "source_id": "src-scenario" },
+      "dispenser_configuration": { "value": "internal_beverage_center", "status": "user_supplied", "source_id": "src-scenario" },
+      "ice_maker": { "value": "dual", "status": "user_supplied", "source_id": "src-scenario" },
+      "finish": { "value": "stainless", "status": "user_supplied", "source_id": "src-scenario" }
+    }
+  },
+  "requirements": [
+    { "requirement_id": "rf-opening-width", "attribute_path": "width_inches", "operator": "lte", "target_value": 35.875, "severity": "hard", "activation_reason": "User supplied a 36-inch opening with configured clearance", "source_fields": ["installation.opening_width_inches"], "failure_code": "installation_width_exceeded" },
+    { "requirement_id": "rf-configuration", "attribute_path": "configuration", "operator": "equals", "target_value": "french_door_bottom_freezer", "severity": "hard", "failure_code": "major_configuration_changed" },
+    { "requirement_id": "rf-capacity-min", "attribute_path": "total_capacity_cuft", "operator": "gte", "target_value": 28, "severity": "conditional", "failure_code": "capacity_below_functional_minimum" },
+    { "requirement_id": "rf-beverage-feature", "attribute_path": "dispenser_configuration", "operator": "equals", "target_value": "internal_beverage_center", "severity": "conditional", "failure_code": "material_dispenser_feature_missing" }
+  ],
+  "candidates": [
+    {
+      "candidate_product": {
+        "id": "example-rf-candidate-close",
+        "product_name": "Illustrative fitting three-door French-door candidate",
+        "model_number": null,
+        "observed_price": null,
+        "availability": "not_researched",
+        "positioning": "upper_mainstream",
+        "category_attributes": { "configuration": "french_door_bottom_freezer", "width_inches": 35.75, "height_inches": 70, "depth_inches": 36, "depth_measurement": "with_handles", "depth_class": "standard_depth", "total_capacity_cuft": 30.5, "door_count": 3, "dispenser_configuration": "internal_beverage_center", "ice_maker": "dual", "finish": "stainless" }
+      },
+      "relationship": {
+        "original_product_id": "example-refrigerator-original-001",
+        "candidate_product_id": "example-rf-candidate-close",
+        "eligibility_pass": true,
+        "failed_requirements": [],
+        "score": 88,
+        "classification": "MATCH",
+        "score_breakdown": { "installation_fit": 25, "configuration": 20, "capacity_proximity": 14, "functional_features": 17, "market_positioning": 12, "pre_penalty_total": 88 },
+        "fallback_level": 0,
+        "overshoot_adjustment": 0,
+        "scored_at": "2026-08-20T00:00:00Z",
+        "score_status": "illustrative_unvalidated"
+      }
+    },
+    {
+      "candidate_product": {
+        "id": "example-rf-candidate-premium-four-door",
+        "product_name": "Illustrative premium four-door candidate with convertible drawer",
+        "model_number": null,
+        "observed_price": null,
+        "availability": "not_researched",
+        "positioning": "premium",
+        "category_attributes": { "configuration": "four_door_french_door", "width_inches": 35.75, "height_inches": 70, "depth_inches": 36, "depth_measurement": "with_handles", "depth_class": "standard_depth", "total_capacity_cuft": 32, "door_count": 4, "dispenser_configuration": "internal_beverage_center", "ice_maker": "dual", "convertible_drawer": true, "finish": "stainless" }
+      },
+      "relationship": {
+        "original_product_id": "example-refrigerator-original-001",
+        "candidate_product_id": "example-rf-candidate-premium-four-door",
+        "eligibility_pass": true,
+        "failed_requirements": [],
+        "score": 67,
+        "classification": "ABOVE LKQ",
+        "score_breakdown": { "installation_fit": 25, "configuration": 8, "capacity_proximity": 11, "functional_features": 18, "market_positioning": 5, "score_before_overshoot": 76 },
+        "fallback_level": 1,
+        "relaxed_constraints": ["major configuration accepted only for over-match comparison"],
+        "overshoot_adjustment": -9,
+        "scored_at": "2026-08-20T00:00:00Z",
+        "score_status": "illustrative_unvalidated"
+      }
+    },
+    {
+      "candidate_product": {
+        "id": "example-rf-candidate-too-wide",
+        "product_name": "Illustrative high-capacity candidate that exceeds the opening",
+        "model_number": null,
+        "observed_price": null,
+        "availability": "not_researched",
+        "positioning": "mainstream",
+        "category_attributes": { "configuration": "french_door_bottom_freezer", "width_inches": 36.25, "height_inches": 70, "depth_inches": 36, "depth_measurement": "with_handles", "depth_class": "standard_depth", "total_capacity_cuft": 33, "door_count": 3, "dispenser_configuration": "internal_beverage_center", "ice_maker": "dual", "finish": "stainless" }
+      },
+      "relationship": {
+        "original_product_id": "example-refrigerator-original-001",
+        "candidate_product_id": "example-rf-candidate-too-wide",
+        "eligibility_pass": false,
+        "failed_requirements": ["installation_width_exceeded"],
+        "score": 61,
+        "classification": "NOT LKQ",
+        "score_breakdown": { "provisional_proximity_score": 61, "classification_override": "hard_installation_requirement_failed" },
+        "fallback_level": 0,
+        "overshoot_adjustment": 0,
+        "scored_at": "2026-08-20T00:00:00Z",
+        "score_status": "illustrative_unvalidated"
+      }
+    }
+  ],
+  "evidence": [
+    { "source_id": "src-user-description", "source_type": "user_input", "url": null, "retrieved_at": "2026-08-20T00:00:00Z", "supports_fields": ["brand", "product_name", "configuration", "installation.opening_width_inches"], "status": "user_supplied" },
+    { "source_id": "src-scenario", "source_type": "illustrative_scenario", "url": null, "retrieved_at": "2026-08-20T00:00:00Z", "supports_fields": ["original_category_attributes", "candidate_attributes"], "status": "unverified" }
+  ]
+}

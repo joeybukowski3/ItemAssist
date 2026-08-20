@@ -1,0 +1,131 @@
+{
+  "example_notice": "ILLUSTRATIVE DATA SHAPE ONLY. Products, scores, prices, and availability are not live market facts.",
+  "research_run_id": "example-avr-run-001",
+  "category": "av_receiver",
+  "scoring_config_version": "concept-avr-v0-unvalidated",
+  "original_user_input": "Illustrative discontinued Denon 7.2-channel AV receiver",
+  "research_confidence": {
+    "identity": 0.52,
+    "specification_extraction": 0.7,
+    "note": "Research confidence is not an LKQ score."
+  },
+  "original_product": {
+    "id": "example-avr-original-001",
+    "category": "av_receiver",
+    "brand": { "value": "Denon", "status": "user_supplied", "source_id": "src-user-description" },
+    "manufacturer": { "value": "Denon", "status": "inferred", "source_id": "src-user-description" },
+    "model_number": { "value": null, "status": "unverified", "source_id": null },
+    "product_name": { "value": "7.2-channel AV receiver", "status": "user_supplied", "source_id": "src-user-description" },
+    "release_year": { "value": null, "status": "unverified", "source_id": null },
+    "discontinued": { "value": true, "status": "user_supplied", "source_id": "src-user-description" },
+    "status": "illustrative_identity_incomplete",
+    "positioning": { "value": "upper_mainstream", "status": "user_supplied", "source_id": "src-scenario" },
+    "original_msrp": null,
+    "observed_price": null,
+    "price_source": null,
+    "price_observed_at": null,
+    "source_urls": ["../reference/itemassist-av-receiver-research.html"],
+    "verification_status": "incomplete_illustrative",
+    "confidence": 0.52,
+    "category_attributes": {
+      "channel_configuration": { "value": "7.2", "status": "user_supplied", "source_id": "src-user-description" },
+      "amplifier_channels": { "value": 7, "status": "user_supplied", "source_id": "src-scenario" },
+      "processed_channels": { "value": 7, "status": "user_supplied", "source_id": "src-scenario" },
+      "rated_power": { "value": null, "status": "unverified", "source_id": null, "measurement_context": null },
+      "hdmi_input_count": { "value": 6, "status": "user_supplied", "source_id": "src-scenario" },
+      "hdmi_capabilities": { "value": ["legacy_4k"], "status": "user_supplied", "source_id": "src-scenario" },
+      "arc_earc": { "value": "arc", "status": "user_supplied", "source_id": "src-scenario" },
+      "dolby_atmos": { "value": true, "status": "user_supplied", "source_id": "src-scenario" },
+      "dts_x": { "value": true, "status": "user_supplied", "source_id": "src-scenario" },
+      "room_correction": { "value": "advanced", "status": "user_supplied", "source_id": "src-scenario" },
+      "multi_zone": { "value": ["zone_2"], "status": "user_supplied", "source_id": "src-scenario" },
+      "pre_outs": { "value": "multichannel", "status": "user_supplied", "source_id": "src-scenario" }
+    }
+  },
+  "requirements": [
+    { "requirement_id": "avr-amplified-channels", "attribute_path": "amplifier_channels", "operator": "gte", "target_value": 7, "severity": "hard", "failure_code": "insufficient_amplified_channels" },
+    { "requirement_id": "avr-processed-channels", "attribute_path": "processed_channels", "operator": "gte", "target_value": 7, "severity": "hard", "failure_code": "insufficient_processed_channels" },
+    { "requirement_id": "avr-modern-video", "attribute_path": "hdmi_capabilities", "operator": "contains_all", "target_value": ["4k_120", "earc"], "severity": "hard", "activation_reason": "Illustrative user states a present-day display requirement", "failure_code": "modern_hdmi_requirement_missing" },
+    { "requirement_id": "avr-zone-2", "attribute_path": "multi_zone", "operator": "contains", "target_value": "zone_2", "severity": "conditional", "failure_code": "required_zone_missing" },
+    { "requirement_id": "avr-pre-outs", "attribute_path": "pre_outs", "operator": "class_gte", "target_value": "multichannel", "severity": "conditional", "failure_code": "required_preouts_missing" }
+  ],
+  "candidates": [
+    {
+      "candidate_product": {
+        "id": "example-avr-candidate-upper-mainstream",
+        "product_name": "Illustrative current upper-mainstream 7-channel AVR",
+        "model_number": null,
+        "observed_price": null,
+        "availability": "not_researched",
+        "positioning": "upper_mainstream",
+        "category_attributes": { "channel_configuration": "7.2", "amplifier_channels": 7, "processed_channels": 7, "rated_power": null, "hdmi_input_count": 6, "hdmi_capabilities": ["4k_120", "earc"], "dolby_atmos": true, "dts_x": true, "room_correction": "advanced", "multi_zone": ["zone_2"], "pre_outs": "multichannel" }
+      },
+      "relationship": {
+        "original_product_id": "example-avr-original-001",
+        "candidate_product_id": "example-avr-candidate-upper-mainstream",
+        "eligibility_pass": true,
+        "failed_requirements": [],
+        "score": 87,
+        "classification": "MATCH",
+        "score_breakdown": { "channel_architecture": 22, "processing_formats": 14, "connectivity": 18, "room_correction": 13, "integration_features": 12, "market_positioning": 12, "pre_penalty_total": 91 },
+        "fallback_level": 0,
+        "overshoot_adjustment": -4,
+        "scored_at": "2026-08-20T00:00:00Z",
+        "score_status": "illustrative_unvalidated"
+      }
+    },
+    {
+      "candidate_product": {
+        "id": "example-avr-candidate-five-channel",
+        "product_name": "Illustrative current entry 5-channel AVR with modern HDMI",
+        "model_number": null,
+        "observed_price": null,
+        "availability": "not_researched",
+        "positioning": "entry",
+        "category_attributes": { "channel_configuration": "5.2", "amplifier_channels": 5, "processed_channels": 5, "rated_power": null, "hdmi_input_count": 5, "hdmi_capabilities": ["4k_120", "earc"], "dolby_atmos": false, "dts_x": false, "room_correction": "basic", "multi_zone": [], "pre_outs": "subwoofer_only" }
+      },
+      "relationship": {
+        "original_product_id": "example-avr-original-001",
+        "candidate_product_id": "example-avr-candidate-five-channel",
+        "eligibility_pass": false,
+        "failed_requirements": ["insufficient_amplified_channels", "insufficient_processed_channels", "required_zone_missing", "required_preouts_missing"],
+        "score": 42,
+        "classification": "NOT LKQ",
+        "score_breakdown": { "provisional_proximity_score": 42, "classification_override": "material_requirements_failed" },
+        "fallback_level": 0,
+        "overshoot_adjustment": 0,
+        "scored_at": "2026-08-20T00:00:00Z",
+        "score_status": "illustrative_unvalidated"
+      }
+    },
+    {
+      "candidate_product": {
+        "id": "example-avr-candidate-flagship",
+        "product_name": "Illustrative current flagship 11-channel AVR",
+        "model_number": null,
+        "observed_price": null,
+        "availability": "not_researched",
+        "positioning": "flagship",
+        "category_attributes": { "channel_configuration": "11.4", "amplifier_channels": 11, "processed_channels": 13, "rated_power": null, "hdmi_input_count": 7, "hdmi_capabilities": ["4k_120", "8k", "earc"], "dolby_atmos": true, "dts_x": true, "room_correction": "flagship", "multi_zone": ["zone_2", "zone_3"], "pre_outs": "full_multichannel" }
+      },
+      "relationship": {
+        "original_product_id": "example-avr-original-001",
+        "candidate_product_id": "example-avr-candidate-flagship",
+        "eligibility_pass": true,
+        "failed_requirements": [],
+        "score": 66,
+        "classification": "ABOVE LKQ",
+        "score_breakdown": { "channel_architecture": 11, "processing_formats": 15, "connectivity": 18, "room_correction": 8, "integration_features": 14, "market_positioning": 4, "score_before_overshoot": 82 },
+        "fallback_level": 0,
+        "overshoot_adjustment": -16,
+        "scored_at": "2026-08-20T00:00:00Z",
+        "score_status": "illustrative_unvalidated"
+      }
+    }
+  ],
+  "evidence": [
+    { "source_id": "src-user-description", "source_type": "user_input", "url": null, "retrieved_at": "2026-08-20T00:00:00Z", "supports_fields": ["brand", "product_name", "discontinued"], "status": "user_supplied" },
+    { "source_id": "src-scenario", "source_type": "illustrative_scenario", "url": null, "retrieved_at": "2026-08-20T00:00:00Z", "supports_fields": ["original_category_attributes", "candidate_attributes", "present_day_requirements"], "status": "unverified" },
+    { "source_id": "src-itemassist-av-context", "source_type": "repository_reference", "url": "../reference/itemassist-av-receiver-research.html", "retrieved_at": "2026-08-20T00:00:00Z", "supports_fields": ["category_methodology"], "status": "confirmed" }
+  ]
+}

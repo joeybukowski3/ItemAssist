@@ -1,0 +1,128 @@
+{
+  "example_notice": "ILLUSTRATIVE DATA SHAPE ONLY. Candidate labels, scores, and availability are not live market facts.",
+  "research_run_id": "example-tv-run-001",
+  "category": "tv",
+  "scoring_config_version": "concept-tv-v0-unvalidated",
+  "original_user_input": "Samsung UN55NU6900",
+  "research_confidence": {
+    "identity": 0.82,
+    "specification_extraction": 0.68,
+    "note": "Illustrative AI confidence; it is not part of the LKQ score."
+  },
+  "original_product": {
+    "id": "example-tv-original-001",
+    "brand": { "value": "Samsung", "status": "user_supplied", "source_id": "src-user-input" },
+    "manufacturer": { "value": "Samsung", "status": "inferred", "source_id": "src-user-input" },
+    "model_number": { "value": "UN55NU6900", "status": "user_supplied", "source_id": "src-user-input" },
+    "product_name": { "value": "55-inch television", "status": "inferred", "source_id": "src-user-input" },
+    "release_year": { "value": null, "status": "unverified", "source_id": null },
+    "discontinued": { "value": true, "status": "unverified", "source_id": null },
+    "status": "illustrative_not_market_verified",
+    "positioning": { "value": "mainstream", "status": "inferred", "source_id": "src-scenario" },
+    "original_msrp": null,
+    "observed_price": null,
+    "price_source": null,
+    "price_observed_at": null,
+    "verification_status": "incomplete_illustrative",
+    "confidence": 0.82,
+    "source_urls": [],
+    "category_attributes": {
+      "screen_size_inches": { "value": 55, "status": "inferred", "source_id": "src-model-string" },
+      "resolution": { "value": "4k_uhd", "status": "unverified", "source_id": null },
+      "display_technology": { "value": "lcd", "status": "unverified", "source_id": null },
+      "backlight_technology": { "value": "conventional_led", "status": "unverified", "source_id": null },
+      "smart_capability": { "value": true, "status": "unverified", "source_id": null },
+      "smart_platform": { "value": null, "status": "unverified", "source_id": null },
+      "native_refresh_rate_hz": { "value": 60, "status": "unverified", "source_id": null },
+      "hdr_formats": { "value": [], "status": "unverified", "source_id": null },
+      "hdmi_port_count": { "value": null, "status": "unverified", "source_id": null }
+    }
+  },
+  "requirements": [
+    { "requirement_id": "tv-size-min", "attribute_path": "screen_size_inches", "operator": "gte", "target_value": 55, "severity": "hard", "status": "illustrative", "failure_code": "screen_size_below_minimum" },
+    { "requirement_id": "tv-resolution-min", "attribute_path": "resolution", "operator": "rank_gte", "target_value": "4k_uhd", "severity": "hard", "status": "illustrative", "failure_code": "resolution_below_minimum" },
+    { "requirement_id": "tv-smart-preserve", "attribute_path": "smart_capability", "operator": "equals", "target_value": true, "severity": "conditional", "status": "illustrative", "failure_code": "smart_function_missing" },
+    { "requirement_id": "tv-tech-class", "attribute_path": "display_technology", "operator": "allowed_class", "target_value": ["lcd"], "severity": "hard", "status": "illustrative", "failure_code": "display_class_not_equivalent" }
+  ],
+  "candidates": [
+    {
+      "candidate_product": {
+        "id": "example-tv-candidate-mainstream-55",
+        "product_name": "Illustrative current 55-inch mainstream LED TV",
+        "model_number": null,
+        "positioning": "mainstream",
+        "observed_price": null,
+        "availability": "not_researched",
+        "category_attributes": { "screen_size_inches": 55, "resolution": "4k_uhd", "display_technology": "lcd", "backlight_technology": "conventional_led", "smart_capability": true, "native_refresh_rate_hz": 60 }
+      },
+      "relationship": {
+        "original_product_id": "example-tv-original-001",
+        "candidate_product_id": "example-tv-candidate-mainstream-55",
+        "eligibility_pass": true,
+        "failed_requirements": [],
+        "score": 86,
+        "classification": "MATCH",
+        "score_breakdown": { "size_equivalence": 20, "resolution": 15, "technology_equivalence": 18, "functional_features": 13, "market_positioning": 14, "specification_proximity": 10, "pre_penalty_total": 90 },
+        "fallback_level": 0,
+        "overshoot_adjustment": -4,
+        "scored_at": "2026-08-20T00:00:00Z",
+        "score_status": "illustrative_unvalidated"
+      }
+    },
+    {
+      "candidate_product": {
+        "id": "example-tv-candidate-premium-65-oled",
+        "product_name": "Illustrative current 65-inch premium OLED TV",
+        "model_number": null,
+        "positioning": "premium",
+        "observed_price": null,
+        "availability": "not_researched",
+        "category_attributes": { "screen_size_inches": 65, "resolution": "4k_uhd", "display_technology": "oled", "backlight_technology": "self_emissive", "smart_capability": true, "native_refresh_rate_hz": 120 }
+      },
+      "relationship": {
+        "original_product_id": "example-tv-original-001",
+        "candidate_product_id": "example-tv-candidate-premium-65-oled",
+        "eligibility_pass": true,
+        "failed_requirements": [],
+        "score": 64,
+        "classification": "ABOVE LKQ",
+        "score_breakdown": { "size_equivalence": 10, "resolution": 15, "technology_equivalence": 11, "functional_features": 15, "market_positioning": 5, "specification_proximity": 8, "pre_penalty_total": 64 },
+        "fallback_level": 1,
+        "relaxed_constraints": ["display technology class accepted only as an over-match comparison"],
+        "overshoot_adjustment": -14,
+        "score_before_overshoot": 78,
+        "scored_at": "2026-08-20T00:00:00Z",
+        "score_status": "illustrative_unvalidated"
+      }
+    },
+    {
+      "candidate_product": {
+        "id": "example-tv-candidate-50",
+        "product_name": "Illustrative current 50-inch mainstream LED TV",
+        "model_number": null,
+        "positioning": "mainstream",
+        "observed_price": null,
+        "availability": "not_researched",
+        "category_attributes": { "screen_size_inches": 50, "resolution": "4k_uhd", "display_technology": "lcd", "backlight_technology": "conventional_led", "smart_capability": true, "native_refresh_rate_hz": 60 }
+      },
+      "relationship": {
+        "original_product_id": "example-tv-original-001",
+        "candidate_product_id": "example-tv-candidate-50",
+        "eligibility_pass": false,
+        "failed_requirements": ["screen_size_below_minimum"],
+        "score": 58,
+        "classification": "NOT LKQ",
+        "score_breakdown": { "provisional_proximity_score": 58, "classification_override": "hard_requirement_failed" },
+        "fallback_level": 0,
+        "overshoot_adjustment": 0,
+        "scored_at": "2026-08-20T00:00:00Z",
+        "score_status": "illustrative_unvalidated"
+      }
+    }
+  ],
+  "evidence": [
+    { "source_id": "src-user-input", "source_type": "user_input", "url": null, "retrieved_at": "2026-08-20T00:00:00Z", "supports_fields": ["brand", "model_number"], "status": "user_supplied" },
+    { "source_id": "src-model-string", "source_type": "normalization_inference", "url": null, "retrieved_at": "2026-08-20T00:00:00Z", "supports_fields": ["screen_size_inches"], "status": "inferred" },
+    { "source_id": "src-scenario", "source_type": "illustrative_scenario", "url": null, "retrieved_at": "2026-08-20T00:00:00Z", "supports_fields": ["positioning", "candidate_attributes"], "status": "unverified" }
+  ]
+}
