@@ -1,9 +1,9 @@
 const crypto = require("crypto");
 
-const { readBody, isHoneypotFilled, validateRequest } = require("./lib/replacement-finder/validation");
-const { checkRateLimit } = require("./lib/replacement-finder/ratelimit");
-const { callEngine, mapEngineFailure, DEFAULT_TIMEOUT_MS } = require("./lib/replacement-finder/engine-client");
-const { projectResult, projectError } = require("./lib/replacement-finder/projection");
+const { readBody, isHoneypotFilled, validateRequest } = require("./_lib/replacement-finder/validation");
+const { checkRateLimit } = require("./_lib/replacement-finder/ratelimit");
+const { callEngine, mapEngineFailure, DEFAULT_TIMEOUT_MS } = require("./_lib/replacement-finder/engine-client");
+const { projectResult, projectError } = require("./_lib/replacement-finder/projection");
 
 /*
  * Same-origin proxy for the Replacement Finder proof of concept. The browser only ever calls this route; the engine

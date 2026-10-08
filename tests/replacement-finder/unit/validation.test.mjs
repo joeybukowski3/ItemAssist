@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const RF = require("../../../assets/js/rf-shared.js");
-const { readBody, isHoneypotFilled, validateRequest } = require("../../../api/lib/replacement-finder/validation.js");
+const { readBody, isHoneypotFilled, validateRequest } = require("../../../api/_lib/replacement-finder/validation.js");
 
 const valid = (overrides = {}) => ({ category: "television", brand: "Samsung", model: "QN55Q80C", notes: "", website: "", ...overrides });
 const req = (body, headers = {}) => ({ headers: { "content-type": "application/json", ...headers }, body });

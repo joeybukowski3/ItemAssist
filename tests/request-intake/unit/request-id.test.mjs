@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { generateRequestId } = require("../../../api/lib/age-verification/request-id.js");
+const { generateRequestId } = require("../../../api/_lib/age-verification/request-id.js");
 
 test("generateRequestId matches the IAV-YYYYMMDD-XXXXXXXX format", () => {
   const id = generateRequestId(new Date("2026-03-01T00:00:00Z"));

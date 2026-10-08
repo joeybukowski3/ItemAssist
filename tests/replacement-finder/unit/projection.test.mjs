@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 import { engineComplete, engineBestAvailable, engineNoResult, deepKeys } from "../endpoint/helpers.mjs";
 
 const require = createRequire(import.meta.url);
-const { projectResult, projectError } = require("../../../api/lib/replacement-finder/projection.js");
+const { projectResult, projectError } = require("../../../api/_lib/replacement-finder/projection.js");
 
 const TOP_LEVEL = ["alternatives", "category", "comparison", "contractVersion", "meta", "needsVerification", "original", "primary", "retrievalQuality", "sources", "status", "warnings"];
 

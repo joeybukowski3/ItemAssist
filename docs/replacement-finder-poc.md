@@ -60,7 +60,7 @@ An over-limit client gets 429 `RATE_LIMITED`.
 
 ## Projection
 
-`api/lib/replacement-finder/projection.js` copies known fields one by one. Unknown keys at any level are dropped; enumerations are
+`api/_lib/replacement-finder/projection.js` copies known fields one by one. Unknown keys at any level are dropped; enumerations are
 checked against the shared lists; strings lose control characters and are length capped; lists are capped (12 comparison rows,
 2 alternatives, 6 sources, 10 needs-verification items, 10 warnings, 16 facts). Source links must be https, carry no credentials or
 port, and be on an accepted host (recomputed from the URL, never taken from a claimed domain). The engine's `refinements` list is not

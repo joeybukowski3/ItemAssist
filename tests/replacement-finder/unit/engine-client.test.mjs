@@ -4,8 +4,8 @@ import { createRequire } from "node:module";
 import { ENGINE_TOKEN, ENGINE_URL, createFakeFetch, jsonResponse, engineComplete, engineError } from "../endpoint/helpers.mjs";
 
 const require = createRequire(import.meta.url);
-const { callEngine, mapEngineFailure, resolveEngineUrl, ENGINE_PATH } = require("../../../api/lib/replacement-finder/engine-client.js");
-const { checkRateLimit, RATELIMIT_PREFIX, RATELIMIT_REQUESTS, RATELIMIT_WINDOW } = require("../../../api/lib/replacement-finder/ratelimit.js");
+const { callEngine, mapEngineFailure, resolveEngineUrl, ENGINE_PATH } = require("../../../api/_lib/replacement-finder/engine-client.js");
+const { checkRateLimit, RATELIMIT_PREFIX, RATELIMIT_REQUESTS, RATELIMIT_WINDOW } = require("../../../api/_lib/replacement-finder/ratelimit.js");
 
 const payload = { category: "television", brand: "Samsung", model: "QN55Q80C", notes: "" };
 

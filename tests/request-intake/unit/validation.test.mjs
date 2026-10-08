@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const validation = require("../../../api/lib/age-verification/validation.js");
+const validation = require("../../../api/_lib/age-verification/validation.js");
 
 const validContact = () => ({
   fullName: "Jane Smith",
