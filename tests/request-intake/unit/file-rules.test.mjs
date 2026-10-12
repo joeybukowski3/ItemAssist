@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const AVFileRules = require("../../../assets/js/av-file-rules.js");
-const serverFiles = require("../../../api/lib/age-verification/files.js");
+const serverFiles = require("../../../api/_lib/age-verification/files.js");
 
 test("validateFileSet accepts every supported type under the size/count limits", () => {
   const error = AVFileRules.validateFileSet([

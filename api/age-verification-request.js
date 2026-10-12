@@ -1,13 +1,13 @@
 const Busboy = require("busboy");
 const { Resend } = require("resend");
 
-const { generateRequestId } = require("./lib/age-verification/request-id");
-const validation = require("./lib/age-verification/validation");
-const files = require("./lib/age-verification/files");
-const { saveRequestRecord } = require("./lib/age-verification/store");
-const { checkRateLimit } = require("./lib/age-verification/ratelimit");
-const { verifyTurnstile } = require("./lib/age-verification/turnstile");
-const { sendInternalNotification, sendCustomerConfirmation } = require("./lib/age-verification/email");
+const { generateRequestId } = require("./_lib/age-verification/request-id");
+const validation = require("./_lib/age-verification/validation");
+const files = require("./_lib/age-verification/files");
+const { saveRequestRecord } = require("./_lib/age-verification/store");
+const { checkRateLimit } = require("./_lib/age-verification/ratelimit");
+const { verifyTurnstile } = require("./_lib/age-verification/turnstile");
+const { sendInternalNotification, sendCustomerConfirmation } = require("./_lib/age-verification/email");
 const AVShared = require("../assets/js/av-shared.js");
 const AVFileRules = require("../assets/js/av-file-rules.js");
 

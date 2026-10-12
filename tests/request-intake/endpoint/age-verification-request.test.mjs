@@ -708,7 +708,7 @@ test("schemaVersion 1 records already in Redis remain readable and untouched", a
   };
   await redis.set("itemassist:request:IAV-20260101-LEGACY01", legacyRecord);
 
-  const { getRequestRecord } = require("../../../api/lib/age-verification/store.js");
+  const { getRequestRecord } = require("../../../api/_lib/age-verification/store.js");
   const fetched = await getRequestRecord("IAV-20260101-LEGACY01", { redis });
 
   assert.deepEqual(fetched, legacyRecord);
