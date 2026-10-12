@@ -20,12 +20,14 @@ module.exports = defineConfig({
   webServer: {
     command: `node "${STATIC_SERVER}"`,
     port: Number(PORT),
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false, // a stale server from another worktree would silently serve the wrong page
     env: { STATIC_SERVER_PORT: String(PORT) }
   },
   projects: [
     { name: "mobile-375", use: { ...devices["Desktop Chrome"], viewport: { width: 375, height: 812 } } },
+    { name: "mobile-390", use: { ...devices["Desktop Chrome"], viewport: { width: 390, height: 844 } } },
     { name: "tablet-768", use: { ...devices["Desktop Chrome"], viewport: { width: 768, height: 1024 } } },
+    { name: "desktop-1024", use: { ...devices["Desktop Chrome"], viewport: { width: 1024, height: 768 } } },
     { name: "desktop-1280", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 900 } } }
   ]
 });

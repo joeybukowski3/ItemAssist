@@ -73,6 +73,76 @@ function projectWarning(item) {
   return severity && code && message ? { code, severity, message } : null;
 }
 
+const SELLER_TYPES = Object.freeze(["RETAILER", "MANUFACTURER"]);
+const RECOMMENDATION_LEVELS = Object.freeze(["RECOMMENDED", "BEST_AVAILABLE"]);
+const RETAIL_STATUS_LABELS = Object.freeze(["AVAILABLE NEW"]);
+const RETAIL_STATUS_FALLBACK = "AVAILABILITY OBSERVED"; // states no more than the record itself (a first-party source was observed); it claims nothing about the match
+const MAX_SOURCE_NAME = 60;
+const MAX_RETAIL_PRICE = 1000000;
+
+function isAcceptedHost(domain) {
+  return ACCEPTED_SOURCE_HOSTS.some((host) => domain === host || domain.endsWith(`.${host}`));
+}
+
+/** Source links: https only, no credentials or port, an accepted host (recomputed from the URL, never the claimed domain). */
+function projectSource(item) {
+  if (!isObject(item) || !RF.isSafeSourceUrl(item.url)) return null;
+  const url = new URL(item.url);
+  const domain = url.hostname.toLowerCase().replace(/^www\./, "");
+  const role = oneOf(item.role, RF.SOURCE_ROLES);
+  return isAcceptedHost(domain) && role ? { domain, url: `${url.origin}${url.pathname}`, role } : null;
+}
+
+/** Only labels the page knows are forwarded. Anything else, including a missing or malformed value, becomes the fixed neutral fallback. */
+function projectStatusLabel(value) {
+  return typeof value === "string" && RETAIL_STATUS_LABELS.includes(value) ? value : RETAIL_STATUS_FALLBACK;
+}
+
+function projectObservedPrice(price) {
+  if (!isObject(price)) return null;
+  const amount = typeof price.amount === "number" ? price.amount : NaN;
+  const validCurrency = typeof price.currency === "string" && /^[A-Z]{3}$/.test(price.currency);
+  return Number.isFinite(amount) && amount > 0 && amount < MAX_RETAIL_PRICE && validCurrency
+    ? { amount: Math.round(amount * 100) / 100, currency: price.currency } : null;
+}
+
+/**
+ * Availability evidence for a recommended or alternative model. Fails closed: anything other than new, currently available,
+ * current-catalog stock from a first-party seller yields null, and a source link that is not on an accepted https host
+ * voids the whole record. Price is an observation only and is never combined with any match result.
+ */
+function projectRetail(item) {
+  if (!isObject(item)) return null;
+  if (item.condition !== "NEW" || item.purchaseStatus !== "AVAILABLE" || item.catalogStatus !== "CURRENT") return null;
+  const sellerType = oneOf(item.sellerType, SELLER_TYPES);
+  if (!sellerType) return null;
+  // No verifiable source means no availability claim: the evidence must point somewhere a reader can check it.
+  const source = projectSource({ url: item.sourceUrl, role: "SUPPORT" });
+  if (!source) return null;
+  return {
+    statusLabel: projectStatusLabel(item.statusLabel),
+    condition: "NEW",
+    purchaseStatus: "AVAILABLE",
+    catalogStatus: "CURRENT",
+    sellerType,
+    sourceName: nullableText(item.sourceName, MAX_SOURCE_NAME) || source.domain,
+    sourceDomain: source.domain,
+    sourceUrl: source.url,
+    observedPrice: projectObservedPrice(item.observedPrice),
+    observedAt: RF.normalizeObservedAt(item.observedAt)
+  };
+}
+
+/**
+ * The level fails closed. Either signal saying "best available" wins, RECOMMENDED needs an explicit signal (the level, or an
+ * explicit isBestAvailableOnly: false), and a missing or garbled signal reads as BEST_AVAILABLE, never as the stronger claim.
+ */
+function projectLevel(item) {
+  const level = oneOf(item.recommendationLevel, RECOMMENDATION_LEVELS);
+  if (level === "BEST_AVAILABLE" || item.isBestAvailableOnly === true) return "BEST_AVAILABLE";
+  return level === "RECOMMENDED" || item.isBestAvailableOnly === false ? "RECOMMENDED" : "BEST_AVAILABLE";
+}
+
 function projectCandidate(item, withExplanation) {
   if (!isObject(item)) return null;
   const classification = oneOf(item.classification, RF.CLASSIFICATIONS);
@@ -82,19 +152,14 @@ function projectCandidate(item, withExplanation) {
   const displayName = text(item.displayName, 90);
   if (!classification || !confidence || !model || !displayName) return null;
   const base = { brand, model, displayName, classification, confidence };
-  return withExplanation
-    ? { ...base, explanation: text(item.explanation, MAX_TEXT), isBestAvailableOnly: item.isBestAvailableOnly === true }
-    : { ...base, role: text(item.role, 40), roleLabel: text(item.roleLabel, 60), differences: list(item.differences, MAX_DIFFERENCES, (entry) => nullableText(entry, 160)) };
-}
-
-/** Source links: https only, no credentials or port, an accepted host (recomputed from the URL, never the claimed domain). */
-function projectSource(item) {
-  if (!isObject(item) || !RF.isSafeSourceUrl(item.url)) return null;
-  const url = new URL(item.url);
-  const domain = url.hostname.toLowerCase().replace(/^www\./, "");
-  const accepted = ACCEPTED_SOURCE_HOSTS.some((host) => domain === host || domain.endsWith(`.${host}`));
-  const role = oneOf(item.role, RF.SOURCE_ROLES);
-  return accepted && role ? { domain, url: `${url.origin}${url.pathname}`, role } : null;
+  if (withExplanation) {
+    const recommendationLevel = projectLevel(item);
+    return { ...base, explanation: text(item.explanation, MAX_TEXT), isBestAvailableOnly: recommendationLevel === "BEST_AVAILABLE", recommendationLevel, retail: projectRetail(item.retail) };
+  }
+  return {
+    ...base, role: text(item.role, 40), roleLabel: text(item.roleLabel, 60), differences: list(item.differences, MAX_DIFFERENCES, (entry) => nullableText(entry, 160)),
+    recommendationLevel: oneOf(item.recommendationLevel, RECOMMENDATION_LEVELS) || "BEST_AVAILABLE", retail: projectRetail(item.retail)
+  };
 }
 
 /**
