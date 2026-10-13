@@ -107,18 +107,26 @@ test("find replacement: Samsung QN55Q80C reaches the existing API and renders th
   await settle(seen);
 });
 
-test("find replacement: free text prefills the structured prompt but never calls the API by itself", async ({ page }) => {
-  const seen = await prepare(page);
+test("find replacement: a typed brand and model starts the lookup directly, without opening the form", async ({ page }) => {
+  const seen = await prepare(page, best());
   await page.goto(PAGE);
   await page.getByLabel("Message ItemAssist").fill("Samsung qn55q80c");
   await page.getByRole("button", { name: "Send message" }).click();
-  await expect(page.locator("#rf-log")).toContainText("I can't hold a free-form conversation yet");
-  await expect(page.locator("#rf-model")).toHaveValue("qn55q80c");
-  expect(seen.posts).toEqual([]);
+  await expect(page.locator("#rf-log")).toContainText("I found Samsung QN55Q80C. Researching the current replacement now.");
+  await expect(page.locator("#rf-product-name")).toHaveText("QN55Q80C");
+  await expect(page.locator("#rf-ask")).toHaveCount(0);
+  await expect(page.locator("#rf-log")).not.toContainText("free-form conversation");
+  expect(seen.posts).toEqual([{ category: "television", brand: "Samsung", model: "QN55Q80C", notes: "", website: "" }]);
+  await settle(seen);
+});
 
+test("find replacement: a general question gets the scope message, with no form and no API call", async ({ page }) => {
+  const seen = await prepare(page);
+  await page.goto(PAGE);
   await page.getByLabel("Message ItemAssist").fill("what is the best phone?");
   await page.getByLabel("Message ItemAssist").press("Enter");
-  await expect(page.locator("#rf-log")).toContainText("I can't answer free-form questions yet");
+  await expect(page.locator("#rf-log")).toContainText("I can currently help identify and research replacement models. Send me a brand and model number, or use Find Replacement.");
+  await expect(page.locator("#rf-ask")).toHaveCount(0);
   expect(seen.posts).toEqual([]);
 });
 

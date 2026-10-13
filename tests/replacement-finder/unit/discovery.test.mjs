@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../");
 // Every script the workspace page loads, in load order.
-const BROWSER_SCRIPTS = ["assets/js/rf-shared.js", "assets/js/rf-dom.js", "assets/js/rf-replacement.js", "assets/js/rf-product.js", "assets/js/rf-assistant.js", "replacement-finder.js"];
+const BROWSER_SCRIPTS = ["assets/js/rf-shared.js", "assets/js/rf-intake.js", "assets/js/rf-dom.js", "assets/js/rf-replacement.js", "assets/js/rf-product.js", "assets/js/rf-assistant.js", "replacement-finder.js"];
 const read = (file) => fs.readFileSync(path.join(ROOT, file), "utf8");
 
 test("the proof of concept stays undiscoverable: noindex page, and no nav link, sitemap entry or robots rule", () => {

@@ -229,13 +229,44 @@
       els.input.focus();
     }
 
-    /** Turns the open prompt into a plain user message once a valid lookup starts. */
-    function commitPrompt(value) {
+    /**
+     * Turns the open prompt into a plain user message once a valid lookup starts. A lookup that came from the conversation already has
+     * the user's own message in the log, so `options.after` (that message) replaces the echo and only decides where earlier history folds.
+     */
+    function commitPrompt(value, options) {
       if (state.prompt) { state.prompt.node.remove(); state.prompt = null; }
+      if (options && options.after) {
+        if (els.log.querySelector(".rf-msg--summary")) foldBefore(options.after);
+        return options.after;
+      }
       var line = "Find replacement: " + value.brand + " " + value.model;
       var node = message("user", [h("p", { text: line }), value.notes ? h("p", { class: "rf-msg-note", text: "Notes: " + value.notes }) : null]);
       if (els.log.querySelector(".rf-msg--summary")) foldBefore(node);
       return node;
+    }
+
+    /* ---------- Clarification choices ---------- */
+
+    /** Removes the buttons of any unanswered question (the question text stays), so a stale choice can't be tapped after the user moved on. */
+    function clearChoices() {
+      Array.prototype.forEach.call(els.log.querySelectorAll(".rf-choices"), function (list) { list.remove(); });
+    }
+
+    /**
+     * One short question with compact choice buttons. Choosing echoes the label as the user's reply and reports the choice's value;
+     * typing an answer instead works too (the controller clears the buttons). It holds no parsing logic of its own.
+     */
+    function askChoice(question, choices, onPick) {
+      clearChoices();
+      var buttons = choices.map(function (choice) {
+        return h("li", {}, [D.button(choice.label, "rf-choice", function () {
+          if (state.busy) return;
+          clearChoices();
+          userSays(choice.label);
+          onPick(choice.value);
+        })]);
+      });
+      return say([h("p", { text: question }), h("ul", { class: "rf-choices", attrs: { "aria-label": "Answer options" } }, buttons)], "rf-msg--choice");
     }
 
     /* ---------- Loading ---------- */
@@ -318,6 +349,7 @@
 
     return {
       say: say, userSays: userSays, openPrompt: openPrompt, closePrompt: closePrompt, commitPrompt: commitPrompt, showLoading: showLoading, foldBefore: foldBefore,
+      askChoice: askChoice, clearChoices: clearChoices,
       setBusy: setBusy, setAvailability: setAvailability, setReportReady: setReportReady, isPromptOpen: function () { return Boolean(state.prompt); },
       focusComposer: function () { els.input.focus(); },
       moveFocusTo: function (node) { node.tabIndex = -1; node.focus({ preventScroll: true }); }

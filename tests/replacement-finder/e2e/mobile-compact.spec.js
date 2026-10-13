@@ -42,7 +42,7 @@ test("composer: pinned to the bottom of the screen, compact, and usable from dee
   await scrollFraction(page, 0.65);
   await page.getByLabel("Message ItemAssist").fill("what is the best phone?");
   await page.getByLabel("Message ItemAssist").press("Enter");
-  await expect(page.locator("#rf-log")).toContainText("I can't answer free-form questions yet");
+  await expect(page.locator("#rf-log")).toContainText("I can currently help identify and research replacement models");
   await expectNoHorizontalOverflow(page);
   await settle(seen);
 });

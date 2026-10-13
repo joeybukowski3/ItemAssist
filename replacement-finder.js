@@ -7,6 +7,7 @@
   "use strict";
 
   var RF = window.RFShared;
+  var Intake = window.RFIntake;
   var D = window.RFDom;
   var API_URL = "/api/replacement-finder";
   var CLIENT_TIMEOUT_MS = 30000;
@@ -18,7 +19,7 @@
   var productRoot = document.getElementById("rf-product-root");
   var narrowQuery = window.matchMedia(NARROW_QUERY);
 
-  var state = { controller: null, stageTimer: null, run: 0, report: null, last: null, enabled: true };
+  var state = { controller: null, stageTimer: null, run: 0, report: null, last: null, enabled: true, intake: Intake.initialState(), exchangeStart: null };
 
   var UNAVAILABLE_ON_ITS_OWN = {
     explain: ["Why this match?", "Run Find Replacement first and I can explain why a model was chosen."],
@@ -72,33 +73,45 @@
     toggle: document.getElementById("rf-convo-toggle")
   }, { onLookup: lookup, onQuick: onQuick, onFreeText: onFreeText, onCancelLoading: cancelLoading, isNarrow: isNarrow });
 
-  /** Input convenience only: recognises "<supported brand> <model>" so the structured prompt can be prefilled. Validation stays authoritative. */
-  function parseEntry(text) {
-    var lower = text.toLowerCase();
-    var keys = Object.keys(RF.SUPPORT);
-    for (var i = 0; i < keys.length; i += 1) {
-      var brand = RF.SUPPORT[keys[i]].brand.toLowerCase();
-      if (lower.indexOf(brand + " ") === 0) return { category: keys[i], model: text.slice(brand.length).trim() };
-    }
-    return null;
+  /**
+   * A typed message goes through the deterministic intake (RFIntake): a confident brand/model starts the existing lookup directly,
+   * a gap becomes one short question, and anything else gets the scope message. No form opens unless the user needs the manual path.
+   * The conversational parse is a convenience; the proxy still validates every request and its answer wins.
+   */
+  function onFreeText(text) {
+    var message = assistant.userSays(text);
+    if (!state.enabled) return assistant.say("Replacement Finder isn't available right now. Please check back soon.");
+    if (state.intake.status !== Intake.STATUS.NEEDS_CLARIFICATION) state.exchangeStart = message;
+    assistant.clearChoices();
+    applyIntake(Intake.receive(state.intake, text));
   }
 
-  function onFreeText(text) {
-    assistant.userSays(text);
-    if (!state.enabled) return assistant.say("Replacement Finder isn't available right now. Please check back soon.");
-    var entry = parseEntry(text);
-    if (entry) {
-      assistant.say("I can't hold a free-form conversation yet, but I can research that model. Check the details and run the lookup.");
-      assistant.openPrompt(entry);
-      return;
+  function onChoice(value) {
+    if (!state.enabled) return;
+    applyIntake(Intake.answer(state.intake, value));
+  }
+
+  function applyIntake(result) {
+    state.intake = result.state;
+    var action = result.action;
+    if (!action) return;
+    if (action.type === "lookup") {
+      assistant.say(action.message);
+      return lookup(action.payload, { after: state.exchangeStart });
     }
-    assistant.say("I can't answer free-form questions yet. I can run a replacement lookup. Enter the item details below.");
-    assistant.openPrompt({});
+    if (action.type === "clarify") return assistant.askChoice(action.prompt, action.choices, onChoice);
+    if (action.type === "manual") {
+      assistant.say(action.message);
+      return assistant.openPrompt(action.prefill);
+    }
+    assistant.say(action.message);
   }
 
   function onQuick(action, notReady) {
     if (action === "find") {
       if (!state.enabled) return assistant.say("Replacement Finder isn't available right now. Please check back soon.");
+      state.intake = Intake.reset();
+      assistant.clearChoices();
       return assistant.openPrompt(state.last || {});
     }
     if (notReady || !state.report) {
@@ -127,6 +140,7 @@
   function cancelLoading() {
     state.run += 1;
     if (state.controller) state.controller.abort();
+    state.intake = Intake.reset();
     stopLoading();
     markLoadingDone();
     showReport();
@@ -148,15 +162,17 @@
     }, STAGE_INTERVAL_MS);
   }
 
-  async function lookup(payload) {
+  /** `source.after` is the user's own message when the lookup came from the conversation (it is not echoed a second time). */
+  async function lookup(payload, source) {
     var run = ++state.run;
+    state.intake = Intake.markResearching(state.intake);
     var controller = new AbortController();
     state.controller = controller;
     state.last = { category: payload.category, model: payload.model, notes: payload.notes };
     // A new lookup replaces the previous report: showing model A's report beside model B's conversation would mislead.
     state.report = null;
     assistant.setReportReady(false);
-    assistant.commitPrompt(payload);
+    assistant.commitPrompt(payload, source);
     assistant.setBusy(true);
     startLoading(payload.brand + " " + payload.model);
     var timeout = window.setTimeout(function () { controller.abort(); }, CLIENT_TIMEOUT_MS);
@@ -187,6 +203,7 @@
   /* ---------- Outcomes ---------- */
 
   function fail(code) {
+    state.intake = Intake.markError(state.intake);
     showReport();
     var again = D.button("Try again", "rf-secondary", function () { assistant.openPrompt(state.last || {}); });
     var node = assistant.say([D.h("p", { text: RF.errorMessage(code) }), D.h("div", { class: "rf-actions" }, [again])], "rf-msg--error");
@@ -195,6 +212,7 @@
   }
 
   function unsupported(payload) {
+    state.intake = Intake.markResult(state.intake);
     showReport();
     var options = Object.keys(RF.SUPPORT).map(function (key) {
       return D.h("li", {}, [D.button(RF.SUPPORT[key].noun, "rf-support-option", function () { assistant.openPrompt({ category: key }); })]);
@@ -243,6 +261,7 @@
       state.report = null;
       return fail("ENGINE_ERROR");
     }
+    state.intake = Intake.markResult(state.intake);
     showReport();
     assistant.setReportReady(true);
     // On the single page the finished lookup leaves one compact summary in the conversation; the rest is a tap away.

@@ -109,6 +109,7 @@ composer is part of that pane. The report is built for the current layout and re
 | `assets/js/rf-assistant.js` | Conversation log, quick actions, composer, the structured "Find a replacement" prompt, loading stages |
 | `assets/js/rf-product.js` | Empty / researching states, report header, five tabs (jump links on the single page), Specifications / Pricing / Evidence panels, wide and compact builders |
 | `assets/js/rf-replacement.js` | Result headline, retail evidence, reasons, match summary, comparison, warnings, alternatives |
+| `assets/js/rf-intake.js` | Conversational intake: message -> lookup payload or one follow-up question (pure, no network) |
 | `assets/js/rf-dom.js` | `textContent`-only element builders |
 | `assets/js/rf-shared.js` | Validation and wording shared with the proxy (headline, assessment and warning vocabulary, price/date formatting) |
 | `replacement-finder.css`, `assets/css/rf-product.css` | Shell and assistant; Product panels (container queries: the pane responds to its own width) |
@@ -119,8 +120,14 @@ composer is part of that pane. The report is built for the current layout and re
   conversation and submits to the existing proxy. Validation is `RFShared.validateLookup`, unchanged.
 - **Verify Specs / Compare Models / Price Item / Why this match?** navigate the report that was already returned (Specifications,
   Replacement, Pricing and Overview tabs). Before a report exists they say plainly that standalone versions are not available yet.
-- Free text is not a chat backend. Text such as `Samsung QN55Q80C` only prefills the structured prompt; anything else gets an honest
-  "not available yet" reply. The attachment control is a disabled placeholder.
+- Free text is a deterministic **conversational intake**, not a chat backend (`assets/js/rf-intake.js`, pure and unit-tested). A message such as
+  `Samsung QN55Q80C`, `LRFCS25D3S` or `Find a replacement for my Samsung QN55Q80C` is parsed into category, brand, model and supported
+  notes and starts the existing lookup directly, with no form. A gap becomes one short question with compact choices (`Samsung Q80C` ->
+  "What size is the TV?"; `LG refrigerator` -> "What is the model number...?"). Anything uncertain, or an unrecognised model, offers
+  **Enter the details manually** (the structured prompt, prefilled) instead of guessing. Brand is inferred only from a supported model
+  pattern; the only composed model is Samsung `QN<size><series>` from a size and a series the user gave. Notes are limited to the two the
+  form already invites (fit the existing opening, reusing the wall mount). The proxy still validates every request and its answer wins.
+  General chat gets a scope message and no API call. The attachment control is a disabled placeholder.
 
 ### What the report shows (all from the public contract)
 

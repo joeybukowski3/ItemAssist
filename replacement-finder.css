@@ -140,6 +140,9 @@
 .rf-cta:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 .rf-secondary { display: inline-flex; align-items: center; min-height: 34px; padding: 0 0.875rem; background: var(--white); color: var(--rf-ink); font-size: 0.8125rem; font-weight: 600; border: 1px solid var(--rf-line-strong); border-radius: 6px; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
 .rf-secondary:hover { background: var(--bg-soft); border-color: var(--slate-mid); }
+.rf-choices { list-style: none; margin: 0.25rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.rf-choice { min-height: 36px; padding: 0 0.875rem; background: var(--white); color: var(--rf-ink); font-size: 0.875rem; font-weight: 600; border: 1px solid var(--rf-line-strong); border-radius: 999px; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.rf-choice:hover { border-color: var(--rf-focus); background: var(--rf-info-bg); }
 .rf-support-list { list-style: none; margin: 0.25rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
 .rf-support-option { width: 100%; text-align: left; padding: 0.625rem 0.875rem; background: var(--white); border: 1px solid var(--rf-line-strong); border-radius: 6px; cursor: pointer; font-weight: 600; color: var(--rf-ink); transition: border-color 0.15s, background 0.15s; }
 .rf-support-option:hover { border-color: var(--rf-focus); background: var(--rf-info-bg); }
