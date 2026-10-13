@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Replacement Finder (Proof of Concept) | Item Assist</title>
-  <meta name="description" content="Find the closest like-kind-and-quality replacement for a supported product, based on its specifications and source-backed comparisons.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ItemAssist Workspace (Proof of Concept) | Item Assist</title>
+  <meta name="description" content="Research an item and find the closest like-kind-and-quality replacement, with source-backed specifications, retail evidence and transparent comparisons.">
   <meta name="robots" content="noindex,nofollow">
   <link rel="icon" type="image/svg+xml" href="assets/itemassist-logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,9 +12,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="replacement-finder.css">
+  <link rel="stylesheet" href="assets/css/rf-product.css">
 </head>
 <body class="rf-body">
-  <a class="skip-link" href="#main">Skip to content</a>
+  <a class="skip-link" href="#rf-compose-input">Skip to the message box</a>
 
   <svg class="rf-sprite" width="0" height="0" aria-hidden="true" focusable="false">
     <defs>
@@ -30,134 +31,61 @@
       <symbol id="rf-i-lock" viewBox="0 0 16 16"><rect x="3.4" y="7.2" width="9.2" height="6.2" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.4 7V5.4a2.6 2.6 0 015.2 0V7" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
       <symbol id="rf-i-arrow" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="rf-i-link" viewBox="0 0 16 16"><path d="M9 3h4v4M13 3L7.5 8.5M11 10v3H3V5h3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-      <symbol id="rf-s-identify" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4L21 21M8 10.5h5M10.5 8v5"/></g></symbol>
-      <symbol id="rf-s-verify" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v5.4c0 4.4-3.1 8-7.5 9.6-4.4-1.6-7.5-5.2-7.5-9.6V6z"/><path d="M8.8 12.1l2.3 2.3 4.2-4.6"/></g></symbol>
-      <symbol id="rf-s-compare" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="8" height="16" rx="1.6"/><rect x="13" y="4" width="8" height="16" rx="1.6"/><path d="M5.5 9h3M5.5 12.5h3M5.5 16h1.5M15.5 9h3M15.5 12.5h3M15.5 16h1.5"/></g></symbol>
-      <symbol id="rf-s-recommend" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9.5" r="5.8"/><path d="M9.6 9.7l1.7 1.7 3.2-3.4M8.6 14.2L7.5 21l4.5-2.3 4.5 2.3-1.1-6.8"/></g></symbol>
+      <symbol id="rf-i-send" viewBox="0 0 16 16"><path d="M8 13V3.5M3.6 7.6L8 3.2l4.4 4.4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="rf-i-clip" viewBox="0 0 16 16"><path d="M12.6 7.4l-4.5 4.5a2.8 2.8 0 01-4-4l5-5a1.9 1.9 0 112.7 2.7l-5 5a.95.95 0 01-1.4-1.3l4.3-4.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     </defs>
   </svg>
 
-  <header class="rf-header">
-    <div class="rf-wrap rf-header-inner">
-      <a href="https://itemassist.com/" class="logo header-logo" aria-label="Item Assist home">
-        <img src="assets/itemassist-logo-header.svg" alt="Item Assist" class="site-logo-img header-logo-img" width="190" height="44">
-      </a>
-      <p class="rf-header-label"><span class="rf-header-name">Proprietary LKQ Research Engine</span> <span class="rf-poc"><span aria-hidden="true">POC</span><span class="rf-visually-hidden">Proof of concept</span></span></p>
-    </div>
+  <header class="rf-bar">
+    <a href="https://itemassist.com/" class="logo header-logo" aria-label="Item Assist home">
+      <img src="assets/itemassist-logo-header.svg" alt="Item Assist" class="site-logo-img header-logo-img" width="190" height="44">
+    </a>
+    <p class="rf-bar-label"><span class="rf-bar-name">Research Workspace</span> <span class="rf-poc"><span aria-hidden="true">POC</span><span class="rf-visually-hidden">Proof of concept</span></span></p>
   </header>
 
-  <main id="main">
-    <div class="rf-wrap">
-      <section class="rf-hero" aria-labelledby="rf-hero-heading">
-        <div class="rf-hero-main">
-          <p class="rf-eyebrow">Replacement Finder</p>
-          <h1 id="rf-hero-heading">Find the Right Replacement.<span>Based on real time data and research.</span></h1>
-        </div>
-        <div class="rf-hero-side">
-          <p class="rf-lede">Enter the product you need to replace. ItemAssist researches the original specifications, evaluates current models, and identifies the closest like-kind-and-quality replacement.</p>
-          <ul class="rf-cred" aria-label="Principles">
-            <li><svg class="rf-ic" aria-hidden="true"><use href="#rf-i-check"/></svg>Specification-driven</li>
-            <li><svg class="rf-ic" aria-hidden="true"><use href="#rf-i-check"/></svg>Source-backed</li>
-            <li><svg class="rf-ic" aria-hidden="true"><use href="#rf-i-check"/></svg>Transparent comparisons</li>
-          </ul>
-        </div>
-      </section>
+  <main id="rf-shell" class="rf-shell">
+    <section id="rf-assistant" class="rf-assistant" aria-labelledby="rf-assistant-h">
+      <div class="rf-pane-head">
+        <h1 id="rf-assistant-h" class="rf-pane-title">ItemAssist Assistant</h1>
+        <p class="rf-pane-sub">Research and replacement analysis</p>
+        <button type="button" id="rf-convo-toggle" class="rf-convo-toggle" aria-controls="rf-log" aria-expanded="false" hidden>View conversation</button>
+      </div>
 
-      <section class="rf-lookup" aria-labelledby="rf-lookup-heading">
-        <div class="rf-lookup-head">
-          <h2 id="rf-lookup-heading" class="rf-eyebrow">Product input</h2>
-        </div>
-        <div class="rf-lookup-body">
+      <div id="rf-log" class="rf-log" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation" tabindex="0"></div>
+
+      <div class="rf-dock">
         <p id="rf-unavailable" class="rf-notice" role="status" hidden>Replacement Finder isn't available right now. Please check back soon.</p>
-
-        <form id="rf-form" class="rf-form" novalidate>
-          <div class="form-honeypot" aria-hidden="true">
-            <label for="rf-website">Website</label>
-            <input type="text" id="rf-website" name="website" tabindex="-1" autocomplete="off">
-          </div>
-
-          <div id="rf-error-summary" class="rf-error-summary" role="alert" tabindex="-1" hidden>
-            <p><strong>Please fix the following:</strong></p>
-            <ul id="rf-error-list"></ul>
-          </div>
-
-          <fieldset class="rf-field rf-field--category">
-            <legend>Category</legend>
-            <div class="rf-seg">
-              <input type="radio" id="rf-cat-television" name="category" value="television" checked>
-              <label for="rf-cat-television">Television</label>
-              <input type="radio" id="rf-cat-refrigerator" name="category" value="refrigerator">
-              <label for="rf-cat-refrigerator">Refrigerator</label>
-            </div>
-          </fieldset>
-
-          <div class="rf-field">
-            <label for="rf-brand">Brand</label>
-            <div class="rf-readonly">
-              <input id="rf-brand" name="brand" type="text" value="Samsung" readonly aria-describedby="rf-brand-hint">
-              <svg class="rf-ic" aria-hidden="true"><use href="#rf-i-lock"/></svg>
-            </div>
-            <p id="rf-brand-hint" class="rf-hint">Currently supported for this category.</p>
-          </div>
-
-          <div class="rf-field rf-field--model">
-            <label for="rf-model">Model number</label>
-            <input id="rf-model" name="model" type="text" class="rf-mono" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="rf-model-hint rf-model-error" required>
-            <p id="rf-model-hint" class="rf-hint">Example: <button type="button" id="rf-use-example" class="rf-link-button">QN55Q80C</button></p>
-            <p id="rf-model-error" class="rf-field-error" hidden></p>
-          </div>
-
-          <div class="rf-field rf-field--notes">
-            <label for="rf-notes">Optional notes</label>
-            <textarea id="rf-notes" name="notes" rows="2" maxlength="300" placeholder="Must fit existing opening, reusing wall mount, etc." aria-describedby="rf-notes-hint rf-notes-error"></textarea>
-            <p id="rf-notes-hint" class="rf-hint">Installation and fit requirements can affect the recommendation. Other preferences may be shown separately if they are not yet included in scoring.</p>
-            <p id="rf-notes-error" class="rf-field-error" hidden></p>
-          </div>
-
-          <div class="rf-form-foot">
-            <p class="rf-support">Currently supports Samsung televisions and LG refrigerators.</p>
-            <button type="submit" id="rf-submit" class="rf-cta">Find Replacement <svg class="rf-ic" aria-hidden="true"><use href="#rf-i-arrow"/></svg></button>
-          </div>
+        <ul id="rf-quick" class="rf-quick" aria-label="Quick actions">
+          <li><button type="button" class="rf-qa rf-qa--primary" data-action="find">Find Replacement</button></li>
+          <li><button type="button" class="rf-qa" data-action="verify" data-needs-report aria-disabled="true">Verify Specs</button></li>
+          <li><button type="button" class="rf-qa" data-action="compare" data-needs-report aria-disabled="true">Compare Models</button></li>
+          <li><button type="button" class="rf-qa" data-action="price" data-needs-report aria-disabled="true">Price Item</button></li>
+          <li><button type="button" class="rf-qa" data-action="explain" data-needs-report data-only-with-report="true" hidden>Why this match?</button></li>
+        </ul>
+        <form id="rf-composer" class="rf-composer" novalidate>
+          <button type="button" class="rf-attach" disabled aria-label="Attach a photo or document (coming soon)" title="Photo and document upload is coming soon"><svg class="rf-ic" aria-hidden="true"><use href="#rf-i-clip"/></svg></button>
+          <label class="rf-visually-hidden" for="rf-compose-input">Message ItemAssist</label>
+          <textarea id="rf-compose-input" rows="1" maxlength="300" placeholder="Ask about this item..." autocomplete="off"></textarea>
+          <button type="submit" class="rf-send" aria-label="Send message"><svg class="rf-ic" aria-hidden="true"><use href="#rf-i-send"/></svg></button>
         </form>
-        </div>
-      </section>
+        <p class="rf-fineprint">Proof of concept. Recommendations depend on available product information and should be confirmed before purchase.</p>
+      </div>
+    </section>
 
-      <div id="rf-results" class="rf-results" tabindex="-1" aria-live="polite" aria-busy="false"></div>
-
-      <section class="rf-method" aria-labelledby="rf-method-heading">
-        <p class="rf-eyebrow">Methodology</p>
-        <h2 id="rf-method-heading">How ItemAssist evaluates replacements</h2>
-        <ol class="rf-steps">
-          <li class="rf-step rf-step--identify">
-            <div class="rf-step-top"><span class="rf-step-icon" aria-hidden="true"><svg class="rf-ic"><use href="#rf-s-identify"/></svg></span><span class="rf-stepn" aria-hidden="true"><small>Step</small>01</span></div>
-            <h3>Identify</h3><p>We establish the original product and specifications.</p>
-          </li>
-          <li class="rf-step rf-step--verify">
-            <div class="rf-step-top"><span class="rf-step-icon" aria-hidden="true"><svg class="rf-ic"><use href="#rf-s-verify"/></svg></span><span class="rf-stepn" aria-hidden="true"><small>Step</small>02</span></div>
-            <h3>Verify</h3><p>Important facts are checked against available product sources.</p>
-          </li>
-          <li class="rf-step rf-step--compare">
-            <div class="rf-step-top"><span class="rf-step-icon" aria-hidden="true"><svg class="rf-ic"><use href="#rf-s-compare"/></svg></span><span class="rf-stepn" aria-hidden="true"><small>Step</small>03</span></div>
-            <h3>Compare</h3><p>Current products are evaluated against the original requirements.</p>
-          </li>
-          <li class="rf-step rf-step--recommend">
-            <div class="rf-step-top"><span class="rf-step-icon" aria-hidden="true"><svg class="rf-ic"><use href="#rf-s-recommend"/></svg></span><span class="rf-stepn" aria-hidden="true"><small>Step</small>04</span></div>
-            <h3>Recommend</h3><p>ItemAssist selects the closest defensible replacement and clearly identifies anything that still needs verification.</p>
-          </li>
-        </ol>
-      </section>
-    </div>
+    <section id="rf-product" class="rf-product" aria-labelledby="rf-product-h">
+      <div class="rf-pane-head rf-pane-head--product">
+        <h2 id="rf-product-h" class="rf-pane-title">Product Intelligence</h2>
+      </div>
+      <div id="rf-product-root" class="rf-product-root"></div>
+    </section>
   </main>
 
-  <footer class="rf-footer">
-    <div class="rf-wrap rf-footer-inner">
-      <p>Replacement Finder is a proof of concept. Recommendations depend on available product information and should be confirmed before purchase.</p>
-      <span>&copy; 2026 Item Assist. All rights reserved.</span>
-    </div>
-  </footer>
-
   <script src="assets/js/rf-shared.js"></script>
-  <script src="assets/js/rf-render.js"></script>
+  <script src="assets/js/rf-intake.js"></script>
+  <script src="assets/js/rf-dom.js"></script>
+  <script src="assets/js/rf-replacement.js"></script>
+  <script src="assets/js/rf-product.js"></script>
+  <script src="assets/js/rf-assistant.js"></script>
   <script src="replacement-finder.js"></script>
 </body>
 </html>

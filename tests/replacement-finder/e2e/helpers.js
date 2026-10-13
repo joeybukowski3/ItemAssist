@@ -46,10 +46,53 @@ async function prepare(page, { enabled = true, reply = () => ({ status: 200, bod
   return seen;
 }
 
+/** Opens the structured "Find a replacement" prompt from the quick action. */
+async function openPrompt(page) {
+  await page.locator('[data-action="find"]').click();
+  await page.locator("#rf-model").waitFor();
+}
+
+/** The old form flow, through the workspace: open the prompt, fill it, submit. */
 async function fillAndSubmit(page, { model = "QN55Q80C", notes = "" } = {}) {
+  if (!(await page.locator("#rf-ask").count())) await openPrompt(page);
   await page.locator("#rf-model").fill(model);
   if (notes) await page.locator("#rf-notes").fill(notes);
   await page.locator("#rf-submit").click();
+}
+
+/** Runs a full lookup against a mocked contract and waits for the report. */
+async function runLookup(page, options = {}) {
+  await fillAndSubmit(page, options);
+  await page.locator("#rf-product-name").waitFor();
+}
+
+// Keep in step with NARROW_QUERY in replacement-finder.js: at or below this width the workspace is one continuous page.
+const NARROW_MAX = 960;
+const isNarrowViewport = (page) => page.viewportSize().width <= NARROW_MAX;
+
+const PANEL_IDS = { Overview: "overview", Specifications: "specs", Replacement: "replacement", Pricing: "pricing", Evidence: "evidence" };
+const panelLocator = (page, name) => page.locator(`#rf-panel-${PANEL_IDS[name]}`);
+
+/** The tab control for a section. Beside the assistant it is a tab; on the single page it is a jump link (same element, no role). */
+const tabControl = (page, name) => page.locator(`#rf-tab-${PANEL_IDS[name]}`);
+
+/** Selects a section: switches tab beside the assistant, jumps to it on the single page. Returns that section's panel. */
+async function openTab(page, name) {
+  await tabControl(page, name).click();
+  return panelLocator(page, name);
+}
+
+/**
+ * True when a jump has landed on `locator`: its top is at or below the sticky bar and in the upper half of the screen.
+ * The last section may be shorter than the screen, in which case the page simply ends before it reaches the top.
+ */
+async function isLanded(page, locator) {
+  return locator.evaluate((node) => {
+    const bar = document.querySelector(".rf-bar").getBoundingClientRect().bottom;
+    const top = node.getBoundingClientRect().top;
+    const atEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+    return top >= bar - 1 && (top < window.innerHeight * 0.5 || (atEnd && top < window.innerHeight));
+  });
 }
 
 async function expectNoHorizontalOverflow(page) {
@@ -57,7 +100,7 @@ async function expectNoHorizontalOverflow(page) {
     const width = document.documentElement.clientWidth;
     // body has overflow-x hidden in styles.css, so also check that no rendered element pokes past the viewport.
     const wide = [...document.querySelectorAll("body *")]
-      .filter((element) => { const box = element.getBoundingClientRect(); return box.width > 0 && box.right > width + 1 && !element.closest(".rf-visually-hidden, .form-honeypot, .rf-sprite, .skip-link, thead"); })
+      .filter((element) => { const box = element.getBoundingClientRect(); return box.width > 0 && box.right > width + 1 && !element.closest(".rf-visually-hidden, .form-honeypot, .rf-sprite, .skip-link, thead, .rf-tablist, .rf-quick"); })
       .map((element) => `${element.tagName.toLowerCase()}.${element.className}`);
     return { scrollWidth: document.documentElement.scrollWidth, clientWidth: width, offenders: wide.slice(0, 5) };
   });
@@ -65,4 +108,7 @@ async function expectNoHorizontalOverflow(page) {
   expect(offenders).toEqual([]);
 }
 
-module.exports = { test, expect, contracts, errorBody, prepare, fillAndSubmit, expectNoHorizontalOverflow, PAGE };
+module.exports = {
+  test, expect, contracts, errorBody, prepare, openPrompt, fillAndSubmit, runLookup, openTab, tabControl, panelLocator, isLanded,
+  isNarrowViewport, NARROW_MAX, expectNoHorizontalOverflow, PAGE
+};

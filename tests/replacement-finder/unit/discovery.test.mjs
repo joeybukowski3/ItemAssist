@@ -5,6 +5,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../");
+// Every script the workspace page loads, in load order.
+const BROWSER_SCRIPTS = ["assets/js/rf-shared.js", "assets/js/rf-intake.js", "assets/js/rf-dom.js", "assets/js/rf-replacement.js", "assets/js/rf-product.js", "assets/js/rf-assistant.js", "replacement-finder.js"];
 const read = (file) => fs.readFileSync(path.join(ROOT, file), "utf8");
 
 test("the proof of concept stays undiscoverable: noindex page, and no nav link, sitemap entry or robots rule", () => {
@@ -26,7 +28,7 @@ test("vercel.json sends X-Robots-Tag for the page and keeps the API response unc
 });
 
 test("the browser code never contains secrets, the engine route, or business scoring logic", () => {
-  const browserFiles = ["replacement-finder.js", "assets/js/rf-render.js", "assets/js/rf-shared.js"].map(read).join("\n");
+  const browserFiles = BROWSER_SCRIPTS.map(read).join("\n");
   for (const forbidden of ["ITEMASSIST_REPLACEMENT", "Authorization", "Bearer", "itemassist-replacement", "SERPER", "UPSTASH", "innerHTML", "outerHTML", "insertAdjacentHTML", "document.write", "eval("]) {
     assert.equal(browserFiles.includes(forbidden), false, `browser code must not contain ${forbidden}`);
   }
@@ -38,5 +40,5 @@ test("the browser code never contains secrets, the engine route, or business sco
 test("the page loads no analytics, tag manager or third-party scripts", () => {
   const html = read("replacement-finder.html");
   assert.equal(/googletagmanager|google-analytics|gtag|<script[^>]+src="https?:/i.test(html), false);
-  assert.deepEqual([...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map((match) => match[1]), ["assets/js/rf-shared.js", "assets/js/rf-render.js", "replacement-finder.js"]);
+  assert.deepEqual([...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map((match) => match[1]), BROWSER_SCRIPTS.filter((file) => file !== "replacement-finder.js").concat("replacement-finder.js"));
 });

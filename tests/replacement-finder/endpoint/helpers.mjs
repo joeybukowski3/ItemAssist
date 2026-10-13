@@ -58,7 +58,7 @@ export const jsonResponse = (status, body, headers = {}) => ({
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const contracts = require("../fixtures/contracts.js");
-export const { engineComplete, enginePartial, engineBestAvailable, engineNoResult, engineError } = contracts;
+export const { engineComplete, enginePartial, engineBestAvailable, engineBestAvailableUnconfirmed, engineNoRetailReplacement, engineNoResult, engineError, retail } = contracts;
 
 export function buildHandlerFixture(createHandler, { env = ENV, fetchImpl, ratelimit = createFakeRatelimit(), ...rest } = {}) {
   const logs = [];
