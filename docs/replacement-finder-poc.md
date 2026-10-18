@@ -81,21 +81,83 @@ Set these in the Vercel project. **Do not commit values.**
 The engine has its own settings (`ITEMASSIST_REPLACEMENT_API_ENABLED`, `ITEMASSIST_REPLACEMENT_API_TOKEN`, `SERPER_API_KEY`,
 `ITEMASSIST_REPLACEMENT_DAILY_SEARCH_LIMIT`); see the serial-decoder repository.
 
-## Page behaviour
+## Workspace UI
 
-- **Form:** category (radio group), fixed supported brand, model, optional notes. Client validation mirrors the proxy's rules.
-- **Loading:** a staged list (Identifying original product, Verifying specifications, Evaluating current models, Comparing
-  requirements, Selecting best replacement) with "This may take up to about 20 seconds." It is a UI sequence describing the work, not
-  live server state. A Cancel button aborts the request.
-- **Complete / Partial:** Original Product, Recommended Replacement, Match Summary (above the comparison), Side-by-Side Comparison,
-  Before Finalizing, Alternatives (max 2), Sources. Partial adds a "Partial Recommendation" banner and keeps every usable section.
-- **Best available:** when `primary.isBestAvailableOnly` is true the primary is titled "Best Available Option Found", is not styled
-  as a normal recommendation, and states that it does not fully satisfy LKQ requirements.
-- **No result / Unsupported / Error:** calm, specific states. Unsupported lists the supported categories and lets the user switch.
-- **Confidence** is categorical (High / Medium / Low). There is no percentage anywhere.
-- **Safe rendering:** every API string goes through `textContent`; there is no `innerHTML`.
-- **Accessibility:** labelled fields, `fieldset`/`legend`, `aria-live` results region, focus moved to the loading/result/error heading,
-  an `alert` error summary, visible focus styles, and status always shown as text alongside colour and an icon.
+`/replacement-finder` is a split-screen research workspace, not a form page. The assistant (left, about 38%) holds the conversation; Product
+Intelligence (right, about 62%) holds the structured report.
+
+At 960px and below there is no pane switch: the workspace is one continuous, compact page.
+
+- **Chat** sits on a white surface with a navy accent. After a lookup the conversation folds to one summary card (headline, model, price line,
+  No Confirmed LKQ); **View conversation** brings the history back. Errors and the open prompt are never folded.
+- **Composer**: a compact bar pinned to the bottom of the screen (safe-area aware via `viewport-fit=cover`), with room reserved at the end
+  of the page so nothing sits behind it. The structured prompt still opens inside the conversation.
+- **Product Intelligence** starts at a solid navy divider. The identity block, one row of short status chips and a compact sticky jump row
+  (Overview, Specs, Replacement, Pricing, Evidence) follow; the row scrolls sideways if it must. Jumps land clear of the bar and the row.
+- **Sections** are bordered cards with a category colour. The match summary is a 2x2 grid; comparison rows are dense (name and importance,
+  original and replacement inline, assessment pill). Critical warnings stay open under the result. Lower-priority detail (why, needs review,
+  alternatives, specifications that are not available, supporting sources, "not available yet") is in native `<details>` disclosures that
+  start closed. A provenance warning is described once under Overview and the other sections point to it.
+- At tablet widths the first sections use two columns and the comparison is a table.
+
+Above 960px nothing of this applies: real tabs show one panel at a time, the assistant pane is sticky with its own scrolling log, and the
+composer is part of that pane. The report is built for the current layout and rebuilt if the layout mode changes.
+
+| File | Role |
+|---|---|
+| `replacement-finder.html` / `.js` | Shell and controller: request state, the only network call, conversation folding |
+| `assets/js/rf-assistant.js` | Conversation log, quick actions, composer, the structured "Find a replacement" prompt, loading stages |
+| `assets/js/rf-product.js` | Empty / researching states, report header, five tabs (jump links on the single page), Specifications / Pricing / Evidence panels, wide and compact builders |
+| `assets/js/rf-replacement.js` | Result headline, retail evidence, reasons, match summary, comparison, warnings, alternatives |
+| `assets/js/rf-intake.js` | Conversational intake: message -> lookup payload or one follow-up question (pure, no network) |
+| `assets/js/rf-dom.js` | `textContent`-only element builders |
+| `assets/js/rf-shared.js` | Validation and wording shared with the proxy (headline, assessment and warning vocabulary, price/date formatting) |
+| `replacement-finder.css`, `assets/css/rf-product.css` | Shell and assistant; Product panels (container queries: the pane responds to its own width) |
+
+### What the assistant does today
+
+- Quick actions: **Find Replacement** opens a compact structured prompt (category, fixed brand, model, optional notes) inside the
+  conversation and submits to the existing proxy. Validation is `RFShared.validateLookup`, unchanged.
+- **Verify Specs / Compare Models / Price Item / Why this match?** navigate the report that was already returned (Specifications,
+  Replacement, Pricing and Overview tabs). Before a report exists they say plainly that standalone versions are not available yet.
+- Free text is a deterministic **conversational intake**, not a chat backend (`assets/js/rf-intake.js`, pure and unit-tested). A message such as
+  `Samsung QN55Q80C`, `LRFCS25D3S` or `Find a replacement for my Samsung QN55Q80C` is parsed into category, brand, model and supported
+  notes and starts the existing lookup directly, with no form. A gap becomes one short question with compact choices (`Samsung Q80C` ->
+  "What size is the TV?"; `LG refrigerator` -> "What is the model number...?"). Anything uncertain, or an unrecognised model, offers
+  **Enter the details manually** (the structured prompt, prefilled) instead of guessing. Brand is inferred only from a supported model
+  pattern; the only composed model is Samsung `QN<size><series>` from a size and a series the user gave. Notes are limited to the two the
+  form already invites (fit the existing opening, reusing the wall mount). The proxy still validates every request and its answer wins.
+  General chat gets a scope message and no API call. The attachment control is a disabled placeholder.
+
+### What the report shows (all from the public contract)
+
+- **Headline** uses the engine's `recommendationLevel`: *Recommended Replacement*, *Best Available Current Replacement*, or, for no
+  primary, *No Current Retail Replacement Found* (warning `NO_CURRENT_RETAIL_REPLACEMENT`) / *No Replacement Found*. *No Confirmed LKQ*
+  appears only when the engine warned `NO_CONFIRMED_LKQ` or `NO_LKQ_CANDIDATE`. Classification (e.g. Unconfirmed) is shown separately.
+- **Retail evidence** (new, available, current, seller, observed price and date) is shown apart from the LKQ classification. Price is an
+  observation, never part of a match result. There is no price history and no replacement-cost calculation. An observation time is shown
+  only when it is a real ISO-8601 date-time with a zone; otherwise the date is simply omitted (never "Invalid Date", never a guess).
+- **Match summary** counts Required / Important / Additional / Needs Review from the comparison rows. No score or percentage.
+- **Comparison** statuses: Match or Meets, Exceeds, Differs, Verify, Conflict (text plus icon, never colour alone). Table when the pane is
+  wide enough, dense stacked rows when it is not.
+- **Provenance**: engine warnings (for example `ORIGINAL_SOURCE_NON_US`) are shown under a plain title in the engine's wording, and facts
+  that were inferred or assumed are labelled as such. The UI makes no claim about family lineage because the contract has no field for it.
+- **Evidence** is grouped as original, replacement, retail availability and supporting sources, each with its link.
+
+### Contract note
+
+`projection.js` also forwards `primary.retail`, `primary.recommendationLevel`, and the same two fields on alternatives. This is the only
+change to the proxy path and it is additive. Every field is copied by name; nothing is spread from the engine object.
+
+- `retail` is dropped entirely (null) unless the engine says new, available and current, from a first-party seller, with a source link that
+  is https, has no credentials or port, and is on an accepted host (the host is recomputed from the URL; query and fragment are removed).
+- Price must be a positive number under a bound with an ISO currency; it is an observation only.
+- `observedAt` is forwarded only if it is a real ISO-8601 date-time with a zone in a plausible year (`RFShared.normalizeObservedAt`),
+  exactly as given; anything else becomes null. The browser applies the same check before rendering.
+- `statusLabel` is forwarded only if it is a known label (`AVAILABLE NEW`); anything else, including a missing value, becomes the fixed
+  neutral `AVAILABILITY OBSERVED`. Raw backend text never reaches the browser, and the label never claims more than the record.
+- `recommendationLevel` fails closed: either best-available signal wins, and a missing or garbled signal reads as `BEST_AVAILABLE`.
+- An older engine without these fields projects to `retail: null` (the UI then shows no availability claim).
 
 ## Tests
 
@@ -103,11 +165,11 @@ All offline. Nothing contacts the engine or any provider.
 
 ```
 npm run test:replacement-finder        # unit + endpoint (node --test)
-npm run test:e2e:replacement-finder    # Playwright at 375 / 768 / 1280
+npm run test:e2e:replacement-finder    # Playwright at 375 / 390 / 768 / 1024 / 1280; the widths spec also covers 520 / 900 / 960 / 961 / 1000 / 1100
 ```
 
 The Playwright suite reuses the repository's analytics-blocking fixture (`tests/request-intake/e2e/fixtures.js`) and static server.
-It mocks `/api/replacement-finder` with `page.route`. To capture screenshots for visual review (written outside the repo):
+It mocks `/api/replacement-finder` with `page.route`; the config refuses to reuse an existing server on its port so a stale server from another worktree cannot serve the wrong page. To capture screenshots for visual review (written outside the repo):
 
 ```
 RF_SCREENSHOT_DIR=/some/dir npx playwright test --config=tests/replacement-finder/e2e/playwright.config.js screenshots.spec.js
