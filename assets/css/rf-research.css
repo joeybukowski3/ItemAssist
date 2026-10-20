@@ -1,0 +1,43 @@
+/*
+ * ItemAssist Research additions to the workspace. Additive only: it reuses the existing .rf-* tokens and components (rf-ph, rf-tabbar,
+ * rf-block, rf-lead, rf-pill, rf-partial) and adds just the few pieces the research report needs. Amber carries "unverified", never mint.
+ */
+
+/* ---------- Assistant: research mode ---------- */
+/* While a research report is on screen the v1 report actions (verify, compare, price, explain) have nothing to act on. */
+.rf-assistant.rf-view-research .rf-quick li:has(> [data-needs-report]) { display: none; }
+.rf-msg--summary .rf-msg-note-q { font-weight: 600; color: var(--rf-ink); }
+.rf-rs-questions { margin: 0.25rem 0 0; padding-left: 1.125rem; }
+.rf-rs-questions li + li { margin-top: 0.25rem; }
+.rf-rs-reply-lines { margin: 0; padding-left: 0; list-style: none; }
+
+/* ---------- Product pane: research report ---------- */
+.rf-report--research .rf-ph-model { font-size: clamp(1.25rem, 3.4cqi, 1.75rem); letter-spacing: -0.015em; }
+.rf-rs-banner { margin: 0 var(--rf-gutter) 0.875rem; }
+.rf-rs-list { margin: 0; padding-left: 1.125rem; display: grid; gap: 0.375rem; font-size: 0.9375rem; line-height: 1.5; color: var(--text-body); }
+.rf-rs-identity { margin: 0 0 0.5rem; font-size: 1.0625rem; font-weight: 650; color: var(--rf-ink); overflow-wrap: anywhere; }
+.rf-rs-sub { margin: 0.875rem 0 0.375rem; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rf-muted); }
+.rf-rs-unsure { margin: 0.875rem 0 0; padding: 0.625rem 0.75rem; background: var(--rf-warn-bg); border: 1px solid var(--rf-warn-line); border-radius: 6px; font-size: 0.875rem; color: var(--rf-warn-text); }
+.rf-rs-reqs { margin: 0.75rem 0 0; padding-left: 1.375rem; display: grid; gap: 0.5rem; font-size: 0.9375rem; line-height: 1.5; color: var(--text-body); }
+.rf-rs-reqs li::marker { font-weight: 700; color: var(--rf-info-text); }
+.rf-rs-alts { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.625rem; }
+.rf-rs-alts li { display: grid; gap: 0.125rem; padding-top: 0.625rem; border-top: 1px solid var(--rf-line); }
+.rf-rs-alts li:first-child { padding-top: 0; border-top: 0; }
+.rf-rs-alt-name { font-weight: 650; color: var(--rf-ink); overflow-wrap: anywhere; }
+.rf-rs-alt-why { font-size: 0.875rem; color: var(--rf-muted); }
+
+.rf-rs-cards { display: grid; gap: 0.875rem; }
+.rf-rs-card { display: grid; gap: 0.5rem; padding: 0.875rem 1rem; background: var(--white); border: 1px solid var(--rf-line-strong); border-left: 4px solid var(--rf-warn-text); border-radius: var(--rf-radius); }
+.rf-rs-card > * { margin: 0; }
+.rf-rs-card-name { font-size: 1.0625rem; font-weight: 700; color: var(--rf-ink); overflow-wrap: anywhere; }
+.rf-rs-why, .rf-rs-diff { font-size: 0.9375rem; line-height: 1.5; color: var(--text-body); }
+.rf-rs-diff--none { color: var(--rf-muted); }
+.rf-rs-concern { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.5rem 0.625rem; background: var(--rf-warn-bg); border: 1px solid var(--rf-warn-line); border-radius: 6px; font-size: 0.875rem; color: var(--rf-warn-text); }
+.rf-rs-concern .rf-ic { margin-top: 2px; }
+
+/* ---------- Narrow: one continuous page; the tab row is not needed because every section is on the page ---------- */
+@media (max-width: 960px) {
+  .rf-report--research .rf-tabbar { display: none; }
+  .rf-report--research .rf-tabpanel { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+  .rf-rs-banner { margin: 0 var(--rf-gutter) 0.5rem; }
+}
