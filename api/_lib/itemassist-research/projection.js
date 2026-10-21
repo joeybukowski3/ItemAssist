@@ -81,10 +81,12 @@ function projectCandidate(item, { withStanding = false } = {}) {
 
 /**
  * @param {unknown} body  the engine's 200 body
- * @param {{requestId: string, elapsedMs: number, quota: object}} context
+ * @param {{requestId: string, elapsedMs: number, quota: object, allowFixture?: boolean}} context
+ *   `allowFixture` is true only on a Vercel Preview (the caller decides from the server environment). Only then may the engine's
+ *   `meta.fixture === true` become the single fixed `meta.fixture: true` demo indicator; everywhere else it is dropped.
  * @returns the public ItemAssist Research response, or null when the engine body is not a valid research contract
  */
-function projectResearch(body, { requestId, elapsedMs, quota }) {
+function projectResearch(body, { requestId, elapsedMs, quota, allowFixture = false }) {
   if (!isObject(body) || body.contractVersion !== CONTRACT_VERSION || body.kind !== KIND) return null;
   const status = oneOf(body.status, STATUSES);
   const meta = isObject(body.meta) ? body.meta : {};
@@ -125,7 +127,8 @@ function projectResearch(body, { requestId, elapsedMs, quota }) {
       requestId,
       elapsedMs: Math.min(MAX_ELAPSED_MS, Math.max(0, Math.round(Number(elapsedMs)) || 0)),
       cached: meta.cached === true,
-      answerSource
+      answerSource,
+      ...(allowFixture === true && meta.fixture === true ? { fixture: true } : {})
     },
     quota
   };

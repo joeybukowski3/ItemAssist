@@ -29,6 +29,7 @@
 
   // The banner above the report: what kind of result this is, stated once and plainly.
   const SUMMARY_TITLE = "AI Research Summary";
+  const DEMO_LABEL = "Demo research data";
   const SUMMARY_NOTE = "Specifications and replacement suggestions are preliminary and not independently verified. Availability and pricing are not checked.";
   const GREETING ="Describe the item you're replacing: a brand and model number, or a short description. I'll identify it, outline what a replacement should match, and suggest candidates to explore.";
   const PLACEHOLDER = "Describe the item or answer my question...";
@@ -310,7 +311,7 @@
 
   const api = {
     MAX_QUERY_CHARS: MAX_QUERY_CHARS, VISITOR_KEY: VISITOR_KEY, VISITOR_PATTERN: VISITOR_PATTERN,
-    SUMMARY_TITLE: SUMMARY_TITLE, SUMMARY_NOTE: SUMMARY_NOTE, GREETING: GREETING, PLACEHOLDER: PLACEHOLDER, FINEPRINT: FINEPRINT, ASK_WHICH: ASK_WHICH, FALLBACK_HELP: FALLBACK_HELP, TOO_LONG: TOO_LONG, STARTING_FRESH: STARTING_FRESH,
+    SUMMARY_TITLE: SUMMARY_TITLE, SUMMARY_NOTE: SUMMARY_NOTE, DEMO_LABEL: DEMO_LABEL, GREETING: GREETING, PLACEHOLDER: PLACEHOLDER, FINEPRINT: FINEPRINT, ASK_WHICH: ASK_WHICH, FALLBACK_HELP: FALLBACK_HELP, TOO_LONG: TOO_LONG, STARTING_FRESH: STARTING_FRESH,
     ERROR_MESSAGES: ERROR_MESSAGES, errorMessage: errorMessage, offersClassic: offersClassic,
     initialSession: initialSession, classify: classify, composeQuery: composeQuery, adopt: adopt, localAnswer: localAnswer,
     reply: reply, categoryLabel: categoryLabel, isResearchResponse: isResearchResponse, createVisitorId: createVisitorId, modelCodes: modelCodes

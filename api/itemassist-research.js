@@ -134,7 +134,7 @@ function createHandler(overrides = {}) {
     // project once with a placeholder, decide, then fill in the real block.
     let projected = null;
     try {
-      projected = succeeded ? projectResearch(result.body, { requestId, elapsedMs: now() - startedAt, quota: null }) : null;
+      projected = succeeded ? projectResearch(result.body, { requestId, elapsedMs: now() - startedAt, quota: null, allowFixture: env.VERCEL_ENV === "preview" }) : null;
     } catch (error) { /* an unprojectable body is a failed call: the visitor is not charged */ }
     if (!projected) {
       // A timeout may still have cost a provider call, so the IP keeps its unit; every other failure gives both back.

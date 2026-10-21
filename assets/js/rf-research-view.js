@@ -64,6 +64,8 @@
       h("p", { class: "rf-ph-brand", text: Research.categoryLabel(data.category) + " research" }),
       D.heading("h3", "rf-product-name", identified ? data.original.identity : "Product not identified", "rf-ph-model"),
       h("div", { class: "rf-status-row", attrs: { role: "group", "aria-label": "Research status" } }, [
+        // Shown only when the server marked the answer as canned Preview data; the text is fixed here, never taken from the response.
+        data.meta && data.meta.fixture === true ? D.pill("info", "info", Research.DEMO_LABEL, "rf-rs-demo") : null,
         D.pill("warn", "q", data.status === "UNAVAILABLE" ? "General guidance only" : "AI estimate, not verified"),
         confidence
       ].filter(Boolean))

@@ -470,3 +470,36 @@ test("at 1024px after research: new messages stay visible, the result is not scr
   await expect(page.locator("#rf-product")).toHaveCount(1);
   settle(seen);
 });
+
+// ---- demo data label ---------------------------------------------------------------------------------------------------------
+
+const demoMeta = (extra = {}) => ({ requestId: "proxy-req-1", elapsedMs: 5, cached: false, answerSource: "AI_ESTIMATE", fixture: true, ...extra });
+
+test("an answer the server marked as demo data shows a fixed 'Demo research data' label in the existing product pane; the layout is unchanged", async ({ page }) => {
+  const seen = await prepare(page, research(() => ok(researchResponse({ meta: demoMeta({ label: "Totally real data", fixtureLabel: "x" }) }))));
+  await ready(page);
+  await send(page, "LG C3 OLED TV");
+  const label = page.locator("#rf-product-root .rf-rs-demo");
+  await expect(label).toHaveCount(1);
+  await expect(label).toHaveText("Demo research data");
+  await expect(label).toBeVisible();
+  // Same structure as any other answer: one label, the status row still holds the AI-estimate pill, one composer, two panes, no overflow.
+  await expect(page.locator("#rf-product-root .rf-status-row")).toContainText("AI estimate, not verified");
+  await expect(page.locator("#rf-product-root")).not.toContainText("Totally real data");
+  await expect(page.locator("#rf-composer")).toHaveCount(1);
+  await expect(page.locator("#rf-assistant, #rf-product")).toHaveCount(2);
+  await expectNoHorizontalOverflow(page);
+  settle(seen);
+});
+
+test("a normal answer shows no demo label, and only the literal boolean true can produce one", async ({ page }) => {
+  for (const meta of [{ cached: false }, { fixture: false }, { fixture: "true" }, { fixture: 1 }, { fixture: {} }]) {
+    const seen = await prepare(page, research(() => ok(researchResponse({ meta: { requestId: "proxy-req-1", elapsedMs: 5, cached: false, answerSource: "AI_ESTIMATE", ...meta } }))));
+    await ready(page);
+    await send(page, "LG C3 OLED TV");
+    await expect(page.locator("#rf-product-name")).toHaveText("LG C3 series 4K OLED smart TV");
+    await expect(page.locator(".rf-rs-demo")).toHaveCount(0);
+    await expect(page.locator("#rf-product-root")).not.toContainText("Demo research data");
+    settle(seen);
+  }
+});
