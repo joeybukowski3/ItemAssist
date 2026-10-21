@@ -8,6 +8,7 @@
     "test:replacement-finder": "node --test \"tests/replacement-finder/unit/*.test.mjs\" \"tests/replacement-finder/endpoint/*.test.mjs\"",
     "test:itemassist-research": "node --test \"tests/itemassist-research/unit/*.test.mjs\" \"tests/itemassist-research/endpoint/*.test.mjs\"",
     "test:e2e:itemassist-research": "playwright test --config=tests/itemassist-research/e2e/playwright.config.js",
+    "test:preview:itemassist-research": "playwright test --config=tests/itemassist-research/preview/playwright.preview.config.js",
     "test:e2e:replacement-finder": "playwright test --config=tests/replacement-finder/e2e/playwright.config.js"
   },
   "dependencies": {
