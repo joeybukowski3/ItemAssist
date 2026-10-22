@@ -1,4 +1,4 @@
-/** Sample ItemAssist Research responses shaped like the proxy's public contract (research.1). Shared by the unit and Playwright tests. */
+/** Sample ItemAssist Research responses shaped like the proxy's public contract (research.1; research2Response builds research.2). Shared by the unit and Playwright tests. */
 
 const DISCLOSURE = "AI estimate from general product knowledge. Specifications, model numbers, availability and pricing have not been verified and may be out of date.";
 
@@ -45,4 +45,23 @@ const researchError = (errorCode, quota) => ({
   ...(quota ? { quota } : {})
 });
 
-module.exports = { researchResponse, researchGuidance, researchError, DISCLOSURE };
+const fs = require("fs");
+const path = require("path");
+
+/**
+ * A research.2 response exactly as the proxy would send it: a golden engine response (built by the backend's own builder) projected through the
+ * real projection. research.2 is a Preview demo, so the projected response always carries the demo indicator (`meta.fixture: true`).
+ * `overrides` is applied to the projected result.
+ */
+function research2Response(scenario, overrides = {}) {
+  const { projectResearch } = require("../../../api/_lib/itemassist-research/projection.js");
+  const golden = JSON.parse(fs.readFileSync(path.join(__dirname, "research2-golden.json"), "utf8"));
+  const entry = golden.scenarios[scenario];
+  if (!entry) throw new Error("unknown research.2 scenario: " + scenario);
+  const projected = projectResearch(JSON.parse(JSON.stringify(entry.engine)), { requestId: "proxy-req-v2", elapsedMs: 900, quota: { limit: 5, remaining: 4, charged: true }, allowFixture: true });
+  return { ...projected, ...overrides };
+}
+
+const RESEARCH2_SCENARIOS = Object.freeze(["tv-premium-oled", "tv-strong-retail", "fridge-constraints", "washer-dimensions", "ambiguous-model", "sparse-estimate", "unsupported-claims", "insufficient"]);
+
+module.exports = { researchResponse, researchGuidance, researchError, research2Response, RESEARCH2_SCENARIOS, DISCLOSURE };

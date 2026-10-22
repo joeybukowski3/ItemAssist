@@ -1,4 +1,5 @@
 const RF = require("../../../assets/js/rf-shared.js");
+const { projectResearch2, CONTRACT_VERSION: CONTRACT_VERSION_2 } = require("./projection-v2");
 
 /**
  * Defence in depth for ItemAssist Research. The engine already returns an allowlisted contract; this layer re-projects it
@@ -84,9 +85,17 @@ function projectCandidate(item, { withStanding = false } = {}) {
  * @param {{requestId: string, elapsedMs: number, quota: object, allowFixture?: boolean}} context
  *   `allowFixture` is true only on a Vercel Preview (the caller decides from the server environment). Only then may the engine's
  *   `meta.fixture === true` become the single fixed `meta.fixture: true` demo indicator; everywhere else it is dropped.
- * @returns the public ItemAssist Research response, or null when the engine body is not a valid research contract
+ * @returns the public ItemAssist Research response (research.1 or research.2), or null when the engine body is not a valid research contract
  */
-function projectResearch(body, { requestId, elapsedMs, quota, allowFixture = false }) {
+function projectResearch(body, context) {
+  // research.2 is projected by its own module, with the same text filter and limits.
+  if (isObject(body) && body.contractVersion === CONTRACT_VERSION_2) {
+    return projectResearch2(body, context, { safeText, safeList, MAX_DISCLOSURE, MAX_ELAPSED_MS, FALLBACK_DISCLOSURE, clean: RF.clean });
+  }
+  return projectResearchV1(body, context);
+}
+
+function projectResearchV1(body, { requestId, elapsedMs, quota, allowFixture = false }) {
   if (!isObject(body) || body.contractVersion !== CONTRACT_VERSION || body.kind !== KIND) return null;
   const status = oneOf(body.status, STATUSES);
   const meta = isObject(body.meta) ? body.meta : {};
@@ -143,4 +152,4 @@ function projectError(code, requestId, quota) {
   };
 }
 
-module.exports = { projectResearch, projectError, isSafe, CONTRACT_VERSION, KIND, ERROR_MESSAGES, FALLBACK_DISCLOSURE };
+module.exports = { projectResearch, projectError, isSafe, CONTRACT_VERSION, CONTRACT_VERSION_2, KIND, ERROR_MESSAGES, FALLBACK_DISCLOSURE };

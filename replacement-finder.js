@@ -316,6 +316,9 @@
   function resetResearch() {
     research.session = RS.initialSession();
     research.view = null;
+    // The fine print describes the report on screen; with no report it returns to the standard wording.
+    var fineprint = document.querySelector(".rf-fineprint");
+    if (fineprint) fineprint.textContent = RS.FINEPRINT;
     showResearchOrEmpty();
     assistant.say(RS.STARTING_FRESH);
     assistant.focusComposer();
@@ -433,6 +436,8 @@
     }
     research.session = RS.adopt(research.session, mode, text, composed, body);
     research.view = view;
+    var fineprint = document.querySelector(".rf-fineprint");
+    if (fineprint) fineprint.textContent = RS.isV2(body) ? RS.FINEPRINT_V2 : RS.FINEPRINT;
     state.report = null;
     assistant.setReportReady(false);
     showResearchOrEmpty();

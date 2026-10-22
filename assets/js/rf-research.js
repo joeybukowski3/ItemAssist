@@ -31,6 +31,7 @@
   const SUMMARY_TITLE = "AI Research Summary";
   const DEMO_LABEL = "Demo research data";
   const SUMMARY_NOTE = "Specifications and replacement suggestions are preliminary and not independently verified. Availability and pricing are not checked.";
+  const FINEPRINT_V2 = "ItemAssist Research combines AI estimates with cited sources. Prices are labelled confirmed, unconfirmed or estimated; confirm specifications, availability and price with a seller before buying.";
   const GREETING ="Describe the item you're replacing: a brand and model number, or a short description. I'll identify it, outline what a replacement should match, and suggest candidates to explore.";
   const PLACEHOLDER = "Describe the item or answer my question...";
   const FINEPRINT = "ItemAssist Research gives AI estimates from general product knowledge. Specifications, availability and pricing are not verified; confirm them before buying.";
@@ -59,6 +60,204 @@
   /** True when the classic lookup is a sensible alternative to offer after this error (never after a quota or rate limit). */
   function offersClassic(code) {
     return OFFER_CLASSIC.indexOf(code) !== -1;
+  }
+
+  /* ---------- research.2: prices, valuation and evidence wording ---------- */
+
+  // Fixed wording for every price-related code. Nothing here is taken from the response except codes, enumerated values and numbers, so a
+  // response can never put its own words (a claim, a link, a price) into these labels. An estimate is never worded as verified.
+  const SUMMARY_NOTE_V2 = "Specifications and replacement suggestions are preliminary. A price is called confirmed only when it comes from the cited source on the date shown; every other figure is an estimate or an unconfirmed listing.";
+  const PRICE_KIND_LABELS = Object.freeze({
+    MSRP: "Original list price (MSRP)", HISTORICAL_RETAIL: "Past retail price", CURRENT_RETAIL_NEW: "Current new-retail price",
+    SECONDARY_REPORT: "Used or marketplace report", AI_ESTIMATE: "AI estimate"
+  });
+  const VERIFICATION_LABELS = Object.freeze({
+    VERIFIED_PAGE: "Shown on the cited source page", SEARCH_LISTING: "Seen in a search listing, not confirmed on the page",
+    SEARCH_SNIPPET: "Seen in a search snippet, not confirmed", NONE: "No source: estimate"
+  });
+  const DATE_LABELS = Object.freeze({ OBSERVED: "Observed", PUBLISHED: "Published", UNKNOWN: "Date not stated" });
+  const METHOD_LABELS = Object.freeze({
+    VERIFIED_MULTI: "Confirmed current prices", VERIFIED_SINGLE: "One confirmed current price", MIXED_VERIFIED_AND_LISTINGS: "Confirmed prices and unconfirmed listings",
+    PROVISIONAL_LISTINGS: "Unconfirmed retailer listings", HISTORICAL_TIER_ESTIMATE: "Estimate from the original's price", AI_ESTIMATE_ONLY: "AI estimate only",
+    INSUFFICIENT: "Not enough evidence"
+  });
+  const TIER_LABELS = Object.freeze({ VALUE: "Value", STANDARD: "Standard", PREMIUM: "Premium", UPPER_PREMIUM: "Upper premium", LUXURY: "Luxury", UNKNOWN: "Not determined" });
+  const TIER_BASIS_LABELS = Object.freeze({ MSRP_EVIDENCE: "Based on the original's reported price", AI_ESTIMATE: "AI estimate of the market tier", UNKNOWN: "Not determined" });
+  const IMPORTANCE_LABELS = Object.freeze({ ESSENTIAL: "Essential", IMPORTANT: "Important", MINOR: "Minor" });
+  const ORIGIN_LABELS = Object.freeze({ CATEGORY_RULE: "Standard for this type of item", AI_ESTIMATE: "Added by the AI estimate" });
+  const COMPARISON_LABELS = Object.freeze({ MEETS: "Meets", EXCEEDS: "Exceeds", SHORTFALL: "Falls short", UNKNOWN: "Not known" });
+  const BASIS_LABELS = Object.freeze({ CONFIRMED: "Confirmed by a cited source", AI_ESTIMATE: "AI estimate" });
+  const MODEL_STATUS_LABELS = Object.freeze({
+    VERIFIED_LISTING: "Model named on a cited seller or maker page", LISTED_PROVISIONAL: "Model named in a cited search listing, not confirmed",
+    FAMILY_LEVEL: "Product family, exact model not confirmed", UNVERIFIED_MODEL: "Exact model identity has not been independently confirmed"
+  });
+  const SOURCE_CLASS_LABELS = Object.freeze({ MANUFACTURER: "Manufacturer", RETAILER: "Retailer", REVIEW: "Review site", TECH_DATABASE: "Specification database", MARKETPLACE: "Marketplace" });
+  const MODEL_RELATION_LABELS = Object.freeze({ EXACT: "Same model code", VARIANT: "Variant of the model code", DIFFERENT: "Different model code", UNKNOWN: "Model match not shown in the evidence" });
+  const EXCLUSION_LABELS = Object.freeze({
+    CONFIRMED_ESSENTIAL_SHORTFALL: "Not in the range: it falls short of an essential requirement (confirmed by a cited source)",
+    SUSPECTED_ESSENTIAL_SHORTFALL: "Not in the range: it appears to fall short of an essential requirement (an estimate)",
+    NO_CURRENT_PRICE: "Not in the range: no current retail price is included in this research"
+  });
+  // What a price did in the valuation: it set the range, it is context only, or it was left out (with the reason shown beside it).
+  const PRICE_ROLE_LABELS = Object.freeze({ USED_IN_RANGE: "Sets the range", CONTEXT_ONLY: "Context only", EXCLUDED: "Excluded from the range" });
+  const PRICE_ROLE_REASONS = Object.freeze({
+    ORIGINAL_CONTEXT: "Context for the original's market tier. It never sets the replacement range.",
+    DATED_PRICE: "A dated price, not a current one. It does not set the range.",
+    SECONDARY_REPORT: "A used or marketplace report. It does not set the range.",
+    AI_ESTIMATE: "An AI estimate with no source. It sets the range only when nothing better is available.",
+    ORIGINAL_ESTIMATE: "An AI estimate of the original's price. No source supports it, and it never sets the replacement range.",
+    NOT_COMPARABLE: "Not used for the range.",
+    CURRENT_COMPARABLE: "A current price for a candidate that meets every essential requirement.",
+    ESTIMATE_ANCHOR: "The estimate band scales this price. No current retail price is included in this research.",
+    ESTIMATE_RANGE: "An AI estimate. No source supports it."
+  });
+  const REJECTION_REASON_LABELS = Object.freeze({
+    AMOUNT_INVALID: "an amount that was not a valid price", CURRENCY_UNSUPPORTED: "a price that was not in US dollars", DATE_INVALID: "a date that was not a real date",
+    DATE_IN_FUTURE: "a date in the future", DATE_REQUIRED: "a price with no date", ESTIMATE_CITES_SOURCE: "an estimate that cited a source",
+    KIND_SOURCE_MISMATCH: "a price from a kind of source that cannot support it", MODEL_UNVERIFIED: "a model number with no evidence about that model",
+    SHAPE_INVALID: "an entry that was malformed", SOURCE_FABRICATED: "a citation whose link and stated source did not match", SOURCE_INVALID: "a link that was not a usable web address",
+    SOURCE_NOT_ALLOWED: "a source that is not on the accepted list", STALE_CURRENT_PRICE: "a price too old to be called current", SUBJECT_INVALID: "an entry about the wrong item",
+    VERIFICATION_DOWNGRADED: "a price confirmed less strongly than claimed", WRONG_PRODUCT: "a price for a different model", COMPARISON_NOT_CONFIRMED: "a comparison with no source behind it",
+    ESSENTIAL_FROM_AI_DOWNGRADED: "an essential requirement added by the AI estimate", IMPORTANCE_FIXED_BY_CODE: "a requirement ranked differently than the standard for this item",
+    MODEL_STATUS_DOWNGRADED: "a model status stronger than the evidence", TIER_BASIS_DOWNGRADED: "a market tier with no price behind it"
+  });
+  const REJECTION_ACTION_LABELS = Object.freeze({ REJECTED: "Set aside", DOWNGRADED: "Downgraded" });
+  const CANDIDATE_LABELS = Object.freeze({ SUCCESSOR: "The successor candidate", ALT_1: "Alternative 1", ALT_2: "Alternative 2" });
+  const DEMO_PRICE_NOTE = "Demo data: the figures and sources in this panel are illustrative, not real prices.";
+
+  const percent = (ratio) => Math.round(ratio * 100) + "%";
+  const plural = (count, one, many) => count + " " + (count === 1 ? one : many);
+  const NOTE_TEXT = Object.freeze({
+    BASED_ON_VERIFIED: (note) => "Based on " + plural(note.count, "current price", "current prices") + " shown on cited seller pages.",
+    BASED_ON_LISTINGS: (note) => "Includes " + plural(note.count, "retailer listing", "retailer listings") + " not confirmed on the product page.",
+    ONE_COMPARABLE: () => "One confirmed price is a documented price anchor for one model, not proof of a unique fair value.",
+    LISTINGS_NOT_CONFIRMED: () => "Listings can differ from the product page, so treat these figures as provisional.",
+    TIER_ESTIMATE_BAND: (note) => "No current retail price is included in this research. The band scales the original's reported price to " + percent(note.low) + " to " + percent(note.high) + ", a broad rule for this type of item.",
+    AI_ESTIMATE_ONLY: () => "No source supports this range. It is an AI estimate.",
+    INSUFFICIENT: () => "There is not enough evidence to estimate a value yet.",
+    MSRP_CONTEXT_ONLY: () => "The original's list price is context only. It does not set the replacement range.",
+    CURRENT_BELOW_ORIGINAL: (note) => "Current prices are about " + percent(note.ratio) + " of the original's list price.",
+    ORIGINAL_DATE_UNKNOWN: () => "The date of the original's price is not stated, so a wider band is used.",
+    TIER_UNKNOWN_WIDENED: () => "The market tier is not known, so the band is wider.",
+    EXCLUDED_CONFIRMED_SHORTFALL: (note) => CANDIDATE_LABELS[note.candidate] + " is left out: it falls short of an essential requirement.",
+    EXCLUDED_SUSPECTED_SHORTFALL: (note) => CANDIDATE_LABELS[note.candidate] + " is left out: it appears to fall short of an essential requirement (an estimate).",
+    EXCLUDED_NO_CURRENT_PRICE: (note) => CANDIDATE_LABELS[note.candidate] + " is not in the range: no current retail price for it is included in this research.",
+    STALE_PRICES_NOT_CURRENT: (note) => plural(note.count, "older price is", "older prices are") + " included as dated. Older prices are never shown as current.",
+    NOT_AN_APPRAISAL: () => "This is a research range, not an appraisal or a guaranteed value."
+  });
+
+  /** The fixed sentence for a valuation note, or null for a code this page does not know. */
+  function noteText(note) {
+    return note && Object.prototype.hasOwnProperty.call(NOTE_TEXT, note.code) ? NOTE_TEXT[note.code](note) : null;
+  }
+
+  function label(table, key, fallback) {
+    return typeof key === "string" && Object.prototype.hasOwnProperty.call(table, key) ? table[key] : fallback;
+  }
+
+  /** "$2,399" for a whole amount, "$2,399.50" otherwise. Formatting only; the amount is never adjusted. */
+  function formatMoney(amount) {
+    if (typeof amount !== "number" || !Number.isFinite(amount)) return null;
+    const whole = Math.round(amount) === amount;
+    try {
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(amount);
+    } catch (error) {
+      return "$" + amount.toFixed(whole ? 0 : 2);
+    }
+  }
+
+  /** "$1,199 to $1,399", or one figure when low equals high; null without a valid range. */
+  function formatRange(range) {
+    if (!range || typeof range !== "object") return null;
+    const low = formatMoney(range.low);
+    const high = formatMoney(range.high);
+    if (!low || !high) return null;
+    return range.low === range.high ? low : low + " to " + high;
+  }
+
+  /** "Oct 21, 2026" from a YYYY-MM-DD date, in UTC so it reads the same everywhere; null for anything else. */
+  function formatDay(value) {
+    if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    const moment = new Date(value + "T00:00:00Z");
+    // Round-trip so a lenient parse of an impossible date ("2026-02-30") is refused rather than shown as another day.
+    if (!Number.isFinite(moment.getTime()) || moment.toISOString().slice(0, 10) !== value) return null;
+    try {
+      return new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" }).format(moment);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  const isV2 = (data) => Boolean(data) && data.contractVersion === "research.2";
+
+  /**
+   * One honest sentence for the valuation. The words come from the method alone: a confirmed price is called confirmed, a listing is
+   * called unconfirmed, a band built from the original's price or from the AI is called an estimate.
+   */
+  function valuationLine(valuation) {
+    if (!valuation) return null;
+    const range = formatRange(valuation.range);
+    const asOf = formatDay(valuation.asOf);
+    switch (valuation.method) {
+      case "VERIFIED_MULTI":
+        return range ? "Current new-retail prices shown on cited seller pages: " + range + (asOf ? ", as of " + asOf : "") + "." : null;
+      case "VERIFIED_SINGLE":
+        return range ? "One confirmed current new-retail price: " + range + (asOf ? ", as of " + asOf : "") + ". It is a price anchor for one model, not a fair-value appraisal." : null;
+      case "MIXED_VERIFIED_AND_LISTINGS":
+        return range ? "Current retail prices point to " + range + (asOf ? ", as of " + asOf : "") + ". Some of those are listings not confirmed on the product page." : null;
+      case "PROVISIONAL_LISTINGS":
+        return range ? "Retailer listings suggest roughly " + range + (asOf ? ", as of " + asOf : "") + ". None is confirmed on the product page, so treat it as provisional." : null;
+      case "HISTORICAL_TIER_ESTIMATE":
+        return range ? "No current retail price is included in this research. Based on the original's reported price, a rough estimate is " + range + ". It is an estimate, not a price for a replacement." : null;
+      case "AI_ESTIMATE_ONLY":
+        return range ? "A rough AI estimate is " + range + ". No source supports it." : null;
+      default:
+        return "There isn't enough evidence to estimate a value yet.";
+    }
+  }
+
+  /**
+   * What a price did in the valuation, derived only from the valuation's own comparables, exclusions and reference, so the price list and the
+   * range always reconcile: USED_IN_RANGE (it sets the range, or anchors an estimate band), EXCLUDED (its candidate was left out, with the
+   * exclusion reason), or CONTEXT_ONLY. `note` is a key of PRICE_ROLE_REASONS; `exclusion` is an exclusion reason code.
+   */
+  function priceRole(pricing, price) {
+    const value = pricing && pricing.valuation;
+    if (!value || !price) return null;
+    if ((value.comparables || []).some(function (row) { return row.priceId === price.id; })) {
+      return { role: "USED_IN_RANGE", note: price.kind === "AI_ESTIMATE" ? "ESTIMATE_RANGE" : "CURRENT_COMPARABLE", exclusion: null };
+    }
+    if (value.method === "HISTORICAL_TIER_ESTIMATE" && value.reference && value.reference.priceId === price.id) {
+      return { role: "USED_IN_RANGE", note: "ESTIMATE_ANCHOR", exclusion: null };
+    }
+    const left = price.candidate ? (value.excluded || []).filter(function (row) { return row.candidate === price.candidate; })[0] : null;
+    if (left) return { role: "EXCLUDED", note: null, exclusion: left.reason };
+    let note = "NOT_COMPARABLE";
+    if (price.kind === "AI_ESTIMATE") note = price.subject === "ORIGINAL" ? "ORIGINAL_ESTIMATE" : "AI_ESTIMATE";
+    else if (price.subject === "ORIGINAL") note = "ORIGINAL_CONTEXT";
+    else if (price.kind === "HISTORICAL_RETAIL") note = "DATED_PRICE";
+    else if (price.kind === "SECONDARY_REPORT") note = "SECONDARY_REPORT";
+    return { role: "CONTEXT_ONLY", note: note, exclusion: null };
+  }
+
+  /** The prices in each role, in id order, for the Pricing tab's three groups. */
+  function pricesByRole(pricing) {
+    const groups = { USED_IN_RANGE: [], CONTEXT_ONLY: [], EXCLUDED: [] };
+    (pricing.prices || []).slice().sort(function (a, b) { return a.id.localeCompare(b.id, undefined, { numeric: true }); }).forEach(function (price) {
+      groups[priceRole(pricing, price).role].push(price);
+    });
+    return groups;
+  }
+
+  /** The count of candidates left out of the value range for an essential shortfall. */
+  function shortfallCount(valuation) {
+    return valuation ? (valuation.excluded || []).filter(function (row) { return /ESSENTIAL_SHORTFALL$/.test(row.reason); }).length : 0;
+  }
+
+  /** The original's reference price (list or past retail) the valuation points at, or null. */
+  function referencePrice(pricing) {
+    if (!pricing || !pricing.valuation || !pricing.valuation.reference) return null;
+    return (pricing.prices || []).filter(function (price) { return price.id === pricing.valuation.reference.priceId; })[0] || null;
   }
 
   /* ---------- Session ---------- */
@@ -171,6 +370,7 @@
     ["differences", /\b(?:differ\w*|compare|comparison|versus|vs|better|worse)\b/i],
     ["why", /\b(?:why|reason|explain|successor|chosen|pick|recommend)\w*/i],
     ["confidence", /\b(?:sure|certain|accurate|accuracy|reliable|trust|verified|confiden\w*|uncertain|right)\b/i],
+    ["value", /\b(?:worth|value|valuation|msrp|how much|price range|ballpark|appraisal)\b/i],
     ["buying", /\b(?:price|cost|cheap|cheaper|stock|available|availability|buy|purchase|where|retailer|deal)\b/i]
   ]);
 
@@ -185,7 +385,8 @@
   function localAnswer(session, input) {
     const data = session.last;
     if (!data) return null;
-    const topic = TOPICS.filter(function (entry) { return entry[1].test(input); }).map(function (entry) { return entry[0]; })[0];
+    // The "value" topic exists only for research.2; a research.1 response answers these questions exactly as it always did.
+    const topic = TOPICS.filter(function (entry) { return (entry[0] !== "value" || isV2(data)) && entry[1].test(input); }).map(function (entry) { return entry[0]; })[0];
     const items = candidateOf(data);
     // A candidate named in the question ("what about the Sony?") is answered from that candidate's own details.
     const lower = String(input).toLowerCase();
@@ -199,7 +400,12 @@
         return item.name + ": " + item.why + (item.differences ? " How it differs: " + item.differences : "") + (item.concern ? " Concern: " + item.concern : "");
       });
     }
-    if (topic === "buying") {
+    if (isV2(data) && (topic === "value" || topic === "buying")) {
+      const line = valuationLine(data.pricing.valuation);
+      const cited = data.pricing.evidence.length;
+      return [line, cited ? "The sources are listed under Pricing & evidence, with the date each was seen." : null, "Check specifications, availability and price with a seller before buying."].filter(Boolean);
+    }
+    if (topic === "value" || topic === "buying") {
       return ["ItemAssist Research doesn't check prices, stock or where to buy, and none of these candidates is confirmed available. Check specifications, availability and price with a seller before buying."];
     }
     if (topic === "confidence") {
@@ -211,7 +417,9 @@
       ].filter(Boolean);
     }
     if (topic === "requirements") {
-      return data.requirements.length ? ["A replacement should match:"].concat(data.requirements.map(function (item) { return "• " + item; })) : null;
+      return data.requirements.length ? ["A replacement should match:"].concat(data.requirements.map(function (item) {
+        return typeof item === "string" ? "• " + item : "• " + item.text + " (" + label(IMPORTANCE_LABELS, item.importance, "").toLowerCase() + ")";
+      })) : null;
     }
     if (!items.length) return ["I don't have a candidate to explain yet. Add detail such as size, color or finish and I'll research again."];
     if (topic === "differences") {
@@ -251,8 +459,20 @@
       }
       const alternatives = (data.suggestions || []).length;
       if (alternatives) lines.push(alternatives === 1 ? "I also found 1 alternative to compare." : "I also found " + alternatives + " alternatives to compare.");
-      if (data.original.uncertainty) lines.push("Not sure about: " + data.original.uncertainty + ".");
-      lines.push("This is an AI estimate and hasn't been verified.");
+      // research.1 keeps its original punctuation; only research.2 tidies a trailing full stop.
+      if (data.original.uncertainty) lines.push("Not sure about: " + (isV2(data) ? data.original.uncertainty.replace(/[.\s]+$/, "") : data.original.uncertainty) + ".");
+      if (isV2(data)) {
+        candidateOf(data).filter(function (item) { return item.modelStatus === "UNVERIFIED_MODEL"; }).forEach(function (item) {
+          lines.push("Exact model identity for " + item.name + " has not been independently confirmed, so treat that model number as unconfirmed.");
+        });
+        const valueLine = valuationLine(data.pricing.valuation);
+        if (valueLine) lines.push(valueLine);
+        const left = shortfallCount(data.pricing.valuation);
+        if (left) lines.push(left === 1 ? "I left 1 candidate out of the value range because it falls short of an essential requirement." : "I left " + left + " candidates out of the value range because they fall short of an essential requirement.");
+        lines.push("Candidates are suggestions, not confirmed equivalents.");
+      } else {
+        lines.push("This is an AI estimate and hasn't been verified.");
+      }
     }
     const remaining = quota && Number.isFinite(quota.remaining) && Number.isFinite(quota.limit) ? quota : null;
     return {
@@ -271,10 +491,17 @@
 
   /** A research response is usable only if it has the shape the page renders; anything else is an engine error. */
   function isResearchResponse(body) {
-    return Boolean(body) && typeof body === "object" && body.contractVersion === "research.1" && body.kind === "ITEMASSIST_RESEARCH"
+    const common = Boolean(body) && typeof body === "object" && body.kind === "ITEMASSIST_RESEARCH"
       && ["OK", "PARTIAL", "GUIDANCE_ONLY", "UNAVAILABLE"].indexOf(body.status) !== -1
       && Boolean(body.original) && typeof body.original === "object" && Array.isArray(body.requirements) && Array.isArray(body.suggestions)
       && Array.isArray(body.clarify) && Array.isArray(body.warnings) && Boolean(body.meta) && typeof body.disclosure === "string";
+    if (!common) return false;
+    if (body.contractVersion === "research.1") return true;
+    // research.2 also carries the pricing block the report renders; without it the response is not usable.
+    const pricing = body.pricing;
+    return body.contractVersion === "research.2" && Boolean(pricing) && typeof pricing === "object" && Boolean(pricing.valuation) && typeof pricing.valuation === "object"
+      && Array.isArray(pricing.prices) && Array.isArray(pricing.evidence) && Array.isArray(pricing.rejections) && Boolean(pricing.tier)
+      && body.requirements.every(function (item) { return Boolean(item) && typeof item === "object" && typeof item.text === "string"; });
   }
 
   /* ---------- Anonymous visitor ID ---------- */
@@ -311,10 +538,17 @@
 
   const api = {
     MAX_QUERY_CHARS: MAX_QUERY_CHARS, VISITOR_KEY: VISITOR_KEY, VISITOR_PATTERN: VISITOR_PATTERN,
-    SUMMARY_TITLE: SUMMARY_TITLE, SUMMARY_NOTE: SUMMARY_NOTE, DEMO_LABEL: DEMO_LABEL, GREETING: GREETING, PLACEHOLDER: PLACEHOLDER, FINEPRINT: FINEPRINT, ASK_WHICH: ASK_WHICH, FALLBACK_HELP: FALLBACK_HELP, TOO_LONG: TOO_LONG, STARTING_FRESH: STARTING_FRESH,
+    SUMMARY_TITLE: SUMMARY_TITLE, SUMMARY_NOTE: SUMMARY_NOTE, DEMO_LABEL: DEMO_LABEL, GREETING: GREETING, PLACEHOLDER: PLACEHOLDER, FINEPRINT: FINEPRINT, FINEPRINT_V2: FINEPRINT_V2, ASK_WHICH: ASK_WHICH, FALLBACK_HELP: FALLBACK_HELP, TOO_LONG: TOO_LONG, STARTING_FRESH: STARTING_FRESH,
     ERROR_MESSAGES: ERROR_MESSAGES, errorMessage: errorMessage, offersClassic: offersClassic,
     initialSession: initialSession, classify: classify, composeQuery: composeQuery, adopt: adopt, localAnswer: localAnswer,
-    reply: reply, categoryLabel: categoryLabel, isResearchResponse: isResearchResponse, createVisitorId: createVisitorId, modelCodes: modelCodes
+    reply: reply, categoryLabel: categoryLabel, isResearchResponse: isResearchResponse, createVisitorId: createVisitorId, modelCodes: modelCodes,
+    isV2: isV2, SUMMARY_NOTE_V2: SUMMARY_NOTE_V2, DEMO_PRICE_NOTE: DEMO_PRICE_NOTE, label: label, noteText: noteText, formatMoney: formatMoney, formatRange: formatRange, formatDay: formatDay,
+    valuationLine: valuationLine, shortfallCount: shortfallCount, referencePrice: referencePrice, priceRole: priceRole, pricesByRole: pricesByRole,
+    PRICE_ROLE_LABELS: PRICE_ROLE_LABELS, PRICE_ROLE_REASONS: PRICE_ROLE_REASONS,
+    PRICE_KIND_LABELS: PRICE_KIND_LABELS, VERIFICATION_LABELS: VERIFICATION_LABELS, DATE_LABELS: DATE_LABELS, METHOD_LABELS: METHOD_LABELS, TIER_LABELS: TIER_LABELS,
+    TIER_BASIS_LABELS: TIER_BASIS_LABELS, IMPORTANCE_LABELS: IMPORTANCE_LABELS, ORIGIN_LABELS: ORIGIN_LABELS, COMPARISON_LABELS: COMPARISON_LABELS, BASIS_LABELS: BASIS_LABELS,
+    MODEL_STATUS_LABELS: MODEL_STATUS_LABELS, SOURCE_CLASS_LABELS: SOURCE_CLASS_LABELS, MODEL_RELATION_LABELS: MODEL_RELATION_LABELS, EXCLUSION_LABELS: EXCLUSION_LABELS,
+    REJECTION_REASON_LABELS: REJECTION_REASON_LABELS, REJECTION_ACTION_LABELS: REJECTION_ACTION_LABELS, CANDIDATE_LABELS: CANDIDATE_LABELS, NOTE_TEXT: NOTE_TEXT
   };
   if (typeof module === "object" && module.exports) module.exports = api;
   else root.RFResearch = api;
