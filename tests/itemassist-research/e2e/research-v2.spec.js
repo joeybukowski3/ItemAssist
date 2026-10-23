@@ -2,7 +2,7 @@
 // mocked /api/itemassist-research response built by projecting a golden engine response through the real proxy projection: no proxy,
 // engine or provider is contacted. Uses the analytics-blocking `test` from the replacement-finder helpers.
 const { test, expect, prepare, isNarrowViewport, expectNoHorizontalOverflow, PAGE } = require("../../replacement-finder/e2e/helpers.js");
-const { researchResponse, research2Response } = require("../fixtures/research.js");
+const { researchResponse, research2Response, research2LiveResponse } = require("../fixtures/research.js");
 
 const settle = (seen) => { expect(seen.consoleErrors).toEqual([]); expect(seen.pageErrors).toEqual([]); expect(seen.analytics).toEqual([]); };
 const research = (reply) => ({ research: { reply } });
@@ -64,11 +64,11 @@ test("Overview: one confirmed price gives a range with its method, date and cave
   await expect(card).toContainText("Prices as of Oct 21, 2026");
   await expect(card).toContainText("Market tier: Premium. Based on the original's reported price.");
   await expect(card.locator("h3")).toHaveText("Replacement price anchor");
-  await expect(card).toContainText("One confirmed price is a documented price anchor for one model, not proof of a unique fair value.");
-  await expect(card).toContainText("It is a price anchor for one model, not a fair-value appraisal.");
+  await expect(card).toContainText("One confirmed price anchors one model. It is not a range.");
+  await expect(card).not.toContainText(/appraisal|fair value/i);
   await expect(card).toContainText("The original's list price is context only. It does not set the replacement range.");
   await expect(card).toContainText("Alternative 2 is left out: it falls short of an essential requirement.");
-  await expect(card).toContainText("This is a research range, not an appraisal or a guaranteed value.");
+  await expect(card).toContainText("Estimates and listing prices can differ from what a seller charges.");
   await expect(overview).toContainText("Closest successor to consider");
   await expect(overview.locator(".rf-lead")).toContainText("Model named on a cited seller or maker page");
   await expect(product(page).locator(".rf-rs-banner")).toContainText("A price is called confirmed only when it comes from the cited source on the date shown");
@@ -82,7 +82,8 @@ test("Overview: unconfirmed listings are provisional, amber, and never styled as
   await expect(card.locator(".rf-rs-range")).toHaveText("$1,199 to $1,399");
   await expect(card).toContainText("Unconfirmed retailer listings");
   await expect(card).toContainText("not confirmed on the product page");
-  await expect(card).toContainText("Listings can differ from the product page, so treat these figures as provisional.");
+  await expect(card).toContainText("These are listing prices, not confirmed on the product page.");
+  await expect(card).not.toContainText("Listing prices can differ from the seller's page.");
   await expect(card.locator(".rf-pill--ok")).toHaveCount(0);
   await expect(card).not.toContainText(/cited seller pages|One confirmed/);
   settle(seen);
@@ -159,6 +160,57 @@ test("Original product: with no price history it says so rather than inventing o
   const panel = await open(page, "original");
   await expect(panel).toContainText("Market tier: Not determined");
   await expect(panel).toContainText("No list or past retail price is included in this research for the original");
+  settle(seen);
+});
+
+// ---- a live answer (no demo marker) through the real projection with the server's live switch on ----------------------------------------------
+
+async function runLive(page, scenario, change) {
+  const seen = await prepare(page, research(() => ok(research2LiveResponse(scenario, change))));
+  await page.goto(PAGE);
+  await expect(page.locator('[data-action="research-new"]')).toBeVisible();
+  await send(page, "test item");
+  await expect(page.locator("#rf-product-name")).toBeVisible();
+  return seen;
+}
+
+test("Live answer: listing prices are labelled as listings, never styled as confirmed, and carry no demo label", async ({ page }) => {
+  const seen = await runLive(page, "tv-premium-oled");
+  const card = product(page).locator("#rf-rpanel-overview .rf-rs-value");
+  await expect(card).toHaveClass(/rf-rs-value--estimate/);
+  await expect(card.locator(".rf-rs-range")).toHaveText("$1,199 to $1,399");
+  await expect(card).toContainText("These are listing prices, not confirmed on the product page.");
+  await expect(card).not.toContainText(/appraisal|fair value|guaranteed/i);
+  await expect(card.locator(".rf-pill--ok")).toHaveCount(0);
+  await expect(page.locator(".rf-rs-demo-note")).toHaveCount(0);
+  await expect(page.getByText("Demo research data")).toHaveCount(0);
+  const pricing = await open(page, "pricing");
+  await expect(pricing).toContainText("A listing's source links to the seller's site, not to a product page.");
+  await expect(pricing.locator(".rf-pill--ok")).toHaveCount(0);
+  await expect(pricing).not.toContainText("Shown on the cited source page");
+  settle(seen);
+});
+
+test("Live answer: MSRP and past retail stay distinct, and a spread of dated sources is described once and shown in full", async ({ page }) => {
+  const seen = await runLive(page, "tv-premium-oled", (body) => {
+    body.pricing.prices.push({ id: "p5", kind: "HISTORICAL_RETAIL", subject: "ORIGINAL", candidate: null, model: null, amount: { currency: "USD", low: 2299, high: 2299 }, asOf: "2025-05-14", asOfBasis: "PUBLISHED", verification: "SEARCH_SNIPPET", evidenceId: "e1" });
+  });
+  const panel = await open(page, "original");
+  await expect(panel.locator(".rf-rs-price")).toHaveCount(2);
+  await expect(panel).toContainText("Original list price (MSRP)");
+  await expect(panel).toContainText("Past retail price");
+  await expect(panel).toContainText("Dated sources put the original at $1,999 to $2,299 when new. They differ, so each is shown.");
+  await expect(panel.locator(".rf-pill--ok")).toHaveCount(0);
+  settle(seen);
+});
+
+test("Live answer: with no dated price the original gets a labelled AI estimate, not a price presented as found", async ({ page }) => {
+  const seen = await runLive(page, "ambiguous-model");
+  const panel = await open(page, "original");
+  await expect(panel).toContainText("No list or past retail price is included in this research for the original");
+  await expect(panel).toContainText("No dated price is included. An AI estimate puts the original at $400 to $1,500 when new.");
+  await expect(panel.locator(".rf-rs-price")).toContainText("AI estimate");
+  await expect(panel.locator(".rf-rs-price")).not.toContainText(/Original list price|Past retail price/);
   settle(seen);
 });
 

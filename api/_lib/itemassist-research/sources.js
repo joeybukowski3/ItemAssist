@@ -38,6 +38,14 @@ const REGISTRY = Object.freeze([
   ["appliancesconnection.com", "RETAILER", "Appliances Connection"],
   ["target.com", "RETAILER", "Target"],
   ["walmart.com", "RETAILER", "Walmart"],
+  ["bhphotovideo.com", "RETAILER", "B&H"],
+  ["pcrichard.com", "RETAILER", "P.C. Richard & Son"],
+  ["newegg.com", "RETAILER", "Newegg"],
+  ["microcenter.com", "RETAILER", "Micro Center"],
+  ["electronicexpress.com", "RETAILER", "Electronic Express"],
+  ["yaleappliance.com", "RETAILER", "Yale Appliance"],
+  ["brandsmartusa.com", "RETAILER", "BrandsMart USA"],
+  ["bjs.com", "RETAILER", "BJ’s Wholesale Club"],
   ["rtings.com", "TECH_DATABASE", "RTINGS"],
   ["displayspecifications.com", "TECH_DATABASE", "DisplaySpecifications"],
   ["tftcentral.co.uk", "TECH_DATABASE", "TFTCentral"],
@@ -51,6 +59,11 @@ const REGISTRY = Object.freeze([
   ["consumerreports.org", "REVIEW", "Consumer Reports"],
   ["reviewed.com", "REVIEW", "Reviewed"],
   ["digitaltrends.com", "REVIEW", "Digital Trends"],
+  ["engadget.com", "REVIEW", "Engadget"],
+  ["zdnet.com", "REVIEW", "ZDNET"],
+  ["forbes.com", "REVIEW", "Forbes"],
+  ["residentialsystems.com", "REVIEW", "Residential Systems"],
+  ["theshortcut.com", "REVIEW", "The Shortcut"],
   ["amazon.com", "MARKETPLACE", "Amazon"],
   ["ebay.com", "MARKETPLACE", "eBay"],
   ["aliexpress.com", "MARKETPLACE", "AliExpress"],
@@ -58,11 +71,12 @@ const REGISTRY = Object.freeze([
   ["offerup.com", "MARKETPLACE", "OfferUp"],
 ]);
 const STOREFRONT_LABELS = Object.freeze(["shop","us","m","products"]);
+const EXACT_HOST_ONLY = Object.freeze(["brandsmartusa.com","bjs.com"]);
 // END GENERATED REGISTRY
 
 const MAX_URL_CHARS = 300;
 // Only the registered domain and its own storefront hosts count: a marketplace, community, seller or forum subdomain can carry third-party content.
-const hostMatches = (host, domain) => host === domain || STOREFRONT_LABELS.some((label) => host === label + "." + domain);
+const hostMatches = (host, domain) => host === domain || (!EXACT_HOST_ONLY.includes(domain) && STOREFRONT_LABELS.some((label) => host === label + "." + domain));
 const bareHost = (host) => String(host || "").toLowerCase().replace(/^www\./, "");
 
 /** Registry entry for a host, or null. */

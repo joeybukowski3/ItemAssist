@@ -42,7 +42,7 @@ test("a confirmed price is worded as confirmed only for confirmed methods", () =
 });
 
 test("the valuation line names the range, the date it applies to, and says nothing without evidence", () => {
-  assert.equal(RS.valuationLine(scenario("fridge-constraints").pricing.valuation), "One confirmed current new-retail price: $2,399, as of Oct 21, 2026. It is a price anchor for one model, not a fair-value appraisal.");
+  assert.equal(RS.valuationLine(scenario("fridge-constraints").pricing.valuation), "One confirmed current new-retail price: $2,399, as of Oct 21, 2026.");
   assert.match(RS.valuationLine(scenario("tv-strong-retail").pricing.valuation), /cited seller pages: \$1,499 to \$1,649, as of Oct 21, 2026/);
   assert.equal(RS.valuationLine(scenario("insufficient").pricing.valuation), "There isn't enough evidence to estimate a value yet.");
   const noRange = { ...scenario("tv-strong-retail").pricing.valuation, range: null };
@@ -59,6 +59,22 @@ test("a historical price is described as context, never as today's price", () =>
   assert.match(RS.noteText({ code: "MSRP_CONTEXT_ONLY" }), /context only/);
   assert.equal(RS.label(RS.DATE_LABELS, "PUBLISHED"), "Published");
   assert.equal(RS.label(RS.DATE_LABELS, "UNKNOWN"), "Date not stated");
+});
+
+test("the original's price history keeps every dated source (list price first, then by date), keeps an AI estimate apart, and describes a spread in one sentence", () => {
+  const price = (id, kind, low, high, asOf, subject = "ORIGINAL") => ({ id, kind, subject, candidate: null, amount: { currency: "USD", low, high }, asOf });
+  const prices = [price("p3", "HISTORICAL_RETAIL", 3299, 3299, "2025-05-14"), price("p1", "HISTORICAL_RETAIL", 2600, 2600, "2023-04-11"), price("p2", "MSRP", 2699, 2699, "2023-03-01"),
+    price("p4", "AI_ESTIMATE", 2000, 3000, null), price("p5", "CURRENT_RETAIL_NEW", 1099, 1099, "2026-10-23", "REPLACEMENT")];
+  const history = RS.originalPrices({ prices });
+  assert.deepEqual(history.sourced.map((item) => item.id), ["p2", "p1", "p3"]);
+  assert.equal(history.estimate.id, "p4");
+  assert.equal(RS.historySummary({ prices }), "Dated sources put the original at $2,600 to $3,299 when new. They differ, so each is shown.");
+  assert.equal(RS.historySummary({ prices: [price("p1", "MSRP", 1899, 1899, "2023-02-28"), price("p2", "HISTORICAL_RETAIL", 1899, 1899, "2023-03-02")] }), "Dated sources agree on $1,899 for the original when new.");
+  assert.equal(RS.historySummary({ prices: [price("p1", "MSRP", 1899, 1899, "2023-02-28")] }), null, "one sourced price needs no summary");
+  assert.equal(RS.historySummary({ prices: [price("p4", "AI_ESTIMATE", 2000, 3000, null)] }), "No dated price is included. An AI estimate puts the original at $2,000 to $3,000 when new.");
+  assert.equal(RS.historySummary({ prices: [price("p5", "CURRENT_RETAIL_NEW", 1099, 1099, "2026-10-23", "REPLACEMENT")] }), null);
+  assert.deepEqual(RS.originalPrices(null), { sourced: [], estimate: null });
+  assert.doesNotMatch([RS.noteText({ code: "NOT_AN_APPRAISAL" }), RS.noteText({ code: "ONE_COMPARABLE" }), RS.noteText({ code: "LISTINGS_NOT_CONFIRMED" }), RS.valuationLine({ method: "PROVISIONAL_LISTINGS", range: { low: 999, high: 1449 }, asOf: "2026-10-23" })].join(" "), /appraisal|fair value|guaranteed|provisional/i, "no formal-appraisal wording");
 });
 
 test("every code the proxy can send has fixed wording: no code falls through to blank or to the response's own words", () => {

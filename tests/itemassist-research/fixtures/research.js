@@ -62,6 +62,23 @@ function research2Response(scenario, overrides = {}) {
   return { ...projected, ...overrides };
 }
 
+/**
+ * The same, as a LIVE answer: the engine body without the demo marker, projected with the server's live switch on. `change` edits the
+ * engine body first (for example to give the original dated prices). The result never carries `meta.fixture`.
+ */
+function research2LiveResponse(scenario, change = () => {}) {
+  const { projectResearch } = require("../../../api/_lib/itemassist-research/projection.js");
+  const golden = JSON.parse(fs.readFileSync(path.join(__dirname, "research2-golden.json"), "utf8"));
+  const entry = golden.scenarios[scenario];
+  if (!entry) throw new Error("unknown research.2 scenario: " + scenario);
+  const body = JSON.parse(JSON.stringify(entry.engine));
+  delete body.meta.fixture;
+  change(body);
+  const projected = projectResearch(body, { requestId: "proxy-req-live", elapsedMs: 900, quota: { limit: 5, remaining: 4, charged: true }, allowFixture: false, allowLive: true });
+  if (!projected) throw new Error("the live projection refused the " + scenario + " body");
+  return projected;
+}
+
 const RESEARCH2_SCENARIOS = Object.freeze(["tv-premium-oled", "tv-strong-retail", "fridge-constraints", "washer-dimensions", "ambiguous-model", "sparse-estimate", "unsupported-claims", "insufficient"]);
 
-module.exports = { researchResponse, researchGuidance, researchError, research2Response, RESEARCH2_SCENARIOS, DISCLOSURE };
+module.exports = { researchResponse, researchGuidance, researchError, research2Response, research2LiveResponse, RESEARCH2_SCENARIOS, DISCLOSURE };

@@ -4,8 +4,10 @@ const { safeSourceUrl, SOURCE_CLASSES, FIRST_PARTY_CLASSES } = require("./source
  * research.2 projection for ItemAssist Research. The engine already validates its own response; this layer re-projects it field by field
  * and applies the same trust rules again, independently, so the browser never receives a price, citation or valuation the page could not
  * stand behind. It is never more permissive than the engine's builder:
- *   - research.2 is accepted only from a demo fixture on a Preview (`allowFixture` and the engine's `meta.fixture`). No live path emits it, and
- *     until retrieval code can establish a page confirmation itself, nothing live may carry one.
+ *   - research.2 is accepted from a demo fixture on a Preview (`allowFixture` and the engine's `meta.fixture`), or, only when the server has
+ *     switched live research.2 on (`allowLive`), from a body with no fixture marker. Until retrieval code can establish a page confirmation
+ *     itself, nothing live may carry one: on the live path every page-level confirmation is lowered to a listing or snippet, whatever the
+ *     engine claims.
  *   - A source link must be an https URL on a registered host (the domain or its storefront hosts). The source name, class and domain are
  *     taken from the registry, never the payload.
  *   - A price needs matching evidence (right subject, a source class allowed for that kind of price, not about a different model), a real
@@ -228,7 +230,7 @@ function projectAmount(raw, kind) {
   return { currency: "USD", low, high };
 }
 
-function projectPrices(raw, { evidence, keys, names, referenceDate }) {
+function projectPrices(raw, { evidence, keys, names, referenceDate, trustPageVerification = false }) {
   const byEvidence = new Map(evidence.map((entry) => [entry.id, entry]));
   const items = [];
   const seen = new Set();
@@ -261,7 +263,7 @@ function projectPrices(raw, { evidence, keys, names, referenceDate }) {
       if (exactName && !SAME_MODEL_RELATIONS.includes(source.modelRelation)) continue;
       if (kind === "CURRENT_RETAIL_NEW" && (asOf === null || asOfBasis !== "OBSERVED" || daysBetween(asOf, referenceDate) > CURRENT_PRICE_MAX_AGE_DAYS)) continue;
       // A page-level confirmation needs a non-marketplace source about the exact model; anything weaker is only a listing or a snippet.
-      if (level === "VERIFIED_PAGE" && !(SAME_MODEL_RELATIONS.includes(source.modelRelation) && source.sourceClass !== "MARKETPLACE")) {
+      if (level === "VERIFIED_PAGE" && !(trustPageVerification && SAME_MODEL_RELATIONS.includes(source.modelRelation) && source.sourceClass !== "MARKETPLACE")) {
         level = kind === "CURRENT_RETAIL_NEW" || kind === "SECONDARY_REPORT" ? "SEARCH_LISTING" : "SEARCH_SNIPPET";
       }
       evidenceId = source.id;
@@ -285,7 +287,7 @@ function projectTier(raw, prices) {
 /** True when `source` (cited evidence, or undefined) is a confirming source about candidate `key`'s own model. */
 const confirms = (source, key) => Boolean(source) && CONFIRMING_CLASSES.includes(source.sourceClass) && source.subject === key && SAME_MODEL_RELATIONS.includes(source.modelRelation);
 
-function projectComparison(raw, { key, requirementIds, evidenceById }) {
+function projectComparison(raw, { key, requirementIds, evidenceById, trustConfirmation = false }) {
   const rows = [];
   const seen = new Set();
   for (const row of (Array.isArray(raw) ? raw : []).slice(0, MAX_REQUIREMENTS * 2)) {
@@ -294,7 +296,8 @@ function projectComparison(raw, { key, requirementIds, evidenceById }) {
     if (!status) continue;
     const source = typeof row.evidenceId === "string" ? evidenceById.get(row.evidenceId) : null;
     // CONFIRMED needs evidence from a confirming source class about this candidate's own model (the same model or a short variant of it); otherwise it is an estimate.
-    const confirmed = row.basis === "CONFIRMED" && confirms(source, key);
+    // Like a page-level price confirmation it is also only possible on a demo fixture: nothing live can establish it yet, whatever the engine claims.
+    const confirmed = trustConfirmation === true && row.basis === "CONFIRMED" && confirms(source, key);
     seen.add(row.requirementId);
     rows.push({ requirementId: row.requirementId, status, basis: confirmed ? "CONFIRMED" : "AI_ESTIMATE", evidenceId: confirmed ? source.id : null });
   }
@@ -475,12 +478,15 @@ function withDemotions(rows, demoted) {
 /**
  * @returns the public research.2 response, or null when the engine body is not a valid research.2 contract from an allowed demo fixture
  */
-function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = false }, helpers) {
+function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = false, allowLive = false }, helpers) {
   const { safeText, safeList, MAX_DISCLOSURE, MAX_ELAPSED_MS, FALLBACK_DISCLOSURE, clean } = helpers;
   if (!isObject(body) || body.contractVersion !== CONTRACT_VERSION || body.kind !== KIND) return null;
   const meta = isObject(body.meta) ? body.meta : {};
-  // research.2 is a Preview demo for now: no live path emits it, so anything else (including a fixture marker without `allowFixture`) is refused.
-  if (allowFixture !== true || meta.fixture !== true) return null;
+  // A demo fixture needs both the Preview and the engine's marker. A live body needs the server switch and carries no marker at all: a
+  // fixture marker without `allowFixture` is refused, and a live body never becomes a demo.
+  const fixture = allowFixture === true && meta.fixture === true;
+  const live = allowLive === true && !Object.prototype.hasOwnProperty.call(meta, "fixture");
+  if (!fixture && !live) return null;
   const status = oneOf(body.status, STATUSES);
   const answerSource = oneOf(meta.answerSource, ANSWER_SOURCES);
   if (!status || !answerSource || !isObject(body.original) || !isObject(body.pricing)) return null;
@@ -515,10 +521,10 @@ function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = fa
 
   const evidenceAll = projectEvidence(body.pricing.evidence, keys);
   const names = Object.fromEntries(drafts.map((entry) => [entry.key, entry.name]));
-  const prices = projectPrices(body.pricing.prices, { evidence: evidenceAll, keys, names, referenceDate });
+  const prices = projectPrices(body.pricing.prices, { evidence: evidenceAll, keys, names, referenceDate, trustPageVerification: fixture });
   const evidenceById = new Map(evidenceAll.map((entry) => [entry.id, entry]));
   const candidates = drafts.map((entry) => {
-    const comparison = projectComparison(entry.raw.comparison, { key: entry.key, requirementIds, evidenceById });
+    const comparison = projectComparison(entry.raw.comparison, { key: entry.key, requirementIds, evidenceById, trustConfirmation: fixture });
     const modelStatus = statusFor(oneOf(entry.raw.modelStatus, MODEL_STATUSES), entry.name, supportFor(entry.key, prices, comparison, evidenceById));
     return { key: entry.key, name: entry.name, why: entry.why, differences: entry.differences, concern: entry.concern, confidence: entry.confidence, standing: entry.standing, modelStatus, comparison };
   });
@@ -576,7 +582,7 @@ function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = fa
       elapsedMs: Math.min(MAX_ELAPSED_MS, Math.max(0, Math.round(Number(elapsedMs)) || 0)),
       cached: meta.cached === true,
       answerSource,
-      fixture: true
+      ...(fixture ? { fixture: true } : {})
     },
     quota
   };

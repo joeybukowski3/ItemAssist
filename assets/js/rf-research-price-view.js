@@ -74,8 +74,9 @@
       R.confidence(value.confidence),
       asOf ? D.pill("neutral", null, "Prices as of " + asOf) : null
     ].filter(Boolean);
-    var notes = value.notes.map(Res.noteText).filter(Boolean);
-    // One confirmed price is an observed anchor for one model, not a range and not a fair-value appraisal.
+    // The line above already says a listing price is unconfirmed; saying it again as a note only adds noise.
+    var notes = value.notes.filter(function (note) { return note.code !== "LISTINGS_NOT_CONFIRMED"; }).map(Res.noteText).filter(Boolean);
+    // One confirmed price is an observed anchor for one model, not a range.
     var heading = value.method === "VERIFIED_SINGLE" ? "Replacement price anchor" : "Replacement value range";
     return h("section", { class: "rf-rs-value rf-rs-value--" + (value.verified ? "confirmed" : "estimate"), attrs: { "aria-labelledby": headingId } }, [
       D.heading("h3", headingId, heading, "rf-eyebrow rf-rs-value-kicker"),
@@ -118,14 +119,20 @@
   /** Original product: market tier and the historical price context. Historical prices are context, never today's retail price. */
   function originalPriceBlock(data) {
     var tier = data.pricing.tier;
-    var reference = Res.referencePrice(data.pricing);
+    var history = Res.originalPrices(data.pricing);
+    var summary = Res.historySummary(data.pricing);
     var children = [];
     children.push(h("p", { class: "rf-rs-tier" }, [h("strong", { text: "Market tier: " }), tier.level === "UNKNOWN" ? "Not determined. The original could not be placed in a tier." : label(Res.TIER_LABELS, tier.level) + ". " + label(Res.TIER_BASIS_LABELS, tier.basis) + "."]));
-    if (reference) {
-      children.push(h("ul", { class: "rf-rs-prices" }, [priceCard(data, reference)]));
+    if (history.sourced.length) {
+      if (summary) children.push(h("p", { class: "rf-rs-value-line", text: summary }));
+      children.push(h("ul", { class: "rf-rs-prices" }, history.sourced.map(function (price) { return priceCard(data, price); })));
       children.push(h("p", { class: "rf-muted", text: "A past or list price is context for the original's market tier. It is not today's retail price and it does not set the replacement range." }));
     } else {
-      children.push(h("p", { class: "rf-muted", text: "No list or past retail price is included in this research for the original, so there is no price history to show." }));
+      children.push(h("p", { class: "rf-muted", text: "No list or past retail price is included in this research for the original, so there is no sourced price history to show." }));
+      if (history.estimate) {
+        if (summary) children.push(h("p", { class: "rf-rs-value-line", text: summary }));
+        children.push(h("ul", { class: "rf-rs-prices" }, [priceCard(data, history.estimate)]));
+      }
     }
     return block("rf-orig-price-h", "Market tier and price history", children);
   }
@@ -238,7 +245,7 @@
           h("span", { class: "rf-rs-source-meta", text: label(Res.SOURCE_CLASS_LABELS, entry.sourceClass) + " · " + (entry.subject === "ORIGINAL" ? SUBJECT_ORIGINAL : label(Res.CANDIDATE_LABELS, entry.subject)) + " · " + seen + " · " + label(Res.MODEL_RELATION_LABELS, entry.modelRelation) })
         ]);
       })) : h("p", { class: "rf-muted", text: "No sources were cited." }),
-      h("p", { class: "rf-muted", text: "Links open the source in a new tab. A link shows where a figure came from; confirm availability and price with the seller." })
+      h("p", { class: "rf-muted", text: "Links open the source in a new tab. A link shows where a figure came from; confirm availability and price with the seller." + (pricing.evidence.some(function (entry) { return /^https:\/\/[^/]+\/$/.test(entry.sourceUrl); }) ? " A listing's source links to the seller's site, not to a product page." : "") })
     ]));
     var rejected = rejectionLines(data);
     if (rejected.length) children.push(block("rf-rejected-h", "Set aside", [list(rejected), h("p", { class: "rf-muted", text: "These were removed before anything was shown, so they do not affect the range." })]));

@@ -30,8 +30,8 @@ test("every golden scenario the engine builds is accepted unchanged", () => {
   }
 });
 
-test("the source registry copy holds every host the golden evidence cites, and 45 hosts", () => {
-  assert.equal(REGISTRY.length, 45);
+test("the source registry copy holds every host the golden evidence cites, and 58 hosts", () => {
+  assert.equal(REGISTRY.length, 58);
   const hosts = Object.values(GOLDEN.scenarios).flatMap((entry) => entry.engine.pricing.evidence.map((item) => item.sourceDomain));
   for (const host of hosts) assert.ok(REGISTRY.some(([domain]) => domain === host), host);
 });
@@ -402,6 +402,79 @@ test("a forged research.2 body is projected, not relayed, and a body that cannot
   assert.equal(failed.json.status, "ERROR");
   assert.equal(failed.json.quota?.charged ?? false, false);
   assert.equal(JSON.stringify(projectError("ENGINE_ERROR", "r")).includes("research.2"), false, "errors keep the stable research.1 error envelope");
+});
+
+/* ---------- Live research.2: no fixture marker, only when the server switched it on, never page-confirmed ---------- */
+
+const LIVE = { ...CONTEXT, allowFixture: false, allowLive: true };
+const live = (id, change = () => {}) => mutate(id, (body) => { delete body.meta.fixture; change(body); });
+const LIVE_ENV = Object.freeze({ ...ENV, ITEMASSIST_RESEARCH_LIVE_CONTRACT: "research.2" });
+
+test("live research.2 is accepted only with the server switch on and no fixture marker, carries no demo indicator, and equals the engine's typed content", () => {
+  const out = project(live("tv-premium-oled"), LIVE);
+  assert.ok(out);
+  assert.equal(Object.hasOwn(out.meta, "fixture"), false, "a live answer is never labelled a demo");
+  assert.equal(canon(without(out)), canon(without(engine("tv-premium-oled"))), "this scenario carries no page confirmation, so nothing changes");
+  assert.equal(project(live("tv-premium-oled")), null, "switch off");
+  for (const flag of ["true", 1, "research.2", undefined, null]) assert.equal(project(live("tv-premium-oled"), { ...LIVE, allowLive: flag }), null, String(flag));
+  for (const marker of [true, false, "true", null]) assert.equal(project(mutate("tv-premium-oled", (body) => { body.meta.fixture = marker; }), LIVE), null, `a fixture marker (${marker}) is never accepted as live`);
+  assert.equal(project(live("tv-premium-oled", (body) => { delete body.meta; }), LIVE), null);
+});
+
+test("on the live path no price is page-confirmed, whatever the engine claims; the same body as a fixture keeps its confirmations", () => {
+  assert.ok(project(engine("tv-strong-retail")).pricing.prices.some((price) => price.verification === "VERIFIED_PAGE"));
+  const out = project(live("tv-strong-retail"), LIVE);
+  assert.ok(out);
+  assert.equal(out.pricing.prices.some((price) => price.verification === "VERIFIED_PAGE"), false);
+  assert.equal(out.pricing.valuation.verified, false);
+  assert.notEqual(out.pricing.valuation.method, "VERIFIED_MULTI");
+});
+
+test("on the live path no comparison row is CONFIRMED and no model is VERIFIED_LISTING, whatever the engine claims; a demo fixture keeps both", () => {
+  const rowsOf = (out) => [out.successor, ...out.suggestions].filter(Boolean).flatMap((entry) => entry.comparison);
+  const demo = project(engine("tv-strong-retail"));
+  assert.ok(rowsOf(demo).some((row) => row.basis === "CONFIRMED"), "precondition: the fixture carries confirmed rows");
+  assert.equal(demo.successor.modelStatus, "VERIFIED_LISTING");
+  const out = project(live("tv-strong-retail"), LIVE);
+  assert.ok(out);
+  assert.equal(rowsOf(out).some((row) => row.basis === "CONFIRMED" || row.evidenceId !== null), false);
+  assert.notEqual(out.successor.modelStatus, "VERIFIED_LISTING");
+  // A forged row on an otherwise honest live body: exact-model evidence in hand, still not a confirmation.
+  const forged = project(live("tv-premium-oled", (body) => {
+    body.pricing.evidence[1].subjectModel = "ABC123X"; body.pricing.evidence[1].expectedModel = "ABC123X"; body.pricing.evidence[1].modelRelation = "EXACT";
+    body.successor.comparison[0] = { requirementId: body.successor.comparison[0].requirementId, status: "MEETS", basis: "CONFIRMED", evidenceId: "e2" };
+  }), LIVE);
+  assert.ok(forged);
+  assert.equal(rowsOf(forged).some((row) => row.basis === "CONFIRMED"), false);
+  assert.notEqual(forged.successor.modelStatus, "VERIFIED_LISTING");
+});
+
+test("source classification: BrandsMart USA and BJ's are retailers on their exact host only, and the proxy copy agrees with the engine's", () => {
+  const { classifyHost, safeSourceUrl } = require("../../../api/_lib/itemassist-research/sources.js");
+  for (const host of ["bjs.com", "www.bjs.com", "brandsmartusa.com", "www.brandsmartusa.com"]) assert.equal(classifyHost(host)?.sourceClass, "RETAILER", host);
+  for (const host of ["shop.bjs.com", "us.bjs.com", "m.bjs.com", "products.bjs.com", "marketplace.bjs.com", "bjs.com.evil.example", "evilbjs.com",
+    "shop.brandsmartusa.com", "marketplace.brandsmartusa.com", "brandsmartusa.com.evil.example", "evilbrandsmartusa.com"]) assert.equal(classifyHost(host), null, host);
+  assert.equal(safeSourceUrl("https://shop.bjs.com/"), null);
+  assert.equal(safeSourceUrl("https://www.bjs.com/")?.sourceName, "BJ’s Wholesale Club");
+  assert.equal(classifyHost("shop.lg.com")?.sourceClass, "MANUFACTURER", "the established storefront rule is unchanged for other hosts");
+  assert.equal(classifyHost("marketplace.walmart.com"), null);
+});
+
+test("the route relays a live research.2 answer when the server switch is on, and refuses the same body when it is off", async () => {
+  const on = buildFixture({ env: LIVE_ENV, fetchImpl: answering(200, live("tv-premium-oled")) });
+  const res = await invoke(on.handler, post());
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.json.contractVersion, "research.2");
+  assert.equal(res.json.pricing.valuation.method, "PROVISIONAL_LISTINGS");
+  assert.equal(Object.hasOwn(res.json.meta, "fixture"), false);
+  assert.equal(res.json.quota.charged, true);
+  const off = buildFixture({ env: ENV, fetchImpl: answering(200, live("tv-premium-oled")) });
+  const refused = await invoke(off.handler, post());
+  assert.notEqual(refused.statusCode, 200);
+  assert.equal(refused.json.status, "ERROR");
+  assert.equal(refused.json.quota?.charged ?? false, false);
+  const preview = buildFixture({ env: { ...LIVE_ENV, VERCEL_ENV: "preview" }, fetchImpl: answering(200, live("tv-premium-oled")) });
+  assert.equal(Object.hasOwn((await invoke(preview.handler, post())).json.meta, "fixture"), false, "a Preview with the switch on still labels only a marked body as a demo");
 });
 
 /* ---------- Correction pass: the proxy is never more permissive than the engine ---------- */

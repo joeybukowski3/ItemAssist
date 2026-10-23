@@ -129,9 +129,9 @@
   const plural = (count, one, many) => count + " " + (count === 1 ? one : many);
   const NOTE_TEXT = Object.freeze({
     BASED_ON_VERIFIED: (note) => "Based on " + plural(note.count, "current price", "current prices") + " shown on cited seller pages.",
-    BASED_ON_LISTINGS: (note) => "Includes " + plural(note.count, "retailer listing", "retailer listings") + " not confirmed on the product page.",
-    ONE_COMPARABLE: () => "One confirmed price is a documented price anchor for one model, not proof of a unique fair value.",
-    LISTINGS_NOT_CONFIRMED: () => "Listings can differ from the product page, so treat these figures as provisional.",
+    BASED_ON_LISTINGS: (note) => "Built from " + plural(note.count, "retailer listing", "retailer listings") + ".",
+    ONE_COMPARABLE: () => "One confirmed price anchors one model. It is not a range.",
+    LISTINGS_NOT_CONFIRMED: () => "Listing prices can differ from the seller's page.",
     TIER_ESTIMATE_BAND: (note) => "No current retail price is included in this research. The band scales the original's reported price to " + percent(note.low) + " to " + percent(note.high) + ", a broad rule for this type of item.",
     AI_ESTIMATE_ONLY: () => "No source supports this range. It is an AI estimate.",
     INSUFFICIENT: () => "There is not enough evidence to estimate a value yet.",
@@ -143,7 +143,7 @@
     EXCLUDED_SUSPECTED_SHORTFALL: (note) => CANDIDATE_LABELS[note.candidate] + " is left out: it appears to fall short of an essential requirement (an estimate).",
     EXCLUDED_NO_CURRENT_PRICE: (note) => CANDIDATE_LABELS[note.candidate] + " is not in the range: no current retail price for it is included in this research.",
     STALE_PRICES_NOT_CURRENT: (note) => plural(note.count, "older price is", "older prices are") + " included as dated. Older prices are never shown as current.",
-    NOT_AN_APPRAISAL: () => "This is a research range, not an appraisal or a guaranteed value."
+    NOT_AN_APPRAISAL: () => "Estimates and listing prices can differ from what a seller charges."
   });
 
   /** The fixed sentence for a valuation note, or null for a code this page does not know. */
@@ -202,11 +202,11 @@
       case "VERIFIED_MULTI":
         return range ? "Current new-retail prices shown on cited seller pages: " + range + (asOf ? ", as of " + asOf : "") + "." : null;
       case "VERIFIED_SINGLE":
-        return range ? "One confirmed current new-retail price: " + range + (asOf ? ", as of " + asOf : "") + ". It is a price anchor for one model, not a fair-value appraisal." : null;
+        return range ? "One confirmed current new-retail price: " + range + (asOf ? ", as of " + asOf : "") + "." : null;
       case "MIXED_VERIFIED_AND_LISTINGS":
         return range ? "Current retail prices point to " + range + (asOf ? ", as of " + asOf : "") + ". Some of those are listings not confirmed on the product page." : null;
       case "PROVISIONAL_LISTINGS":
-        return range ? "Retailer listings suggest roughly " + range + (asOf ? ", as of " + asOf : "") + ". None is confirmed on the product page, so treat it as provisional." : null;
+        return range ? "Retailer listings suggest roughly " + range + (asOf ? ", as of " + asOf : "") + ". These are listing prices, not confirmed on the product page." : null;
       case "HISTORICAL_TIER_ESTIMATE":
         return range ? "No current retail price is included in this research. Based on the original's reported price, a rough estimate is " + range + ". It is an estimate, not a price for a replacement." : null;
       case "AI_ESTIMATE_ONLY":
@@ -252,6 +252,31 @@
   /** The count of candidates left out of the value range for an essential shortfall. */
   function shortfallCount(valuation) {
     return valuation ? (valuation.excluded || []).filter(function (row) { return /ESSENTIAL_SHORTFALL$/.test(row.reason); }).length : 0;
+  }
+
+  /**
+   * The original's own prices for display: dated list and past retail prices (list price first, then by date), and an AI estimate kept apart.
+   * Conflicting sourced prices are all kept; the page shows each with its source and date.
+   */
+  function originalPrices(pricing) {
+    const own = ((pricing && pricing.prices) || []).filter(function (price) { return price.subject === "ORIGINAL"; });
+    const sourced = own.filter(function (price) { return price.kind === "MSRP" || price.kind === "HISTORICAL_RETAIL"; }).sort(function (a, b) {
+      return (a.kind === b.kind ? 0 : a.kind === "MSRP" ? -1 : 1) || String(a.asOf || "").localeCompare(String(b.asOf || "")) || a.id.localeCompare(b.id, undefined, { numeric: true });
+    });
+    return { sourced: sourced, estimate: own.filter(function (price) { return price.kind === "AI_ESTIMATE"; })[0] || null };
+  }
+
+  /** One short sentence about the original's price history when it is more than a single sourced price, else null. */
+  function historySummary(pricing) {
+    const history = originalPrices(pricing);
+    if (history.sourced.length > 1) {
+      const low = Math.min.apply(null, history.sourced.map(function (price) { return price.amount.low; }));
+      const high = Math.max.apply(null, history.sourced.map(function (price) { return price.amount.high; }));
+      return low === high ? "Dated sources agree on " + formatMoney(low) + " for the original when new."
+        : "Dated sources put the original at " + formatRange({ low: low, high: high }) + " when new. They differ, so each is shown.";
+    }
+    if (!history.sourced.length && history.estimate) return "No dated price is included. An AI estimate puts the original at " + formatRange(history.estimate.amount) + " when new.";
+    return null;
   }
 
   /** The original's reference price (list or past retail) the valuation points at, or null. */
@@ -543,7 +568,7 @@
     initialSession: initialSession, classify: classify, composeQuery: composeQuery, adopt: adopt, localAnswer: localAnswer,
     reply: reply, categoryLabel: categoryLabel, isResearchResponse: isResearchResponse, createVisitorId: createVisitorId, modelCodes: modelCodes,
     isV2: isV2, SUMMARY_NOTE_V2: SUMMARY_NOTE_V2, DEMO_PRICE_NOTE: DEMO_PRICE_NOTE, label: label, noteText: noteText, formatMoney: formatMoney, formatRange: formatRange, formatDay: formatDay,
-    valuationLine: valuationLine, shortfallCount: shortfallCount, referencePrice: referencePrice, priceRole: priceRole, pricesByRole: pricesByRole,
+    valuationLine: valuationLine, shortfallCount: shortfallCount, referencePrice: referencePrice, originalPrices: originalPrices, historySummary: historySummary, priceRole: priceRole, pricesByRole: pricesByRole,
     PRICE_ROLE_LABELS: PRICE_ROLE_LABELS, PRICE_ROLE_REASONS: PRICE_ROLE_REASONS,
     PRICE_KIND_LABELS: PRICE_KIND_LABELS, VERIFICATION_LABELS: VERIFICATION_LABELS, DATE_LABELS: DATE_LABELS, METHOD_LABELS: METHOD_LABELS, TIER_LABELS: TIER_LABELS,
     TIER_BASIS_LABELS: TIER_BASIS_LABELS, IMPORTANCE_LABELS: IMPORTANCE_LABELS, ORIGIN_LABELS: ORIGIN_LABELS, COMPARISON_LABELS: COMPARISON_LABELS, BASIS_LABELS: BASIS_LABELS,

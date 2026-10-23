@@ -82,9 +82,11 @@ function projectCandidate(item, { withStanding = false } = {}) {
 
 /**
  * @param {unknown} body  the engine's 200 body
- * @param {{requestId: string, elapsedMs: number, quota: object, allowFixture?: boolean}} context
+ * @param {{requestId: string, elapsedMs: number, quota: object, allowFixture?: boolean, allowLive?: boolean}} context
  *   `allowFixture` is true only on a Vercel Preview (the caller decides from the server environment). Only then may the engine's
  *   `meta.fixture === true` become the single fixed `meta.fixture: true` demo indicator; everywhere else it is dropped.
+ *   `allowLive` is true only when the server environment says live research.2 is switched on; it admits a research.2 body that carries no
+ *   fixture marker, with every page-level confirmation lowered (see projection-v2.js).
  * @returns the public ItemAssist Research response (research.1 or research.2), or null when the engine body is not a valid research contract
  */
 function projectResearch(body, context) {
