@@ -107,6 +107,8 @@
     AI_ESTIMATE: "An AI estimate with no source. It sets the range only when nothing better is available.",
     ORIGINAL_ESTIMATE: "An AI estimate of the original's price. No source supports it, and it never sets the replacement range.",
     NOT_COMPARABLE: "Not used for the range.",
+    OTHER_FAMILY: "A current price for a different candidate family. It is listed separately and does not set the headline range.",
+    SIZE_NOT_CONFIRMED: "A retail example whose listing does not state the screen size. It does not confirm a match and does not set the range.",
     CURRENT_COMPARABLE: "A current price for a candidate that meets every essential requirement.",
     ESTIMATE_ANCHOR: "The estimate band scales this price. No current retail price is included in this research.",
     ESTIMATE_RANGE: "An AI estimate. No source supports it."
@@ -135,7 +137,9 @@
     TIER_ESTIMATE_BAND: (note) => "No current retail price is included in this research. The band scales the original's reported price to " + percent(note.low) + " to " + percent(note.high) + ", a broad rule for this type of item.",
     AI_ESTIMATE_ONLY: () => "No source supports this range. It is an AI estimate.",
     INSUFFICIENT: () => "There is not enough evidence to estimate a value yet.",
-    MSRP_CONTEXT_ONLY: () => "The original's list price is context only. It does not set the replacement range.",
+    // A past retail price is not a list price: the sentence names the kind of price the valuation actually points at.
+    MSRP_CONTEXT_ONLY: (note, context) => "The original's " + (context && context.referenceKind === "HISTORICAL_RETAIL" ? "past retail price" : "list price") + " is context only. It does not set the replacement range.",
+    OTHER_FAMILIES_SEPARATE: (note) => (note.count === 1 ? "Prices for another candidate family are" : "Prices for " + note.count + " other candidate families are") + " listed separately. They do not set this range.",
     CURRENT_BELOW_ORIGINAL: (note) => "Current prices are about " + percent(note.ratio) + " of the original's list price.",
     ORIGINAL_DATE_UNKNOWN: () => "The date of the original's price is not stated, so a wider band is used.",
     TIER_UNKNOWN_WIDENED: () => "The market tier is not known, so the band is wider.",
@@ -146,9 +150,9 @@
     NOT_AN_APPRAISAL: () => "Estimates and listing prices can differ from what a seller charges."
   });
 
-  /** The fixed sentence for a valuation note, or null for a code this page does not know. */
-  function noteText(note) {
-    return note && Object.prototype.hasOwnProperty.call(NOTE_TEXT, note.code) ? NOTE_TEXT[note.code](note) : null;
+  /** The fixed sentence for a valuation note, or null for a code this page does not know. `context` (optional) names the kind of price the valuation points at. */
+  function noteText(note, context) {
+    return note && Object.prototype.hasOwnProperty.call(NOTE_TEXT, note.code) ? NOTE_TEXT[note.code](note, context) : null;
   }
 
   function label(table, key, fallback) {
@@ -206,6 +210,8 @@
       case "MIXED_VERIFIED_AND_LISTINGS":
         return range ? "Current retail prices point to " + range + (asOf ? ", as of " + asOf : "") + ". Some of those are listings not confirmed on the product page." : null;
       case "PROVISIONAL_LISTINGS":
+        // One qualifying listing is an anchor for one price, not a range and not a conclusion about value.
+        if (range && (valuation.comparables || []).length === 1) return "One retailer listing shows " + range + (asOf ? ", as of " + asOf : "") + ". It is a single listing price, not confirmed on the product page, and not a value range.";
         return range ? "Retailer listings suggest roughly " + range + (asOf ? ", as of " + asOf : "") + ". These are listing prices, not confirmed on the product page." : null;
       case "HISTORICAL_TIER_ESTIMATE":
         return range ? "No current retail price is included in this research. Based on the original's reported price, a rough estimate is " + range + ". It is an estimate, not a price for a replacement." : null;
@@ -224,6 +230,8 @@
   function priceRole(pricing, price) {
     const value = pricing && pricing.valuation;
     if (!value || !price) return null;
+    // A listing that states no screen size is shown as an example, whatever else is true of its candidate.
+    if (price.sizeConfirmed === false) return { role: "CONTEXT_ONLY", note: "SIZE_NOT_CONFIRMED", exclusion: null };
     if ((value.comparables || []).some(function (row) { return row.priceId === price.id; })) {
       return { role: "USED_IN_RANGE", note: price.kind === "AI_ESTIMATE" ? "ESTIMATE_RANGE" : "CURRENT_COMPARABLE", exclusion: null };
     }
@@ -233,7 +241,11 @@
     const left = price.candidate ? (value.excluded || []).filter(function (row) { return row.candidate === price.candidate; })[0] : null;
     if (left) return { role: "EXCLUDED", note: null, exclusion: left.reason };
     let note = "NOT_COMPARABLE";
-    if (price.kind === "AI_ESTIMATE") note = price.subject === "ORIGINAL" ? "ORIGINAL_ESTIMATE" : "AI_ESTIMATE";
+    // A current price for a candidate family none of the range's comparables belong to: listed apart from the headline, not discarded.
+    const otherFamily = price.kind === "CURRENT_RETAIL_NEW" && price.candidate && (value.comparables || []).length > 0
+      && !(value.comparables || []).some(function (row) { return row.candidate === price.candidate; });
+    if (otherFamily) note = "OTHER_FAMILY";
+    else if (price.kind === "AI_ESTIMATE") note = price.subject === "ORIGINAL" ? "ORIGINAL_ESTIMATE" : "AI_ESTIMATE";
     else if (price.subject === "ORIGINAL") note = "ORIGINAL_CONTEXT";
     else if (price.kind === "HISTORICAL_RETAIL") note = "DATED_PRICE";
     else if (price.kind === "SECONDARY_REPORT") note = "SECONDARY_REPORT";

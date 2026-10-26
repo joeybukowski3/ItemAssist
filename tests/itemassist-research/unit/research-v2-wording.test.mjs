@@ -61,6 +61,32 @@ test("a historical price is described as context, never as today's price", () =>
   assert.equal(RS.label(RS.DATE_LABELS, "UNKNOWN"), "Date not stated");
 });
 
+test("a past retail price is never called a list price, and another family's price is listed apart rather than hidden or blended", () => {
+  assert.match(RS.noteText({ code: "MSRP_CONTEXT_ONLY" }, { referenceKind: "MSRP" }), /^The original's list price is context only/);
+  assert.match(RS.noteText({ code: "MSRP_CONTEXT_ONLY" }, { referenceKind: "HISTORICAL_RETAIL" }), /^The original's past retail price is context only/);
+  assert.equal(RS.noteText({ code: "OTHER_FAMILIES_SEPARATE", count: 1 }), "Prices for another candidate family are listed separately. They do not set this range.");
+  assert.equal(RS.noteText({ code: "OTHER_FAMILIES_SEPARATE", count: 2 }), "Prices for 2 other candidate families are listed separately. They do not set this range.");
+  const price = (id, candidate) => ({ id, kind: "CURRENT_RETAIL_NEW", subject: "REPLACEMENT", candidate, amount: { currency: "USD", low: 1000, high: 1000 } });
+  const pricing = { prices: [price("p1", "SUCCESSOR"), price("p2", "ALT_1"), price("p3", "ALT_2")], valuation: { method: "PROVISIONAL_LISTINGS", comparables: [{ priceId: "p1", candidate: "SUCCESSOR", verification: "SEARCH_LISTING" }], excluded: [{ candidate: "ALT_2", reason: "NO_CURRENT_PRICE" }], reference: null } };
+  assert.deepEqual(RS.priceRole(pricing, pricing.prices[0]), { role: "USED_IN_RANGE", note: "CURRENT_COMPARABLE", exclusion: null });
+  assert.deepEqual(RS.priceRole(pricing, pricing.prices[1]), { role: "CONTEXT_ONLY", note: "OTHER_FAMILY", exclusion: null }, "a priced family that does not set the headline is context, with its own reason");
+  assert.equal(RS.priceRole(pricing, pricing.prices[2]).role, "EXCLUDED", "an excluded candidate keeps its exclusion reason");
+  assert.match(RS.label(RS.PRICE_ROLE_REASONS, "OTHER_FAMILY"), /different candidate family/);
+});
+
+test("one qualifying listing is worded as a single listing price, never as a range or a value conclusion; a size-unconfirmed listing is context", () => {
+  const listing = (comparables) => ({ method: "PROVISIONAL_LISTINGS", range: { low: 1096, high: 1096 }, asOf: "2026-10-26", comparables: comparables.map((priceId) => ({ priceId, candidate: "SUCCESSOR", verification: "SEARCH_LISTING" })) });
+  const single = RS.valuationLine(listing(["p1"]));
+  assert.equal(single, "One retailer listing shows $1,096, as of Oct 26, 2026. It is a single listing price, not confirmed on the product page, and not a value range.");
+  assert.doesNotMatch(single, /appraisal|fair value|guaranteed|provisional|worth/i);
+  assert.match(RS.valuationLine({ ...listing(["p1", "p2"]), range: { low: 999, high: 1096 } }), /^Retailer listings suggest roughly \$999 to \$1,096/, "two or more listings keep the range wording");
+  const price = (id, extra = {}) => ({ id, kind: "CURRENT_RETAIL_NEW", subject: "REPLACEMENT", candidate: "ALT_1", amount: { currency: "USD", low: 1398, high: 1398 }, ...extra });
+  const pricing = { prices: [price("p1"), price("p2", { sizeConfirmed: false })], valuation: { method: "PROVISIONAL_LISTINGS", comparables: [], excluded: [{ candidate: "ALT_1", reason: "NO_CURRENT_PRICE" }], reference: null } };
+  assert.deepEqual(RS.priceRole(pricing, pricing.prices[1]), { role: "CONTEXT_ONLY", note: "SIZE_NOT_CONFIRMED", exclusion: null }, "an example stays context even though its candidate is excluded");
+  assert.equal(RS.priceRole(pricing, pricing.prices[0]).role, "EXCLUDED");
+  assert.match(RS.label(RS.PRICE_ROLE_REASONS, "SIZE_NOT_CONFIRMED"), /does not state the screen size.*does not confirm a match/);
+});
+
 test("the original's price history keeps every dated source (list price first, then by date), keeps an AI estimate apart, and describes a spread in one sentence", () => {
   const price = (id, kind, low, high, asOf, subject = "ORIGINAL") => ({ id, kind, subject, candidate: null, amount: { currency: "USD", low, high }, asOf });
   const prices = [price("p3", "HISTORICAL_RETAIL", 3299, 3299, "2025-05-14"), price("p1", "HISTORICAL_RETAIL", 2600, 2600, "2023-04-11"), price("p2", "MSRP", 2699, 2699, "2023-03-01"),

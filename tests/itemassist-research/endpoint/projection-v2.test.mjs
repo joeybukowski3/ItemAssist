@@ -430,6 +430,61 @@ test("on the live path no price is page-confirmed, whatever the engine claims; t
   assert.notEqual(out.pricing.valuation.method, "VERIFIED_MULTI");
 });
 
+// The engine's valuation when one family's prices set the headline and another family's, far apart, are listed separately.
+const splitFamilies = (change = () => {}) => live("tv-strong-retail", (body) => {
+  for (const price of body.pricing.prices) if (price.kind === "CURRENT_RETAIL_NEW") price.verification = "SEARCH_LISTING";
+  body.pricing.prices.find((price) => price.id === "p4").amount = { currency: "USD", low: 2999, high: 2999 };
+  body.pricing.valuation = {
+    method: "PROVISIONAL_LISTINGS", basis: "PROVISIONAL_LISTINGS", verified: false, range: { currency: "USD", low: 1599, high: 1649 }, confidence: "MEDIUM", asOf: "2026-10-21",
+    comparables: ["p2", "p3"].map((priceId) => ({ priceId, candidate: "SUCCESSOR", verification: "SEARCH_LISTING" })), excluded: [], reference: { priceId: "p1", kind: "MSRP" },
+    notes: [{ code: "BASED_ON_LISTINGS", count: 2 }, { code: "LISTINGS_NOT_CONFIRMED" }, { code: "OTHER_FAMILIES_SEPARATE", count: 1 }, { code: "MSRP_CONTEXT_ONLY" }, { code: "NOT_AN_APPRAISAL" }]
+  };
+  change(body);
+});
+
+test("a range set by the lead family alone is accepted with its note, and the other family's price stays in the list without setting the range", () => {
+  const out = project(splitFamilies(), LIVE);
+  assert.ok(out);
+  assert.deepEqual([out.pricing.valuation.method, out.pricing.valuation.range], ["PROVISIONAL_LISTINGS", { currency: "USD", low: 1599, high: 1649 }]);
+  assert.deepEqual(out.pricing.valuation.comparables.map((row) => row.priceId), ["p2", "p3"]);
+  assert.ok(out.pricing.valuation.notes.some((note) => note.code === "OTHER_FAMILIES_SEPARATE" && note.count === 1));
+  assert.equal(priceOf(out, "p4").amount.low, 2999, "the alternative's own price is still shown, with its own source");
+  assert.equal(out.pricing.valuation.excluded.length, 0);
+  // A range that quietly includes the other family's price no longer equals what the comparables say, so it is refused rather than shown.
+  const stretched = project(splitFamilies((body) => { body.pricing.valuation.range.high = 2999; }), LIVE);
+  assert.equal(stretched.pricing.valuation.method, "INSUFFICIENT");
+  // The note is only valid where a current price set the range.
+  const estimateOnly = project(live("sparse-estimate", (body) => { body.pricing.valuation.notes.unshift({ code: "OTHER_FAMILIES_SEPARATE", count: 1 }); }), LIVE);
+  assert.equal(estimateOnly.pricing.valuation.notes.some((note) => note.code === "OTHER_FAMILIES_SEPARATE"), false);
+});
+
+test("a listing marked size-not-confirmed is projected as an example only on a current listing, and can never be a comparable", () => {
+  const unsizedBody = (change = () => {}) => live("tv-strong-retail", (body) => {
+    for (const price of body.pricing.prices) if (price.kind === "CURRENT_RETAIL_NEW") price.verification = "SEARCH_LISTING";
+    Object.assign(body.pricing.prices.find((price) => price.id === "p4"), { sizeConfirmed: false });
+    body.pricing.prices.find((price) => price.id === "p1").sizeConfirmed = false;
+    body.pricing.valuation = {
+      method: "PROVISIONAL_LISTINGS", basis: "PROVISIONAL_LISTINGS", verified: false, range: { currency: "USD", low: 1599, high: 1649 }, confidence: "MEDIUM", asOf: "2026-10-21",
+      comparables: ["p2", "p3"].map((priceId) => ({ priceId, candidate: "SUCCESSOR", verification: "SEARCH_LISTING" })), excluded: [], reference: { priceId: "p1", kind: "MSRP" },
+      notes: [{ code: "BASED_ON_LISTINGS", count: 2 }, { code: "LISTINGS_NOT_CONFIRMED" }, { code: "NOT_AN_APPRAISAL" }]
+    };
+    change(body);
+  });
+  const out = project(unsizedBody(), LIVE);
+  assert.equal(priceOf(out, "p4").sizeConfirmed, false, "the example keeps its mark");
+  assert.equal(Object.hasOwn(priceOf(out, "p1"), "sizeConfirmed"), false, "a forged mark on the original's MSRP is dropped");
+  assert.equal(Object.hasOwn(priceOf(out, "p2"), "sizeConfirmed"), false, "an ordinary price carries no mark");
+  assert.deepEqual(out.pricing.valuation.range, { currency: "USD", low: 1599, high: 1649 });
+  // An unsized listing among the comparables is refused, even when the range is made to match.
+  const forged = project(unsizedBody((body) => {
+    body.pricing.valuation.comparables.push({ priceId: "p4", candidate: "ALT_1", verification: "SEARCH_LISTING" });
+    body.pricing.valuation.range = { currency: "USD", low: 1499, high: 1649 };
+    body.pricing.valuation.notes[0].count = 3;
+  }), LIVE);
+  assert.equal(forged.pricing.valuation.method, "INSUFFICIENT");
+  assert.equal(priceOf(forged, "p4").sizeConfirmed, false);
+});
+
 test("on the live path no comparison row is CONFIRMED and no model is VERIFIED_LISTING, whatever the engine claims; a demo fixture keeps both", () => {
   const rowsOf = (out) => [out.successor, ...out.suggestions].filter(Boolean).flatMap((entry) => entry.comparison);
   const demo = project(engine("tv-strong-retail"));

@@ -75,9 +75,12 @@
       asOf ? D.pill("neutral", null, "Prices as of " + asOf) : null
     ].filter(Boolean);
     // The line above already says a listing price is unconfirmed; saying it again as a note only adds noise.
-    var notes = value.notes.filter(function (note) { return note.code !== "LISTINGS_NOT_CONFIRMED"; }).map(Res.noteText).filter(Boolean);
+    var noteContext = { referenceKind: value.reference ? value.reference.kind : null };
+    var notes = value.notes.filter(function (note) { return note.code !== "LISTINGS_NOT_CONFIRMED"; }).map(function (note) { return Res.noteText(note, noteContext); }).filter(Boolean);
     // One confirmed price is an observed anchor for one model, not a range.
-    var heading = value.method === "VERIFIED_SINGLE" ? "Replacement price anchor" : "Replacement value range";
+    // One qualifying listing is likewise an anchor, not a range.
+    var singleListing = value.method === "PROVISIONAL_LISTINGS" && (value.comparables || []).length === 1;
+    var heading = value.method === "VERIFIED_SINGLE" ? "Replacement price anchor" : singleListing ? "Current listing price anchor" : "Replacement value range";
     return h("section", { class: "rf-rs-value rf-rs-value--" + (value.verified ? "confirmed" : "estimate"), attrs: { "aria-labelledby": headingId } }, [
       D.heading("h3", headingId, heading, "rf-eyebrow rf-rs-value-kicker"),
       range ? h("p", { class: "rf-rs-range rf-mono", text: range }) : h("p", { class: "rf-rs-range rf-rs-range--none", text: "Not enough evidence to estimate" }),
@@ -111,7 +114,7 @@
         h("span", { class: "rf-rs-price-amount rf-mono", text: amount || "" })
       ]),
       h("p", { class: "rf-rs-price-meta" }, [subjectText(price) + (price.model ? " · " + price.model : "")]),
-      h("div", { class: "rf-rs-price-status" }, [verificationPill(price.verification), h("span", { class: "rf-rs-price-date", text: dateText(price) })]),
+      h("div", { class: "rf-rs-price-status" }, [verificationPill(price.verification), price.sizeConfirmed === false ? D.pill("warn", "q", "Size not confirmed") : null, h("span", { class: "rf-rs-price-date", text: dateText(price) })].filter(Boolean)),
       link ? h("p", { class: "rf-rs-price-source" }, [link, source ? " · " + label(Res.SOURCE_CLASS_LABELS, source.sourceClass) + ", " + label(Res.MODEL_RELATION_LABELS, source.modelRelation).toLowerCase() : ""]) : h("p", { class: "rf-rs-price-source rf-muted", text: "No source: this is an estimate." })
     ].concat(roleLines(data, price)));
   }

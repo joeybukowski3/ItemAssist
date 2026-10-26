@@ -191,6 +191,33 @@ test("Live answer: listing prices are labelled as listings, never styled as conf
   settle(seen);
 });
 
+test("Live answer: one qualifying listing is a 'Current listing price anchor', and unsized listings are examples marked 'Size not confirmed'", async ({ page }) => {
+  const seen = await runLive(page, "tv-premium-oled", (body) => {
+    const [, successor, alt, other] = body.pricing.prices;
+    Object.assign(alt, { amount: { currency: "USD", low: 1398, high: 1398 }, sizeConfirmed: false });
+    Object.assign(other, { amount: { currency: "USD", low: 2359.41, high: 2359.41 }, sizeConfirmed: false });
+    body.pricing.valuation = {
+      method: "PROVISIONAL_LISTINGS", basis: "PROVISIONAL_LISTINGS", verified: false, range: { currency: "USD", low: successor.amount.low, high: successor.amount.high }, confidence: "LOW", asOf: successor.asOf,
+      comparables: [{ priceId: "p2", candidate: "SUCCESSOR", verification: "SEARCH_LISTING" }], excluded: [{ candidate: "ALT_1", reason: "NO_CURRENT_PRICE" }, { candidate: "ALT_2", reason: "NO_CURRENT_PRICE" }],
+      reference: { priceId: "p1", kind: "MSRP" },
+      notes: [{ code: "BASED_ON_LISTINGS", count: 1 }, { code: "LISTINGS_NOT_CONFIRMED" }, { code: "EXCLUDED_NO_CURRENT_PRICE", candidate: "ALT_1" }, { code: "EXCLUDED_NO_CURRENT_PRICE", candidate: "ALT_2" }, { code: "MSRP_CONTEXT_ONLY" }, { code: "CURRENT_BELOW_ORIGINAL", ratio: 0.65 }, { code: "NOT_AN_APPRAISAL" }]
+    };
+  });
+  const card = product(page).locator("#rf-rpanel-overview .rf-rs-value");
+  await expect(card.locator("h3")).toHaveText("Current listing price anchor");
+  await expect(card.locator(".rf-rs-range")).toHaveText("$1,299");
+  await expect(card).toContainText("One retailer listing shows $1,299, as of Oct 20, 2026. It is a single listing price, not confirmed on the product page, and not a value range.");
+  await expect(card).not.toContainText(/appraisal|fair value|guaranteed|Replacement value range/i);
+  await expect(card.locator(".rf-pill--ok")).toHaveCount(0);
+  const pricing = await open(page, "pricing");
+  await expect(pricing.locator(".rf-pill", { hasText: "Size not confirmed" })).toHaveCount(2);
+  await expect(pricing.locator(".rf-rs-price[data-price-id='p3']")).toContainText("A retail example whose listing does not state the screen size. It does not confirm a match and does not set the range.");
+  await expect(pricing.locator(".rf-rs-price[data-price-id='p3']")).toHaveAttribute("data-price-role", "CONTEXT_ONLY");
+  await expect(pricing.locator(".rf-rs-price[data-price-id='p2']")).toHaveAttribute("data-price-role", "USED_IN_RANGE");
+  await expect(pricing.locator(".rf-rs-price[data-price-id='p2']").getByText("Size not confirmed")).toHaveCount(0);
+  settle(seen);
+});
+
 test("Live answer: MSRP and past retail stay distinct, and a spread of dated sources is described once and shown in full", async ({ page }) => {
   const seen = await runLive(page, "tv-premium-oled", (body) => {
     body.pricing.prices.push({ id: "p5", kind: "HISTORICAL_RETAIL", subject: "ORIGINAL", candidate: null, model: null, amount: { currency: "USD", low: 2299, high: 2299 }, asOf: "2025-05-14", asOfBasis: "PUBLISHED", verification: "SEARCH_SNIPPET", evidenceId: "e1" });

@@ -1799,10 +1799,10 @@
           },
           {
             "id": "r8",
-            "key": null,
-            "text": "Same remote style",
-            "importance": "IMPORTANT",
-            "origin": "AI_ESTIMATE"
+            "key": "smart",
+            "text": "A smart platform with the apps you use",
+            "importance": "MINOR",
+            "origin": "CATEGORY_RULE"
           }
         ],
         "requirementsSource": "AI_ESTIMATE_PLUS_CATEGORY_GUIDANCE",

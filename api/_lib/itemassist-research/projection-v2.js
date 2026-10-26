@@ -77,7 +77,7 @@ const NOTE_PARAMS = Object.freeze({
   BASED_ON_VERIFIED: ["count"], BASED_ON_LISTINGS: ["count"], ONE_COMPARABLE: [], LISTINGS_NOT_CONFIRMED: [], TIER_ESTIMATE_BAND: ["low", "high"],
   AI_ESTIMATE_ONLY: [], INSUFFICIENT: [], MSRP_CONTEXT_ONLY: [], CURRENT_BELOW_ORIGINAL: ["ratio"], ORIGINAL_DATE_UNKNOWN: [], TIER_UNKNOWN_WIDENED: [],
   EXCLUDED_CONFIRMED_SHORTFALL: ["candidate"], EXCLUDED_SUSPECTED_SHORTFALL: ["candidate"], EXCLUDED_NO_CURRENT_PRICE: ["candidate"],
-  STALE_PRICES_NOT_CURRENT: ["count"], NOT_AN_APPRAISAL: []
+  STALE_PRICES_NOT_CURRENT: ["count"], OTHER_FAMILIES_SEPARATE: ["count"], NOT_AN_APPRAISAL: []
 });
 const METHOD_ONLY_NOTES = Object.freeze({
   BASED_ON_VERIFIED: ["VERIFIED_MULTI", "VERIFIED_SINGLE", "MIXED_VERIFIED_AND_LISTINGS"],
@@ -86,6 +86,7 @@ const METHOD_ONLY_NOTES = Object.freeze({
   ONE_COMPARABLE: ["VERIFIED_SINGLE"],
   TIER_ESTIMATE_BAND: ["HISTORICAL_TIER_ESTIMATE"], TIER_UNKNOWN_WIDENED: ["HISTORICAL_TIER_ESTIMATE"], ORIGINAL_DATE_UNKNOWN: ["HISTORICAL_TIER_ESTIMATE"],
   AI_ESTIMATE_ONLY: ["AI_ESTIMATE_ONLY"], INSUFFICIENT: ["INSUFFICIENT"],
+  OTHER_FAMILIES_SEPARATE: ["VERIFIED_MULTI", "VERIFIED_SINGLE", "MIXED_VERIFIED_AND_LISTINGS", "PROVISIONAL_LISTINGS"],
   MSRP_CONTEXT_ONLY: ["VERIFIED_MULTI", "VERIFIED_SINGLE", "MIXED_VERIFIED_AND_LISTINGS", "PROVISIONAL_LISTINGS"],
   CURRENT_BELOW_ORIGINAL: ["VERIFIED_MULTI", "VERIFIED_SINGLE", "MIXED_VERIFIED_AND_LISTINGS", "PROVISIONAL_LISTINGS"]
 });
@@ -268,8 +269,10 @@ function projectPrices(raw, { evidence, keys, names, referenceDate, trustPageVer
       }
       evidenceId = source.id;
     }
+    // `sizeConfirmed: false` (a television listing that states no screen size) exists on a current listing only; anywhere else it is dropped.
+    const unsizedExample = entry.sizeConfirmed === false && kind === "CURRENT_RETAIL_NEW" && level === "SEARCH_LISTING" && subject === "REPLACEMENT" && candidate !== null;
     seen.add(entry.id);
-    items.push({ id: entry.id, kind, subject, candidate, model, amount, asOf, asOfBasis, verification: level, evidenceId });
+    items.push({ id: entry.id, kind, subject, candidate, model, amount, asOf, asOfBasis, verification: level, evidenceId, ...(unsizedExample ? { sizeConfirmed: false } : {}) });
     if (items.length >= MAX_PRICES) break;
   }
   return items;
@@ -398,6 +401,8 @@ function projectValuation(raw, { prices, candidates, requirements }) {
     const price = isObject(row) ? byId.get(row.priceId) : null;
     if (!price || row.candidate !== price.candidate || row.verification !== price.verification || comparables.some((other) => other.priceId === price.id)) return null;
     if (price.candidate !== null && excluded.some((entry) => entry.candidate === price.candidate)) return null;
+    // A listing that does not confirm the screen size is an example only: it can never set or widen the range.
+    if (price.sizeConfirmed === false) return null;
     comparables.push({ priceId: price.id, candidate: price.candidate, verification: price.verification });
   }
   const resolved = comparables.map((row) => byId.get(row.priceId));
