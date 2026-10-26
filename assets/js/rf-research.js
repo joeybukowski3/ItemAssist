@@ -68,7 +68,7 @@
   // response can never put its own words (a claim, a link, a price) into these labels. An estimate is never worded as verified.
   const SUMMARY_NOTE_V2 = "Specifications and replacement suggestions are preliminary. A price is called confirmed only when it comes from the cited source on the date shown; every other figure is an estimate or an unconfirmed listing.";
   const PRICE_KIND_LABELS = Object.freeze({
-    MSRP: "Original list price (MSRP)", HISTORICAL_RETAIL: "Past retail price", CURRENT_RETAIL_NEW: "Current new-retail price",
+    MSRP: "Original list price (MSRP)", HISTORICAL_RETAIL: "Past retail price", ORIGINAL_LISTING: "Original model listing", CURRENT_RETAIL_NEW: "Current new-retail price",
     SECONDARY_REPORT: "Used or marketplace report", AI_ESTIMATE: "AI estimate"
   });
   const VERIFICATION_LABELS = Object.freeze({
@@ -107,6 +107,7 @@
     AI_ESTIMATE: "An AI estimate with no source. It sets the range only when nothing better is available.",
     ORIGINAL_ESTIMATE: "An AI estimate of the original's price. No source supports it, and it never sets the replacement range.",
     NOT_COMPARABLE: "Not used for the range.",
+    ORIGINAL_LISTING: "A price seen for the original model on a seller's page, with no reliable date. It may be a sale, clearance or discontinued price. It is not a list price, and it never sets the replacement range.",
     OTHER_FAMILY: "A current price for a different candidate family. It is listed separately and does not set the headline range.",
     SIZE_NOT_CONFIRMED: "A retail example whose listing does not state the screen size. It does not confirm a match and does not set the range.",
     CURRENT_COMPARABLE: "A current price for a candidate that meets every essential requirement.",
@@ -126,6 +127,7 @@
   const REJECTION_ACTION_LABELS = Object.freeze({ REJECTED: "Set aside", DOWNGRADED: "Downgraded" });
   const CANDIDATE_LABELS = Object.freeze({ SUCCESSOR: "The successor candidate", ALT_1: "Alternative 1", ALT_2: "Alternative 2" });
   const DEMO_PRICE_NOTE = "Demo data: the figures and sources in this panel are illustrative, not real prices.";
+  const COMPATIBILITY_TEXT = "Compatibility not fully established. Confirm the original door configuration and fit before relying on this range.";
 
   const percent = (ratio) => Math.round(ratio * 100) + "%";
   const plural = (count, one, many) => count + " " + (count === 1 ? one : many);
@@ -140,6 +142,7 @@
     // A past retail price is not a list price: the sentence names the kind of price the valuation actually points at.
     MSRP_CONTEXT_ONLY: (note, context) => "The original's " + (context && context.referenceKind === "HISTORICAL_RETAIL" ? "past retail price" : "list price") + " is context only. It does not set the replacement range.",
     OTHER_FAMILIES_SEPARATE: (note) => (note.count === 1 ? "Prices for another candidate family are" : "Prices for " + note.count + " other candidate families are") + " listed separately. They do not set this range.",
+    COMPATIBILITY_NOT_ESTABLISHED: () => COMPATIBILITY_TEXT,
     CURRENT_BELOW_ORIGINAL: (note) => "Current prices are about " + percent(note.ratio) + " of the original's list price.",
     ORIGINAL_DATE_UNKNOWN: () => "The date of the original's price is not stated, so a wider band is used.",
     TIER_UNKNOWN_WIDENED: () => "The market tier is not known, so the band is wider.",
@@ -149,6 +152,14 @@
     STALE_PRICES_NOT_CURRENT: (note) => plural(note.count, "older price is", "older prices are") + " included as dated. Older prices are never shown as current.",
     NOT_AN_APPRAISAL: () => "Estimates and listing prices can differ from what a seller charges."
   });
+
+  /**
+   * The caution shown directly under the headline value when the range rests on listings priced while a material fact about the original (its
+   * door configuration) is unresolved, or null. It comes from the valuation note the engine derives from its own eligibility state.
+   */
+  function compatibilityLine(valuation) {
+    return valuation && Array.isArray(valuation.notes) && valuation.notes.some(function (note) { return note && note.code === "COMPATIBILITY_NOT_ESTABLISHED"; }) ? COMPATIBILITY_TEXT : null;
+  }
 
   /** The fixed sentence for a valuation note, or null for a code this page does not know. `context` (optional) names the kind of price the valuation points at. */
   function noteText(note, context) {
@@ -194,6 +205,15 @@
 
   const isV2 = (data) => Boolean(data) && data.contractVersion === "research.2";
 
+  // Listing prices this close (highest within 2% of the lowest) are one price seen at several sellers.
+  const NEAR_IDENTICAL_RATIO = 1.02;
+
+  /** True when the valuation rests on listings that are one price, not a spread: a single listing, or several within NEAR_IDENTICAL_RATIO. */
+  function isListingAnchor(valuation) {
+    if (!valuation || valuation.method !== "PROVISIONAL_LISTINGS" || !valuation.range || !Array.isArray(valuation.comparables) || !valuation.comparables.length) return false;
+    return valuation.comparables.length === 1 || valuation.range.high <= valuation.range.low * NEAR_IDENTICAL_RATIO;
+  }
+
   /**
    * One honest sentence for the valuation. The words come from the method alone: a confirmed price is called confirmed, a listing is
    * called unconfirmed, a band built from the original's price or from the AI is called an estimate.
@@ -210,6 +230,11 @@
       case "MIXED_VERIFIED_AND_LISTINGS":
         return range ? "Current retail prices point to " + range + (asOf ? ", as of " + asOf : "") + ". Some of those are listings not confirmed on the product page." : null;
       case "PROVISIONAL_LISTINGS":
+        // Listings that agree within a couple of percent are one price seen at several sellers, not a market range.
+        if (range && isListingAnchor(valuation) && valuation.comparables.length > 1) {
+          const count = valuation.comparables.length;
+          return (count === 2 ? "Two" : String(count)) + " retailer listings agree at about " + formatMoney(valuation.range.low) + (asOf ? ", as of " + asOf : "") + ". They are listing prices, not confirmed on the product page, and not a value range.";
+        }
         // One qualifying listing is an anchor for one price, not a range and not a conclusion about value.
         if (range && (valuation.comparables || []).length === 1) return "One retailer listing shows " + range + (asOf ? ", as of " + asOf : "") + ". It is a single listing price, not confirmed on the product page, and not a value range.";
         return range ? "Retailer listings suggest roughly " + range + (asOf ? ", as of " + asOf : "") + ". These are listing prices, not confirmed on the product page." : null;
@@ -246,6 +271,7 @@
       && !(value.comparables || []).some(function (row) { return row.candidate === price.candidate; });
     if (otherFamily) note = "OTHER_FAMILY";
     else if (price.kind === "AI_ESTIMATE") note = price.subject === "ORIGINAL" ? "ORIGINAL_ESTIMATE" : "AI_ESTIMATE";
+    else if (price.kind === "ORIGINAL_LISTING") note = "ORIGINAL_LISTING";
     else if (price.subject === "ORIGINAL") note = "ORIGINAL_CONTEXT";
     else if (price.kind === "HISTORICAL_RETAIL") note = "DATED_PRICE";
     else if (price.kind === "SECONDARY_REPORT") note = "SECONDARY_REPORT";
@@ -275,7 +301,9 @@
     const sourced = own.filter(function (price) { return price.kind === "MSRP" || price.kind === "HISTORICAL_RETAIL"; }).sort(function (a, b) {
       return (a.kind === b.kind ? 0 : a.kind === "MSRP" ? -1 : 1) || String(a.asOf || "").localeCompare(String(b.asOf || "")) || a.id.localeCompare(b.id, undefined, { numeric: true });
     });
-    return { sourced: sourced, estimate: own.filter(function (price) { return price.kind === "AI_ESTIMATE"; })[0] || null };
+    // Listings of the original model (undated, current or clearance) are context, kept apart from its list and dated past prices.
+    const listings = own.filter(function (price) { return price.kind === "ORIGINAL_LISTING"; }).sort(function (a, b) { return a.amount.low - b.amount.low; });
+    return { sourced: sourced, listings: listings, estimate: own.filter(function (price) { return price.kind === "AI_ESTIMATE"; })[0] || null };
   }
 
   /** One short sentence about the original's price history when it is more than a single sourced price, else null. */
@@ -439,8 +467,9 @@
     }
     if (isV2(data) && (topic === "value" || topic === "buying")) {
       const line = valuationLine(data.pricing.valuation);
+      const caution = compatibilityLine(data.pricing.valuation);
       const cited = data.pricing.evidence.length;
-      return [line, cited ? "The sources are listed under Pricing & evidence, with the date each was seen." : null, "Check specifications, availability and price with a seller before buying."].filter(Boolean);
+      return [line, caution, cited ? "The sources are listed under Pricing & evidence, with the date each was seen." : null, "Check specifications, availability and price with a seller before buying."].filter(Boolean);
     }
     if (topic === "value" || topic === "buying") {
       return ["ItemAssist Research doesn't check prices, stock or where to buy, and none of these candidates is confirmed available. Check specifications, availability and price with a seller before buying."];
@@ -504,6 +533,7 @@
         });
         const valueLine = valuationLine(data.pricing.valuation);
         if (valueLine) lines.push(valueLine);
+        if (compatibilityLine(data.pricing.valuation)) lines.push(COMPATIBILITY_TEXT);
         const left = shortfallCount(data.pricing.valuation);
         if (left) lines.push(left === 1 ? "I left 1 candidate out of the value range because it falls short of an essential requirement." : "I left " + left + " candidates out of the value range because they fall short of an essential requirement.");
         lines.push("Candidates are suggestions, not confirmed equivalents.");
@@ -580,7 +610,7 @@
     initialSession: initialSession, classify: classify, composeQuery: composeQuery, adopt: adopt, localAnswer: localAnswer,
     reply: reply, categoryLabel: categoryLabel, isResearchResponse: isResearchResponse, createVisitorId: createVisitorId, modelCodes: modelCodes,
     isV2: isV2, SUMMARY_NOTE_V2: SUMMARY_NOTE_V2, DEMO_PRICE_NOTE: DEMO_PRICE_NOTE, label: label, noteText: noteText, formatMoney: formatMoney, formatRange: formatRange, formatDay: formatDay,
-    valuationLine: valuationLine, shortfallCount: shortfallCount, referencePrice: referencePrice, originalPrices: originalPrices, historySummary: historySummary, priceRole: priceRole, pricesByRole: pricesByRole,
+    valuationLine: valuationLine, compatibilityLine: compatibilityLine, isListingAnchor: isListingAnchor, shortfallCount: shortfallCount, referencePrice: referencePrice, originalPrices: originalPrices, historySummary: historySummary, priceRole: priceRole, pricesByRole: pricesByRole,
     PRICE_ROLE_LABELS: PRICE_ROLE_LABELS, PRICE_ROLE_REASONS: PRICE_ROLE_REASONS,
     PRICE_KIND_LABELS: PRICE_KIND_LABELS, VERIFICATION_LABELS: VERIFICATION_LABELS, DATE_LABELS: DATE_LABELS, METHOD_LABELS: METHOD_LABELS, TIER_LABELS: TIER_LABELS,
     TIER_BASIS_LABELS: TIER_BASIS_LABELS, IMPORTANCE_LABELS: IMPORTANCE_LABELS, ORIGIN_LABELS: ORIGIN_LABELS, COMPARISON_LABELS: COMPARISON_LABELS, BASIS_LABELS: BASIS_LABELS,

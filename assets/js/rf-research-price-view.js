@@ -62,12 +62,23 @@
     return h("ul", { class: className || "rf-rs-list" }, items.map(function (text) { return h("li", { text: text }); }));
   }
 
+  /** The distinct seller names behind the listings that set the valuation, in the order of their prices. */
+  function sellerNames(data, value) {
+    var names = [];
+    value.comparables.map(function (row) { return data.pricing.prices.filter(function (price) { return price.id === row.priceId; })[0]; }).filter(Boolean)
+      .sort(function (a, b) { return a.amount.low - b.amount.low; })
+      .forEach(function (price) { var entry = evidenceOf(data, price.evidenceId); if (entry && names.indexOf(entry.sourceName) === -1) names.push(entry.sourceName); });
+    return names.join(", ");
+  }
+
   /** The valuation range, how it was reached, and every caveat, always together. */
   function valuationCard(data, idSuffix) {
     var headingId = "rf-value" + (idSuffix || "") + "-h";
     var value = data.pricing.valuation;
     var tier = data.pricing.tier;
-    var range = Res.formatRange(value.range);
+    var anchor = Res.isListingAnchor(value);
+    // Listings that agree are shown as the one price they agree on (the lowest actually seen), not as a range a cent wide.
+    var range = anchor && value.range.low !== value.range.high ? Res.formatMoney(value.range.low) : Res.formatRange(value.range);
     var asOf = Res.formatDay(value.asOf);
     var pills = [
       D.pill(value.verified ? "ok" : "warn", value.verified ? "check" : "q", label(Res.METHOD_LABELS, value.method)),
@@ -76,16 +87,21 @@
     ].filter(Boolean);
     // The line above already says a listing price is unconfirmed; saying it again as a note only adds noise.
     var noteContext = { referenceKind: value.reference ? value.reference.kind : null };
-    var notes = value.notes.filter(function (note) { return note.code !== "LISTINGS_NOT_CONFIRMED"; }).map(function (note) { return Res.noteText(note, noteContext); }).filter(Boolean);
+    var notes = value.notes.filter(function (note) { return note.code !== "LISTINGS_NOT_CONFIRMED" && note.code !== "COMPATIBILITY_NOT_ESTABLISHED"; }).map(function (note) { return Res.noteText(note, noteContext); }).filter(Boolean);
     // One confirmed price is an observed anchor for one model, not a range.
     // One qualifying listing is likewise an anchor, not a range.
-    var singleListing = value.method === "PROVISIONAL_LISTINGS" && (value.comparables || []).length === 1;
-    var heading = value.method === "VERIFIED_SINGLE" ? "Replacement price anchor" : singleListing ? "Current listing price anchor" : "Replacement value range";
+    var compatibility = Res.compatibilityLine(value);
+    var heading = value.method === "VERIFIED_SINGLE" ? "Replacement price anchor" : anchor ? "Current listing price anchor" : "Replacement value range";
+    // Where the anchor comes from: the sellers behind the listings that set it.
+    var sellers = anchor ? sellerNames(data, value) : "";
     return h("section", { class: "rf-rs-value rf-rs-value--" + (value.verified ? "confirmed" : "estimate"), attrs: { "aria-labelledby": headingId } }, [
       D.heading("h3", headingId, heading, "rf-eyebrow rf-rs-value-kicker"),
       range ? h("p", { class: "rf-rs-range rf-mono", text: range }) : h("p", { class: "rf-rs-range rf-rs-range--none", text: "Not enough evidence to estimate" }),
+      // Directly under the figure: a range that rests on an unresolved fact about the original is not to be read without it.
+      compatibility ? h("p", { class: "rf-rs-compat", text: compatibility }) : null,
       h("div", { class: "rf-lead-meta" }, pills),
       h("p", { class: "rf-rs-value-line", text: Res.valuationLine(value) || "" }),
+      sellers ? h("p", { class: "rf-rs-value-sellers rf-muted", text: "Seen at: " + sellers + "." }) : null,
       tier.level !== "UNKNOWN" ? h("p", { class: "rf-rs-tier" }, [h("strong", { text: "Market tier: " }), label(Res.TIER_LABELS, tier.level) + ". " + label(Res.TIER_BASIS_LABELS, tier.basis) + "."]) : null,
       notes.length ? list(notes, "rf-rs-notes") : null,
       data.meta && data.meta.fixture === true ? h("p", { class: "rf-rs-demo-note", text: Res.DEMO_PRICE_NOTE }) : null
@@ -136,6 +152,12 @@
         if (summary) children.push(h("p", { class: "rf-rs-value-line", text: summary }));
         children.push(h("ul", { class: "rf-rs-prices" }, [priceCard(data, history.estimate)]));
       }
+    }
+    // Prices seen for the original model itself, apart from its list and dated prices: context, never history, never a replacement price.
+    if (history.listings.length) {
+      children.push(h("p", { class: "rf-rs-sub", text: "Original model listings seen (" + history.listings.length + ")" }));
+      children.push(h("ul", { class: "rf-rs-prices" }, history.listings.map(function (price) { return priceCard(data, price); })));
+      children.push(h("p", { class: "rf-muted", text: "These are prices seen for the original model, not list prices. They can be sale, clearance or discontinued prices, and they do not set the replacement range." }));
     }
     return block("rf-orig-price-h", "Market tier and price history", children);
   }

@@ -87,6 +87,29 @@ test("one qualifying listing is worded as a single listing price, never as a ran
   assert.match(RS.label(RS.PRICE_ROLE_REASONS, "SIZE_NOT_CONFIRMED"), /does not state the screen size.*does not confirm a match/);
 });
 
+test("listings of the original model are context apart from its history; listings that agree are one price anchor with its sellers, never a cent-wide range", () => {
+  const price = (id, kind, low, extra = {}) => ({ id, kind, subject: "ORIGINAL", candidate: null, amount: { currency: "USD", low, high: low }, asOf: null, ...extra });
+  const prices = [price("p1", "MSRP", 1099, { asOf: "2023-03-01" }), price("p2", "ORIGINAL_LISTING", 1239.94), price("p3", "ORIGINAL_LISTING", 899.96), price("p4", "AI_ESTIMATE", 900)];
+  const history = RS.originalPrices({ prices });
+  assert.deepEqual(history.sourced.map((item) => item.id), ["p1"], "a listing is never history");
+  assert.deepEqual(history.listings.map((item) => item.id), ["p3", "p2"], "listings, lowest first");
+  assert.equal(RS.historySummary({ prices }), null, "a discount listing does not make a spread of 'dated sources'");
+  assert.equal(RS.label(RS.PRICE_KIND_LABELS, "ORIGINAL_LISTING"), "Original model listing");
+  assert.deepEqual(RS.priceRole({ prices, valuation: { method: "PROVISIONAL_LISTINGS", comparables: [], excluded: [], reference: null } }, prices[1]), { role: "CONTEXT_ONLY", note: "ORIGINAL_LISTING", exclusion: null });
+  assert.match(RS.label(RS.PRICE_ROLE_REASONS, "ORIGINAL_LISTING"), /no reliable date.*not a list price.*never sets the replacement range/);
+  // Anchors: one listing, or several within 2%; a real spread stays a range.
+  const listings = (lows) => ({ method: "PROVISIONAL_LISTINGS", range: { low: Math.min(...lows), high: Math.max(...lows) }, asOf: "2026-10-26", comparables: lows.map((_, index) => ({ priceId: "p" + (index + 1), candidate: "SUCCESSOR", verification: "SEARCH_LISTING" })) });
+  assert.equal(RS.isListingAnchor(listings([1096])), true);
+  assert.equal(RS.isListingAnchor(listings([1249, 1249.99])), true);
+  assert.equal(RS.isListingAnchor(listings([1000, 1019])), true, "just inside 2%");
+  assert.equal(RS.isListingAnchor(listings([1000, 1021])), false, "just outside 2%");
+  assert.equal(RS.isListingAnchor(listings([1249, 1299.99])), false);
+  assert.equal(RS.isListingAnchor({ ...listings([1249, 1249.99]), method: "VERIFIED_MULTI" }), false, "only listings are an anchor");
+  assert.equal(RS.valuationLine(listings([1249, 1249.99])), "Two retailer listings agree at about $1,249, as of Oct 26, 2026. They are listing prices, not confirmed on the product page, and not a value range.");
+  assert.match(RS.valuationLine(listings([1249, 1249.5, 1250])), /^3 retailer listings agree at about \$1,249/);
+  assert.match(RS.valuationLine(listings([1249, 1399])), /^Retailer listings suggest roughly \$1,249 to \$1,399/);
+});
+
 test("the original's price history keeps every dated source (list price first, then by date), keeps an AI estimate apart, and describes a spread in one sentence", () => {
   const price = (id, kind, low, high, asOf, subject = "ORIGINAL") => ({ id, kind, subject, candidate: null, amount: { currency: "USD", low, high }, asOf });
   const prices = [price("p3", "HISTORICAL_RETAIL", 3299, 3299, "2025-05-14"), price("p1", "HISTORICAL_RETAIL", 2600, 2600, "2023-04-11"), price("p2", "MSRP", 2699, 2699, "2023-03-01"),
@@ -99,7 +122,7 @@ test("the original's price history keeps every dated source (list price first, t
   assert.equal(RS.historySummary({ prices: [price("p1", "MSRP", 1899, 1899, "2023-02-28")] }), null, "one sourced price needs no summary");
   assert.equal(RS.historySummary({ prices: [price("p4", "AI_ESTIMATE", 2000, 3000, null)] }), "No dated price is included. An AI estimate puts the original at $2,000 to $3,000 when new.");
   assert.equal(RS.historySummary({ prices: [price("p5", "CURRENT_RETAIL_NEW", 1099, 1099, "2026-10-23", "REPLACEMENT")] }), null);
-  assert.deepEqual(RS.originalPrices(null), { sourced: [], estimate: null });
+  assert.deepEqual(RS.originalPrices(null), { sourced: [], listings: [], estimate: null });
   assert.doesNotMatch([RS.noteText({ code: "NOT_AN_APPRAISAL" }), RS.noteText({ code: "ONE_COMPARABLE" }), RS.noteText({ code: "LISTINGS_NOT_CONFIRMED" }), RS.valuationLine({ method: "PROVISIONAL_LISTINGS", range: { low: 999, high: 1449 }, asOf: "2026-10-23" })].join(" "), /appraisal|fair value|guaranteed|provisional/i, "no formal-appraisal wording");
 });
 

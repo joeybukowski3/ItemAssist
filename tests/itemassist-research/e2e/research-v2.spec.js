@@ -177,6 +177,7 @@ async function runLive(page, scenario, change) {
 test("Live answer: listing prices are labelled as listings, never styled as confirmed, and carry no demo label", async ({ page }) => {
   const seen = await runLive(page, "tv-premium-oled");
   const card = product(page).locator("#rf-rpanel-overview .rf-rs-value");
+  await expect(product(page).locator(".rf-rs-compat"), "no unresolved fact behind this range: no compatibility caution").toHaveCount(0);
   await expect(card).toHaveClass(/rf-rs-value--estimate/);
   await expect(card.locator(".rf-rs-range")).toHaveText("$1,199 to $1,399");
   await expect(card).toContainText("These are listing prices, not confirmed on the product page.");
@@ -215,6 +216,67 @@ test("Live answer: one qualifying listing is a 'Current listing price anchor', a
   await expect(pricing.locator(".rf-rs-price[data-price-id='p3']")).toHaveAttribute("data-price-role", "CONTEXT_ONLY");
   await expect(pricing.locator(".rf-rs-price[data-price-id='p2']")).toHaveAttribute("data-price-role", "USED_IN_RANGE");
   await expect(pricing.locator(".rf-rs-price[data-price-id='p2']").getByText("Size not confirmed")).toHaveCount(0);
+  settle(seen);
+});
+
+test("Live answer: two listings that agree are ONE price anchor with the sellers behind it, not a cent-wide range", async ({ page }) => {
+  const seen = await runLive(page, "tv-premium-oled", (body) => {
+    const [, successor, alt, other] = body.pricing.prices;
+    Object.assign(successor, { amount: { currency: "USD", low: 1249, high: 1249 } });
+    Object.assign(alt, { amount: { currency: "USD", low: 1249.99, high: 1249.99 } });
+    Object.assign(other, { sizeConfirmed: false });
+    body.pricing.valuation = {
+      method: "PROVISIONAL_LISTINGS", basis: "PROVISIONAL_LISTINGS", verified: false, range: { currency: "USD", low: 1249, high: 1249.99 }, confidence: "MEDIUM", asOf: successor.asOf,
+      comparables: [{ priceId: "p2", candidate: "SUCCESSOR", verification: "SEARCH_LISTING" }, { priceId: "p3", candidate: "ALT_1", verification: "SEARCH_LISTING" }], excluded: [{ candidate: "ALT_2", reason: "NO_CURRENT_PRICE" }],
+      reference: { priceId: "p1", kind: "MSRP" },
+      notes: [{ code: "BASED_ON_LISTINGS", count: 2 }, { code: "LISTINGS_NOT_CONFIRMED" }, { code: "EXCLUDED_NO_CURRENT_PRICE", candidate: "ALT_2" }, { code: "MSRP_CONTEXT_ONLY" }, { code: "CURRENT_BELOW_ORIGINAL", ratio: 0.62 }, { code: "NOT_AN_APPRAISAL" }]
+    };
+  });
+  const card = product(page).locator("#rf-rpanel-overview .rf-rs-value");
+  await expect(card.locator("h3")).toHaveText("Current listing price anchor");
+  await expect(card.locator(".rf-rs-range")).toHaveText("$1,249");
+  await expect(card).toContainText("Two retailer listings agree at about $1,249, as of Oct 20, 2026. They are listing prices, not confirmed on the product page, and not a value range.");
+  await expect(card.locator(".rf-rs-value-sellers")).toHaveText("Seen at: Best Buy, Abt.");
+  await expect(card).not.toContainText(/\$1,249\.99|appraisal|fair value|Replacement value range/i);
+  settle(seen);
+});
+
+test("Live answer: a range priced while the original's door configuration is unresolved carries the compatibility caution directly under it, and a fully supported one does not", async ({ page }) => {
+  const caution = "Compatibility not fully established. Confirm the original door configuration and fit before relying on this range.";
+  const seen = await runLive(page, "tv-premium-oled", (body) => {
+    const notes = body.pricing.valuation.notes;
+    notes.splice(notes.findIndex((note) => note.code === "NOT_AN_APPRAISAL"), 0, { code: "COMPATIBILITY_NOT_ESTABLISHED" });
+  });
+  const card = product(page).locator("#rf-rpanel-overview .rf-rs-value");
+  await expect(card.locator(".rf-rs-range + .rf-rs-compat")).toHaveText(caution);
+  await expect(card.locator(".rf-rs-compat")).toBeVisible();
+  await expect(card.locator(".rf-rs-notes")).not.toContainText("Compatibility not fully established");
+  await expect(card).not.toContainText(/verified|recommended|compatible with/i);
+  const pricing = await open(page, "pricing");
+  await expect(pricing.locator(".rf-rs-range + .rf-rs-compat")).toHaveText(caution);
+  await expectNoHorizontalOverflow(page);
+  settle(seen);
+});
+
+test("Live answer: listings of the ORIGINAL model are undated context under the original, never history, never a replacement price", async ({ page }) => {
+  const seen = await runLive(page, "tv-premium-oled", (body) => {
+    body.pricing.evidence.push({ id: "e5", subject: "ORIGINAL", sourceUrl: "https://www.plessers.com/bosch/shpm65z55n", publishedAt: null, observedAt: null, subjectModel: "SHPM65Z55N", expectedModel: "SHPM65Z55N" });
+    body.pricing.prices.push({ id: "p5", kind: "ORIGINAL_LISTING", subject: "ORIGINAL", candidate: null, model: "SHPM65Z55N", amount: { currency: "USD", low: 1099, high: 1099 }, asOf: null, asOfBasis: "UNKNOWN", verification: "SEARCH_SNIPPET", evidenceId: "e5" });
+  });
+  const original = await open(page, "original");
+  await expect(original).toContainText("Original model listings seen (1)");
+  const listing = original.locator(".rf-rs-price[data-price-id='p5']");
+  await expect(listing).toContainText("Original model listing");
+  await expect(listing).toContainText("$1,099");
+  await expect(listing).toContainText("Date not stated");
+  await expect(listing).toContainText("Plesser’s Appliances");
+  await expect(original).toContainText("These are prices seen for the original model, not list prices.");
+  await expect(original.locator(".rf-rs-price[data-price-id='p1']")).toContainText("Original list price (MSRP)");
+  const pricing = await open(page, "pricing");
+  const card = pricing.locator(".rf-rs-price[data-price-id='p5']");
+  await expect(card).toHaveAttribute("data-price-role", "CONTEXT_ONLY");
+  await expect(card).toContainText("It is not a list price, and it never sets the replacement range.");
+  await expect(product(page).locator("#rf-rpanel-overview .rf-rs-range")).toHaveText("$1,199 to $1,399");
   settle(seen);
 });
 

@@ -30,8 +30,8 @@ test("every golden scenario the engine builds is accepted unchanged", () => {
   }
 });
 
-test("the source registry copy holds every host the golden evidence cites, and 58 hosts", () => {
-  assert.equal(REGISTRY.length, 58);
+test("the source registry copy holds every host the golden evidence cites, and 62 hosts", () => {
+  assert.equal(REGISTRY.length, 62);
   const hosts = Object.values(GOLDEN.scenarios).flatMap((entry) => entry.engine.pricing.evidence.map((item) => item.sourceDomain));
   for (const host of hosts) assert.ok(REGISTRY.some(([domain]) => domain === host), host);
 });
@@ -483,6 +483,25 @@ test("a listing marked size-not-confirmed is projected as an example only on a c
   }), LIVE);
   assert.equal(forged.pricing.valuation.method, "INSUFFICIENT");
   assert.equal(priceOf(forged, "p4").sizeConfirmed, false);
+});
+
+test("an undated listing of the original model is projected as undated context from a maker or retailer only, and can never be a replacement price or a comparable", () => {
+  const withListing = (change = () => {}) => live("tv-premium-oled", (body) => {
+    body.pricing.evidence.push({ id: "e5", subject: "ORIGINAL", sourceUrl: "https://www.plessers.com/bosch/shpm65z55n", publishedAt: null, observedAt: null, subjectModel: "SHPM65Z55N", expectedModel: "SHPM65Z55N" });
+    body.pricing.prices.push({ id: "p5", kind: "ORIGINAL_LISTING", subject: "ORIGINAL", candidate: null, model: "SHPM65Z55N", amount: { currency: "USD", low: 1099, high: 1099 }, asOf: null, asOfBasis: "UNKNOWN", verification: "SEARCH_SNIPPET", evidenceId: "e5" });
+    change(body);
+  });
+  const out = project(withListing(), LIVE);
+  assert.deepEqual([priceOf(out, "p5").kind, priceOf(out, "p5").asOf, priceOf(out, "p5").asOfBasis, priceOf(out, "p5").subject], ["ORIGINAL_LISTING", null, "UNKNOWN", "ORIGINAL"], "it stays undated");
+  assert.equal(out.pricing.valuation.comparables.some((row) => row.priceId === "p5"), false);
+  assert.equal(out.pricing.evidence.find((entry) => entry.id === "e5").sourceName, "Plesser’s Appliances", "the name comes from the registry");
+  // Wrong subject, wrong source class, or a forged range: dropped.
+  assert.equal(priceOf(project(withListing((body) => { Object.assign(body.pricing.prices.at(-1), { subject: "REPLACEMENT", candidate: "SUCCESSOR" }); }), LIVE), "p5"), undefined, "a replacement cannot be an original listing");
+  assert.equal(priceOf(project(withListing((body) => { body.pricing.evidence.at(-1).sourceUrl = "https://www.cnet.com/review/x"; }), LIVE), "p5"), undefined, "a review is not a seller");
+  assert.equal(priceOf(project(withListing((body) => { Object.assign(body.pricing.prices.at(-1), { amount: { currency: "USD", low: 1000, high: 1200 } }); }), LIVE), "p5"), undefined, "an observed price is not a range");
+  // Pushed into the valuation it is refused: the valuation falls back to "insufficient" rather than relaying a listing as a comparable.
+  const forged = project(withListing((body) => { body.pricing.valuation.comparables.push({ priceId: "p5", candidate: null, verification: "SEARCH_SNIPPET" }); }), LIVE);
+  assert.equal(forged.pricing.valuation.method, "INSUFFICIENT");
 });
 
 test("on the live path no comparison row is CONFIRMED and no model is VERIFIED_LISTING, whatever the engine claims; a demo fixture keeps both", () => {

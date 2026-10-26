@@ -46,6 +46,10 @@ const REGISTRY = Object.freeze([
   ["yaleappliance.com", "RETAILER", "Yale Appliance"],
   ["brandsmartusa.com", "RETAILER", "BrandsMart USA"],
   ["bjs.com", "RETAILER", "BJ’s Wholesale Club"],
+  ["plessers.com", "RETAILER", "Plesser’s Appliances"],
+  ["appliancefactory.com", "RETAILER", "Appliance Factory"],
+  ["townappliance.com", "RETAILER", "Town Appliance"],
+  ["applianceleaders.com", "RETAILER", "Appliance Leaders"],
   ["rtings.com", "TECH_DATABASE", "RTINGS"],
   ["displayspecifications.com", "TECH_DATABASE", "DisplaySpecifications"],
   ["tftcentral.co.uk", "TECH_DATABASE", "TFTCentral"],
@@ -71,7 +75,7 @@ const REGISTRY = Object.freeze([
   ["offerup.com", "MARKETPLACE", "OfferUp"],
 ]);
 const STOREFRONT_LABELS = Object.freeze(["shop","us","m","products"]);
-const EXACT_HOST_ONLY = Object.freeze(["brandsmartusa.com","bjs.com"]);
+const EXACT_HOST_ONLY = Object.freeze(["brandsmartusa.com","bjs.com","plessers.com","appliancefactory.com","townappliance.com","applianceleaders.com"]);
 // END GENERATED REGISTRY
 
 const MAX_URL_CHARS = 300;
