@@ -107,7 +107,7 @@ test("Overview: an AI-only range is labelled an estimate with no source, and a m
   await expect(card).toContainText("AI estimate only");
   await expect(card).toContainText("No source supports this range. It is an AI estimate.");
   await expect(card.locator(".rf-pill--ok")).toHaveCount(0);
-  await expect(log(page)).toContainText("A rough AI estimate is $450 to $1,400. No source supports it.");
+  await expect(log(page)).toContainText("A rough AI estimate is $450 to $1,400. No source supports it, and no current listing was eligible to check it against, so it is not a market-value range.");
   settle(seen);
 });
 
@@ -596,5 +596,30 @@ test("the research.2 fine print resets to the standard wording when a new resear
   await page.locator('[data-action="research-new"]').click();
   await expect(page.locator(".rf-fineprint")).toContainText("gives AI estimates from general product knowledge");
   await expect(page.locator(".rf-fineprint")).not.toContainText("cited sources");
+  settle(seen);
+});
+
+test("Live answer: an AI-only range is not a market-value range, original-model prices do not support it, and unverified listings at other sellers are plain text outside the range", async ({ page }) => {
+  const seen = await runLive(page, "unsupported-claims", (body) => {
+    body.pricing.evidence.push({ id: "e2", subject: "ORIGINAL", sourceUrl: "https://www.plessers.com/ge/pfe28kynfs", publishedAt: null, observedAt: null, subjectModel: "PFE28KYNFS", expectedModel: "PFE28KYNFS" });
+    body.pricing.prices.push({ id: "p8", kind: "ORIGINAL_LISTING", subject: "ORIGINAL", candidate: null, model: "PFE28KYNFS", amount: { currency: "USD", low: 3323, high: 3323 }, asOf: null, asOfBasis: "UNKNOWN", verification: "SEARCH_SNIPPET", evidenceId: "e2" });
+    body.suggestions[0].otherSellerListings = [{ seller: "Southeast Steel", amount: 1998.95, model: null }, { seller: "Colder's", amount: 2499.95, model: null }];
+  });
+  const card = product(page).locator("#rf-rpanel-overview .rf-rs-value");
+  await expect(card).toContainText("no current listing was eligible to check it against, so it is not a market-value range");
+  await expect(card.locator(".rf-rs-original-context")).toHaveText("Prices seen for the original model are context for the original only. They do not support this replacement estimate.");
+  await expect(card.locator(".rf-pill--ok")).toHaveCount(0);
+  const replacements = await open(page, "replacements");
+  const unlisted = replacements.locator(".rf-rs-unlisted");
+  await expect(unlisted).toHaveCount(1);
+  await expect(unlisted).toContainText("Unverified listings seen");
+  await expect(unlisted.locator("li")).toHaveText(["$1,998.95 at Southeast Steel", "$2,499.95 at Colder's"]);
+  await expect(unlisted).toContainText("These sellers are not on the approved source list and the listings are not confirmed. They are not used in the range.");
+  await expect(unlisted.locator("a")).toHaveCount(0);
+  await expect(replacements.locator(".rf-rs-price[data-price-role='USED_IN_RANGE']")).toHaveCount(0);
+  const pricing = await open(page, "pricing");
+  await expect(pricing).not.toContainText("Southeast Steel");
+  await expect(pricing.locator(".rf-rs-price[data-price-id='p8']")).toHaveAttribute("data-price-role", "CONTEXT_ONLY");
+  if (!isNarrowViewport(page)) await expectNoHorizontalOverflow(page);
   settle(seen);
 });

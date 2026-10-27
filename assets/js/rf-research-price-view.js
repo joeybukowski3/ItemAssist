@@ -20,6 +20,7 @@
   var IMPORTANCE_ORDER = ["ESSENTIAL", "IMPORTANT", "MINOR"];
   var SUBJECT_ORIGINAL = "Original product";
   var ROLE_ORDER = ["USED_IN_RANGE", "CONTEXT_ONLY", "EXCLUDED"];
+  var ORIGINAL_CONTEXT_LINE = "Prices seen for the original model are context for the original only. They do not support this replacement estimate.";
 
   function block(id, title, children) {
     return h("section", { class: "rf-block", attrs: { "aria-labelledby": id } }, [D.heading("h3", id, title, "rf-eyebrow rf-sec-label")].concat(children));
@@ -94,6 +95,8 @@
     var heading = value.method === "VERIFIED_SINGLE" ? "Replacement price anchor" : anchor ? "Current listing price anchor" : "Replacement value range";
     // Where the anchor comes from: the sellers behind the listings that set it.
     var sellers = anchor ? sellerNames(data, value) : "";
+    // An AI-only figure beside prices seen for the original model: those say what the original cost, not what a replacement costs.
+    var originalContext = value.method === "AI_ESTIMATE_ONLY" && data.pricing.prices.some(function (price) { return price.subject === "ORIGINAL" && price.kind !== "AI_ESTIMATE"; });
     return h("section", { class: "rf-rs-value rf-rs-value--" + (value.verified ? "confirmed" : "estimate"), attrs: { "aria-labelledby": headingId } }, [
       D.heading("h3", headingId, heading, "rf-eyebrow rf-rs-value-kicker"),
       range ? h("p", { class: "rf-rs-range rf-mono", text: range }) : h("p", { class: "rf-rs-range rf-rs-range--none", text: "Not enough evidence to estimate" }),
@@ -101,6 +104,7 @@
       compatibility ? h("p", { class: "rf-rs-compat", text: compatibility }) : null,
       h("div", { class: "rf-lead-meta" }, pills),
       h("p", { class: "rf-rs-value-line", text: Res.valuationLine(value) || "" }),
+      originalContext ? h("p", { class: "rf-rs-value-line rf-muted rf-rs-original-context", text: ORIGINAL_CONTEXT_LINE }) : null,
       sellers ? h("p", { class: "rf-rs-value-sellers rf-muted", text: "Seen at: " + sellers + "." }) : null,
       tier.level !== "UNKNOWN" ? h("p", { class: "rf-rs-tier" }, [h("strong", { text: "Market tier: " }), label(Res.TIER_LABELS, tier.level) + ". " + label(Res.TIER_BASIS_LABELS, tier.basis) + "."]) : null,
       notes.length ? list(notes, "rf-rs-notes") : null,
@@ -212,7 +216,22 @@
   function candidatePrice(data, key) {
     var prices = data.pricing.prices.filter(function (price) { return price.candidate === key; });
     var current = prices.filter(function (price) { return price.kind === "CURRENT_RETAIL_NEW"; })[0] || prices[0];
-    return current ? h("ul", { class: "rf-rs-prices rf-rs-prices--inline" }, [priceCard(data, current)]) : h("p", { class: "rf-muted", text: "No price for this candidate is included in this research." });
+    return current ? h("ul", { class: "rf-rs-prices rf-rs-prices--inline" }, [priceCard(data, current)]) : h("p", { class: "rf-muted", text: "No sourced price for this candidate is included in this research." });
+  }
+
+  /**
+   * Listings seen at sellers that are not on the approved source list, shown only for a candidate with no sourced price. Plain text: no link, no
+   * source, no price role. They are said not to set the range because they do not.
+   */
+  function otherSellerBlock(data, item, key) {
+    var listings = item.otherSellerListings || [];
+    var priced = data.pricing.prices.some(function (price) { return price.candidate === key && price.kind === "CURRENT_RETAIL_NEW"; });
+    if (!listings.length || priced) return null;
+    return h("div", { class: "rf-rs-unlisted" }, [
+      h("p", { class: "rf-rs-sub", text: "Unverified listings seen" }),
+      h("ul", { class: "rf-rs-list" }, listings.map(function (entry) { return h("li", { text: Res.formatMoney(entry.amount) + " at " + entry.seller + (entry.model ? " (" + entry.model + ")" : "") }); })),
+      h("p", { class: "rf-muted", text: "These sellers are not on the approved source list and the listings are not confirmed. They are not used in the range." })
+    ]);
   }
 
   /** The extra lines a candidate card carries in research.2: its price, any exclusion, and the requirement-by-requirement comparison. */
@@ -220,6 +239,7 @@
     var excluded = data.pricing.valuation.excluded.filter(function (row) { return row.candidate === key; })[0];
     return [
       candidatePrice(data, key),
+      otherSellerBlock(data, item, key),
       excluded ? h("p", { class: "rf-rs-excluded" }, [D.icon("info"), h("span", { text: label(Res.EXCLUSION_LABELS, excluded.reason) })]) : null,
       comparisonBlock(data, item)
     ].filter(Boolean);

@@ -483,6 +483,27 @@ function withDemotions(rows, demoted) {
   return rows.length >= MAX_REJECTIONS ? rows : [...rows, { scope: "REQUIREMENT", reason: "ESSENTIAL_FROM_AI_DOWNGRADED", action: "DOWNGRADED", count: Math.min(99, demoted) }];
 }
 
+/* ---------- Listings at sellers that are not recognised sources ---------- */
+
+// Unverified context beside a candidate with no sourced price: a seller's name as plain text and an amount. Never a link, a source or a price in
+// `pricing.prices`, so it can neither set nor widen the range. The same checks as the engine's, applied again here.
+const SELLER_NAME = /^[A-Za-z0-9][A-Za-z0-9 .,'&+-]{1,39}$/;
+const LINK_LIKE = /https?:|www\.|\.[a-z]{2,}(?:\s|$)/i;
+const MAX_OTHER_LISTINGS = 2;
+
+function projectOtherListings(raw, safeText) {
+  const out = [];
+  for (const entry of (Array.isArray(raw) ? raw : []).slice(0, MAX_OTHER_LISTINGS * 2)) {
+    if (!isObject(entry) || typeof entry.seller !== "string") continue;
+    const seller = safeText(entry.seller.trim().replace(/\s+/g, " "), 40);
+    if (!seller || !SELLER_NAME.test(seller) || LINK_LIKE.test(seller) || !finiteIn(entry.amount, MIN_AMOUNT, MAX_AMOUNT)) continue;
+    if (out.some((other) => other.seller.toLowerCase() === seller.toLowerCase())) continue;
+    out.push({ seller, amount: round2(entry.amount), model: cleanModel(entry.model) });
+    if (out.length >= MAX_OTHER_LISTINGS) break;
+  }
+  return out;
+}
+
 /**
  * @returns the public research.2 response, or null when the engine body is not a valid research.2 contract from an allowed demo fixture
  */
@@ -519,7 +540,8 @@ function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = fa
     return {
       raw: item, name, why, differences: safeText(item.differences), concern,
       confidence: oneOf(typeof item.confidence === "string" ? item.confidence.toUpperCase() : "", CONFIDENCES) || "LOW",
-      standing: withStanding ? (oneOf(item.standing, STANDINGS) && !concernWithheld ? item.standing : "CONDITIONAL") : null
+      standing: withStanding ? (oneOf(item.standing, STANDINGS) && !concernWithheld ? item.standing : "CONDITIONAL") : null,
+      otherSellerListings: projectOtherListings(item.otherSellerListings, safeText)
     };
   };
   const successorDraft = successorRaw ? cleanCandidate(successorRaw, true) : null;
@@ -534,7 +556,10 @@ function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = fa
   const candidates = drafts.map((entry) => {
     const comparison = projectComparison(entry.raw.comparison, { key: entry.key, requirementIds, evidenceById, trustConfirmation: fixture });
     const modelStatus = statusFor(oneOf(entry.raw.modelStatus, MODEL_STATUSES), entry.name, supportFor(entry.key, prices, comparison, evidenceById));
-    return { key: entry.key, name: entry.name, why: entry.why, differences: entry.differences, concern: entry.concern, confidence: entry.confidence, standing: entry.standing, modelStatus, comparison };
+    return {
+      key: entry.key, name: entry.name, why: entry.why, differences: entry.differences, concern: entry.concern, confidence: entry.confidence, standing: entry.standing, modelStatus, comparison,
+      ...(entry.otherSellerListings.length ? { otherSellerListings: entry.otherSellerListings } : {})
+    };
   });
 
   // Evidence nobody uses is dropped: no orphan citations.

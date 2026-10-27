@@ -711,3 +711,20 @@ test("the production route refuses research.2: no Preview, no response", async (
   assert.equal(res.json.status, "ERROR");
   assert.equal(JSON.stringify(res.json).includes("research.2"), false);
 });
+
+test("listings at unrecognised sellers ride on a candidate as plain text: validated, bounded, and never a price, a source or a change to the valuation", () => {
+  const base = project(engine("unsupported-claims"));
+  const withListings = (listings) => project(mutate("unsupported-claims", (body) => { body.suggestions[0].otherSellerListings = listings; }));
+  const out = withListings([{ seller: "Mazer Appliance", amount: 2399, model: null }, { seller: "Southeast Steel", amount: 1998.955, model: "LFXS26973S", url: "https://x.test/", price: 1 }, { seller: "Third Seller", amount: 1500, model: null }]);
+  assert.deepEqual(out.suggestions[0].otherSellerListings, [{ seller: "Mazer Appliance", amount: 2399, model: null }, { seller: "Southeast Steel", amount: 1998.96, model: "LFXS26973S" }], "at most two; unknown keys are not carried");
+  assert.equal(canon(out.pricing), canon(base.pricing), "prices, sources and the valuation are exactly what they were");
+  const { otherSellerListings, ...rest } = out.suggestions[0];
+  assert.equal(canon(rest), canon(base.suggestions[0]));
+  // Refused entries: link-like names, bad amounts, duplicates, a name the claim filter withholds. A candidate with none carries no field.
+  for (const entry of [{ seller: "www.shop.test", amount: 100 }, { seller: "See https://x.test", amount: 100 }, { seller: "Shop.example.com", amount: 100 }, { seller: "Fine Seller", amount: 0 }, { seller: "Fine Seller", amount: "1,200" }, { seller: "<b>Fine</b>", amount: 100 }]) {
+    assert.equal("otherSellerListings" in withListings([entry]).suggestions[0], false, JSON.stringify(entry));
+  }
+  assert.equal(withListings([{ seller: "Fine Seller", amount: 100 }, { seller: "fine seller", amount: 200 }]).suggestions[0].otherSellerListings.length, 1, "unique by seller");
+  assert.equal("otherSellerListings" in withListings("not a list").suggestions[0], false);
+  assert.equal("otherSellerListings" in base.suggestions[0], false, "absent unless there is something to show");
+});

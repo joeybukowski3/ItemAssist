@@ -241,7 +241,7 @@
       case "HISTORICAL_TIER_ESTIMATE":
         return range ? "No current retail price is included in this research. Based on the original's reported price, a rough estimate is " + range + ". It is an estimate, not a price for a replacement." : null;
       case "AI_ESTIMATE_ONLY":
-        return range ? "A rough AI estimate is " + range + ". No source supports it." : null;
+        return range ? "A rough AI estimate is " + range + ". No source supports it, and no current listing was eligible to check it against, so it is not a market-value range." : null;
       default:
         return "There isn't enough evidence to estimate a value yet.";
     }
