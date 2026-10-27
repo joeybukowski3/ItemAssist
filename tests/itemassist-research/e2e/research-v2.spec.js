@@ -592,10 +592,10 @@ test("Pricing & evidence with no prices says so plainly and claims no search", a
 
 test("the research.2 fine print resets to the standard wording when a new research session starts", async ({ page }) => {
   const seen = await run(page, "fridge-constraints");
-  await expect(page.locator(".rf-fineprint")).toContainText("combines AI estimates with cited sources");
+  await expect(page.locator(".rf-fineprint")).toContainText("not a professional appraisal or verified replacement-cost determination");
   await page.locator('[data-action="research-new"]').click();
   await expect(page.locator(".rf-fineprint")).toContainText("gives AI estimates from general product knowledge");
-  await expect(page.locator(".rf-fineprint")).not.toContainText("cited sources");
+  await expect(page.locator(".rf-fineprint")).not.toContainText("professional appraisal");
   settle(seen);
 });
 

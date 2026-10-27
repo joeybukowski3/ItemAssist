@@ -1,7 +1,8 @@
 // P1: the hosted ItemAssist Preview, reviewed with browser-level mocks. Zero backend, Redis or provider calls:
 //  - every /api/itemassist-research and /api/replacement-finder call is answered by a mock in the browser;
 //  - any other /api call is refused and fails the test (the `unmocked` list);
-//  - the deployed Preview keeps research DISABLED. The research UI is switched on only by the mocked status response.
+//  - the deployed-Preview test reads the deployment's own status (GET only, environment only) and expects the workspace to match it, whether
+//    research is on or off there; every other test switches the research UI on with a mocked status response.
 // The Deployment Protection bypass secret (VERCEL_AUTOMATION_BYPASS_SECRET) is read here only, sent only to the Preview origin, and never
 // logged, put in a URL, or recorded (traces are off in the config).
 const { test: base, expect, contracts, prepare, isNarrowViewport, expectNoHorizontalOverflow } = require("../../replacement-finder/e2e/helpers.js");
@@ -23,6 +24,8 @@ const test = base.extend({
       } else {
         const probe = await context.request.get(PAGE);
         if (!probe.ok()) throw new Error(`The Preview answered HTTP ${probe.status()}. If it is protected by Vercel Deployment Protection, set ${BYPASS}.`);
+        // A protected Preview redirects to Vercel's own login page, which answers 200 from another origin: that is a blocked run, not a page to test.
+        if (new URL(probe.url()).origin !== target.baseURL) throw new Error(`The Preview redirected to another origin, so it is behind Vercel Deployment Protection. Set ${BYPASS} to run this suite against it.`);
       }
     }
     await use();
@@ -61,7 +64,7 @@ const settle = (seen) => {
 
 // ---- the deployed Preview itself ------------------------------------------------------------------------------------------------------
 
-test("the deployed Preview is untouched: its own status says research is OFF, the research assets are served, and it loads as the classic workspace", async ({ page }) => {
+test("the deployed Preview's workspace matches its own research status: research controls when enabled, the classic workspace when not", async ({ page }) => {
   test.skip(target.local, "needs the hosted Preview (the local static server has no API)");
   const unmocked = [];
   const classicSeen = { consoleErrors: [], pageErrors: [] };
@@ -81,15 +84,28 @@ test("the deployed Preview is untouched: its own status says research is OFF, th
   const response = await page.goto(PAGE);
   expect(response.status()).toBe(200);
   expect(response.headers()["x-robots-tag"]).toMatch(/noindex/);
-  await expect(log(page)).toContainText("Tell me what item you're researching. You can start with a brand and model number.");
-  await expect(page.locator('[data-action="research-new"]')).toHaveCount(0);
-  await expect(page.locator('[data-action="find"]')).toHaveText("Find Replacement");
+  // The research assets are served on every deployment, whichever way the status points.
   expect(await page.evaluate(() => [typeof window.RFResearch, typeof window.RFResearchView])).toEqual(["object", "object"]);
 
+  // The deployment's own status: exactly { enabled: boolean, dailyLimit: positive integer }, never cached. The page above read the same route.
   const status = await page.request.get("/api/itemassist-research", { headers: { Accept: "application/json" } });
   expect(status.status()).toBe(200);
-  expect(await status.json()).toEqual({ enabled: false, dailyLimit: 5 });
   expect(status.headers()["cache-control"]).toMatch(/no-store/);
+  const body = await status.json();
+  expect(Object.keys(body).sort()).toEqual(["dailyLimit", "enabled"]);
+  expect(typeof body.enabled).toBe("boolean");
+  expect(Number.isInteger(body.dailyLimit) && body.dailyLimit > 0).toBe(true);
+
+  // The workspace is exactly one of the two, chosen by that status. Nothing is typed or sent, so no research request is made.
+  if (body.enabled) {
+    await expect(page.locator('[data-action="research-new"]')).toBeVisible();
+    await expect(log(page)).toContainText("Describe the item you're replacing");
+    await expect(page.locator('[data-action="find"]')).toHaveText("Classic lookup");
+  } else {
+    await expect(log(page)).toContainText("Tell me what item you're researching. You can start with a brand and model number.");
+    await expect(page.locator('[data-action="research-new"]')).toHaveCount(0);
+    await expect(page.locator('[data-action="find"]')).toHaveText("Find Replacement");
+  }
   expect(unmocked).toEqual([]);
   expect(classicSeen.consoleErrors).toEqual([]);
   expect(classicSeen.pageErrors).toEqual([]);

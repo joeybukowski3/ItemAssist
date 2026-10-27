@@ -31,7 +31,7 @@
   const SUMMARY_TITLE = "AI Research Summary";
   const DEMO_LABEL = "Demo research data";
   const SUMMARY_NOTE = "Specifications and replacement suggestions are preliminary and not independently verified. Availability and pricing are not checked.";
-  const FINEPRINT_V2 = "ItemAssist Research combines AI estimates with cited sources. Prices are labelled confirmed, unconfirmed or estimated; confirm specifications, availability and price with a seller before buying.";
+  const FINEPRINT_V2 = "ItemAssist Research provides preliminary AI-assisted product and pricing guidance, not a professional appraisal or verified replacement-cost determination. Specifications and retailer prices may be incomplete or estimated. Confirm essential features, availability and current prices before relying on a replacement recommendation.";
   const GREETING ="Describe the item you're replacing: a brand and model number, or a short description. I'll identify it, outline what a replacement should match, and suggest candidates to explore.";
   const PLACEHOLDER = "Describe the item or answer my question...";
   const FINEPRINT = "ItemAssist Research gives AI estimates from general product knowledge. Specifications, availability and pricing are not verified; confirm them before buying.";

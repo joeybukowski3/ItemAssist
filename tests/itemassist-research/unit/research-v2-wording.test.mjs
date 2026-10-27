@@ -236,7 +236,8 @@ test("the demo-data note and the research.2 summary note never call an estimate 
   assert.match(RS.DEMO_PRICE_NOTE, /illustrative, not real prices/);
   assert.match(RS.SUMMARY_NOTE_V2, /confirmed only when it comes from the cited source on the date shown/);
   assert.match(RS.SUMMARY_NOTE_V2, /every other figure is an estimate or an unconfirmed listing/);
-  assert.match(RS.FINEPRINT_V2, /confirm specifications, availability and price with a seller/);
+  assert.match(RS.FINEPRINT_V2, /not a professional appraisal or verified replacement-cost determination/);
+  assert.match(RS.FINEPRINT_V2, /Confirm essential features, availability and current prices before relying on a replacement recommendation/);
 });
 
 test("research.1 chat behaviour is unchanged: the value topic and the trailing-period tidy exist only for research.2", () => {
