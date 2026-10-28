@@ -504,6 +504,20 @@ function projectOtherListings(raw, safeText) {
   return out;
 }
 
+// A sentence of the model's prose that says a candidate matches, equals or exceeds the original's capacity. It is the model's guess: when the
+// engine's own capacity comparison for that candidate is unknown, not assessed or a shortfall, the guess must not read as established.
+const CAPACITY_CLAIM = new RegExp(
+  "\\b(?:match\\w*|exceed\\w*|meet\\w*|equal\\w*|same|similar|comparable|identical|larger|bigger|greater|more)\\b[^.!?]*(?:capacit\\w*|cu\\.? ?ft|cubic f(?:ee|oo)t)"
+  + "|(?:capacit\\w*|cu\\.? ?ft|cubic f(?:ee|oo)t)[^.!?]*\\b(?:match\\w*|exceed\\w*|meet\\w*|equal\\w*|same|similar|comparable)\\b", "i");
+// What a reason says when nothing but such a claim was in it.
+const NEUTRAL_WHY = "A comparable product family to consider.";
+
+/** The text without its capacity-match sentences, or null when none is left. Other statements in the text are kept as written. */
+function withoutCapacityClaim(value) {
+  if (typeof value !== "string" || !value) return value;
+  return value.split(/(?<=[.!?])\s+(?=[A-Z])/).filter((sentence) => !CAPACITY_CLAIM.test(sentence)).join(" ").trim() || null;
+}
+
 /**
  * @returns the public research.2 response, or null when the engine body is not a valid research.2 contract from an allowed demo fixture
  */
@@ -553,11 +567,16 @@ function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = fa
   const names = Object.fromEntries(drafts.map((entry) => [entry.key, entry.name]));
   const prices = projectPrices(body.pricing.prices, { evidence: evidenceAll, keys, names, referenceDate, trustPageVerification: fixture });
   const evidenceById = new Map(evidenceAll.map((entry) => [entry.id, entry]));
+  const capacityId = (requirements.find((item) => item.key === "capacity") || {}).id;
   const candidates = drafts.map((entry) => {
     const comparison = projectComparison(entry.raw.comparison, { key: entry.key, requirementIds, evidenceById, trustConfirmation: fixture });
     const modelStatus = statusFor(oneOf(entry.raw.modelStatus, MODEL_STATUSES), entry.name, supportFor(entry.key, prices, comparison, evidenceById));
+    // The comparison row is the result and is never changed here; only the model's prose is held to it (see `withoutCapacityClaim`).
+    const capacityRow = capacityId ? comparison.find((row) => row.requirementId === capacityId) : null;
+    const capacityOpen = Boolean(capacityId) && (!capacityRow || capacityRow.status === "UNKNOWN" || capacityRow.status === "SHORTFALL");
     return {
-      key: entry.key, name: entry.name, why: entry.why, differences: entry.differences, concern: entry.concern, confidence: entry.confidence, standing: entry.standing, modelStatus, comparison,
+      key: entry.key, name: entry.name, why: capacityOpen ? withoutCapacityClaim(entry.why) || NEUTRAL_WHY : entry.why,
+      differences: capacityOpen ? withoutCapacityClaim(entry.differences) : entry.differences, concern: entry.concern, confidence: entry.confidence, standing: entry.standing, modelStatus, comparison,
       ...(entry.otherSellerListings.length ? { otherSellerListings: entry.otherSellerListings } : {})
     };
   });

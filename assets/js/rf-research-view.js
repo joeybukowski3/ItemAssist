@@ -76,12 +76,14 @@
     ];
   }
 
-  function candidateMeta(item) {
+  function candidateMeta(item, v2) {
     var conditional = item.standing === "CONDITIONAL";
+    // research.2: a caveat badge is shown only while a concern is actually shown beside it (research.1 keeps its badge as it was).
+    var showStanding = item.standing && (!conditional || !v2 || Boolean(item.concern));
     return h("div", { class: "rf-lead-meta" }, [
       R.confidence(item.confidence),
       item.modelStatus ? D.pill(item.modelStatus === "VERIFIED_LISTING" ? "info" : "warn", item.modelStatus === "VERIFIED_LISTING" ? "check" : "q", Research.label(Research.MODEL_STATUS_LABELS, item.modelStatus, "")) : null,
-      item.standing ? D.pill(conditional ? "warn" : "info", conditional ? "q" : "check", conditional ? "Successor, with a caveat" : "Direct successor") : null,
+      showStanding ? D.pill(conditional ? "warn" : "info", conditional ? "q" : "check", conditional ? "Successor, with a caveat" : "Direct successor") : null,
       D.pill("neutral", "q", "Unverified suggestion")
     ].filter(Boolean));
   }
@@ -96,11 +98,11 @@
     return item.concern ? h("p", { class: "rf-rs-concern" }, [D.icon("info"), h("span", {}, [h("strong", { text: "Concern: " }), item.concern])]) : null;
   }
 
-  function card(item, label, extra) {
+  function card(item, label, extra, v2) {
     return h("article", { class: "rf-rs-card" }, [
       h("p", { class: "rf-eyebrow rf-rs-card-label", text: label }),
       h("h4", { class: "rf-rs-card-name rf-mono", text: item.name }),
-      candidateMeta(item),
+      candidateMeta(item, v2),
       h("p", { class: "rf-rs-why" }, [h("strong", { text: "Why it fits: " }), item.why]),
       differenceLine(item),
       concernLine(item)
@@ -120,7 +122,7 @@
       D.heading("h3", "rf-lead-h", "Closest successor to consider", "rf-eyebrow rf-lead-kicker"),
       h("p", { class: "rf-lead-name rf-mono", text: item.name }),
       h("p", { class: "rf-lead-text", text: item.why }),
-      candidateMeta(item),
+      candidateMeta(item, Research.isV2(data)),
       item.differences ? h("p", { class: "rf-lead-note" }, [h("strong", { text: "Biggest difference: " }), item.differences]) : null,
       item.concern ? h("p", { class: "rf-lead-note" }, [h("strong", { text: "Concern: " }), item.concern]) : null
     ].filter(Boolean));
@@ -165,8 +167,8 @@
   function replacementsPanel(data) {
     var cards = [];
     var v2 = Research.isV2(data);
-    if (data.successor) cards.push(card(data.successor, "Successor candidate", v2 ? P.candidateDetail(data, data.successor, "SUCCESSOR") : null));
-    data.suggestions.forEach(function (item, index) { cards.push(card(item, "Alternative " + (index + 1), v2 ? P.candidateDetail(data, item, "ALT_" + (index + 1)) : null)); });
+    if (data.successor) cards.push(card(data.successor, "Successor candidate", v2 ? P.candidateDetail(data, data.successor, "SUCCESSOR") : null, v2));
+    data.suggestions.forEach(function (item, index) { cards.push(card(item, "Alternative " + (index + 1), v2 ? P.candidateDetail(data, item, "ALT_" + (index + 1)) : null, v2)); });
     if (!cards.length) return [D.emptyNote("No replacement candidates", "No candidates to show yet. Add detail in the conversation and I'll research again.")];
     return [block("rf-cands-h", "Candidates to compare", [
       h("div", { class: "rf-rs-cards" }, cards),

@@ -84,7 +84,21 @@ test("one qualifying listing is worded as a single listing price, never as a ran
   const pricing = { prices: [price("p1"), price("p2", { sizeConfirmed: false })], valuation: { method: "PROVISIONAL_LISTINGS", comparables: [], excluded: [{ candidate: "ALT_1", reason: "NO_CURRENT_PRICE" }], reference: null } };
   assert.deepEqual(RS.priceRole(pricing, pricing.prices[1]), { role: "CONTEXT_ONLY", note: "SIZE_NOT_CONFIRMED", exclusion: null }, "an example stays context even though its candidate is excluded");
   assert.equal(RS.priceRole(pricing, pricing.prices[0]).role, "EXCLUDED");
-  assert.match(RS.label(RS.PRICE_ROLE_REASONS, "SIZE_NOT_CONFIRMED"), /does not state the screen size.*does not confirm a match/);
+  assert.match(RS.label(RS.PRICE_ROLE_REASONS, "SIZE_NOT_CONFIRMED"), /size is not confirmed against the original.*does not confirm a match/);
+});
+
+test("no price role claims that every essential requirement is met: a priced candidate is only one with none known to fall short, and never confirmed as an exact match", () => {
+  const comparable = RS.label(RS.PRICE_ROLE_REASONS, "CURRENT_COMPARABLE");
+  assert.equal(comparable, "A current price for a candidate with no essential requirement known to fall short. It is not confirmed as an exact match.");
+  for (const text of Object.values(RS.PRICE_ROLE_REASONS)) assert.doesNotMatch(text, /meets every|meets all|satisf(?:ies|y) every|all essential/i, text);
+  // The wording is the same for every method that lets a listing set a range, so it cannot read stronger for a search listing than for anything else.
+  for (const id of RESEARCH2_SCENARIOS) {
+    const data = scenario(id);
+    for (const price of data.pricing.prices) {
+      const role = RS.priceRole(data.pricing, price);
+      if (role.role === "USED_IN_RANGE" && role.note === "CURRENT_COMPARABLE") assert.equal(RS.label(RS.PRICE_ROLE_REASONS, role.note), comparable, `${id} ${price.id}`);
+    }
+  }
 });
 
 test("listings of the original model are context apart from its history; listings that agree are one price anchor with its sellers, never a cent-wide range", () => {
@@ -190,6 +204,24 @@ test("research.1 replies are unchanged: still the 'hasn't been verified' closing
   const lines = RS.reply(researchResponse(), null).lines;
   assert.equal(lines[lines.length - 1], "This is an AI estimate and hasn't been verified.");
   assert.equal(lines.some((line) => /\$\d/.test(line)), false);
+});
+
+test("'with a caveat' is said of a research.2 successor only while a concern is actually carried; research.1 keeps its wording", () => {
+  const successorLine = (data) => RS.reply(data, null).lines.find((line) => /^Closest successor to consider/.test(line));
+  const v2 = scenario("fridge-constraints");
+  assert.equal(v2.successor.standing, "CONDITIONAL");
+  assert.ok(v2.successor.concern, "the golden successor carries a real concern");
+  assert.match(successorLine(v2), /\(with a caveat, see Replacements\)\.$/);
+  const noConcern = { ...v2, successor: { ...v2.successor, concern: null } };
+  assert.equal(noConcern.successor.standing, "CONDITIONAL");
+  assert.equal(successorLine(noConcern), `Closest successor to consider: ${v2.successor.name}.`, "no concern, no caveat");
+  const recommended = scenario("tv-strong-retail");
+  assert.doesNotMatch(successorLine(recommended), /caveat/);
+  // research.1 is unchanged: its conditional successor is called conditional whether or not a concern text survived.
+  const v1 = researchResponse();
+  assert.equal(v1.successor.standing, "CONDITIONAL");
+  assert.match(successorLine(v1), /\(with a caveat/);
+  assert.match(successorLine({ ...v1, successor: { ...v1.successor, concern: null } }), /\(with a caveat/);
 });
 
 test("a question about worth or price is answered from the valuation, with the date, the sources, and the reminder to check with a seller", () => {

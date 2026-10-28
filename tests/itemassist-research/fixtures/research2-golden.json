@@ -1811,7 +1811,7 @@
           "why": "The next generation of the same LG C-series OLED line.",
           "differences": null,
           "concern": null,
-          "confidence": "HIGH",
+          "confidence": "MEDIUM",
           "standing": "RECOMMENDED",
           "verified": false,
           "modelStatus": "UNVERIFIED_MODEL",

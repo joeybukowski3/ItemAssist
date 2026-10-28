@@ -109,8 +109,8 @@
     NOT_COMPARABLE: "Not used for the range.",
     ORIGINAL_LISTING: "A price seen for the original model on a seller's page, with no reliable date. It may be a sale, clearance or discontinued price. It is not a list price, and it never sets the replacement range.",
     OTHER_FAMILY: "A current price for a different candidate family. It is listed separately and does not set the headline range.",
-    SIZE_NOT_CONFIRMED: "A retail example whose listing does not state the screen size. It does not confirm a match and does not set the range.",
-    CURRENT_COMPARABLE: "A current price for a candidate that meets every essential requirement.",
+    SIZE_NOT_CONFIRMED: "A retail example whose size is not confirmed against the original. It does not confirm a match and does not set the range.",
+    CURRENT_COMPARABLE: "A current price for a candidate with no essential requirement known to fall short. It is not confirmed as an exact match.",
     ESTIMATE_ANCHOR: "The estimate band scales this price. No current retail price is included in this research.",
     ESTIMATE_RANGE: "An AI estimate. No source supports it."
   });
@@ -519,7 +519,7 @@
       tone = "best";
       lines.push("This looks like " + data.original.identity + (data.original.confidence === "HIGH" ? "." : " (" + data.original.confidence.toLowerCase() + " confidence)."));
       if (data.successor) {
-        lines.push("Closest successor to consider: " + data.successor.name + (data.successor.standing === "CONDITIONAL" ? " (with a caveat, see Replacements)." : "."));
+        lines.push("Closest successor to consider: " + data.successor.name + (data.successor.standing === "CONDITIONAL" && (!isV2(data) || data.successor.concern) ? " (with a caveat, see Replacements)." : "."));
       } else {
         lines.push("I couldn't name a direct successor with confidence.");
       }

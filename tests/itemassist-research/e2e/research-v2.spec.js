@@ -212,7 +212,9 @@ test("Live answer: one qualifying listing is a 'Current listing price anchor', a
   await expect(card.locator(".rf-pill--ok")).toHaveCount(0);
   const pricing = await open(page, "pricing");
   await expect(pricing.locator(".rf-pill", { hasText: "Size not confirmed" })).toHaveCount(2);
-  await expect(pricing.locator(".rf-rs-price[data-price-id='p3']")).toContainText("A retail example whose listing does not state the screen size. It does not confirm a match and does not set the range.");
+  await expect(pricing.locator(".rf-rs-price[data-price-id='p3']")).toContainText("A retail example whose size is not confirmed against the original. It does not confirm a match and does not set the range.");
+  await expect(pricing.locator(".rf-rs-price[data-price-id='p2']")).toContainText("A current price for a candidate with no essential requirement known to fall short. It is not confirmed as an exact match.");
+  await expect(pricing).not.toContainText(/meets every essential requirement/i);
   await expect(pricing.locator(".rf-rs-price[data-price-id='p3']")).toHaveAttribute("data-price-role", "CONTEXT_ONLY");
   await expect(pricing.locator(".rf-rs-price[data-price-id='p2']")).toHaveAttribute("data-price-role", "USED_IN_RANGE");
   await expect(pricing.locator(".rf-rs-price[data-price-id='p2']").getByText("Size not confirmed")).toHaveCount(0);
@@ -322,6 +324,34 @@ test("Requirements: a criterion the AI added is marked as such", async ({ page }
   await expect(panel).toContainText("Total height with the stacked dryer under the cabinet limit");
   await expect(panel.locator(".rf-rs-reqlist .rf-pill--warn")).toContainText("Added by the AI estimate");
   await expect(panel).toContainText("Standard criteria plus AI-added detail");
+  settle(seen);
+});
+
+test("the caveat badge is shown beside a real concern, in the overview, the candidate card and the conversation", async ({ page }) => {
+  const seen = await run(page, "fridge-constraints");
+  const successor = research2Response("fridge-constraints").successor;
+  expect(successor.concern).toBeTruthy();
+  const overview = await open(page, "overview");
+  await expect(overview.locator(".rf-lead-meta .rf-pill", { hasText: "Successor, with a caveat" })).toHaveCount(1);
+  await expect(overview).toContainText(`Concern: ${successor.concern}`);
+  await expect(log(page)).toContainText("(with a caveat, see Replacements)");
+  const replacements = await open(page, "replacements");
+  await expect(replacements.locator(".rf-rs-card .rf-lead-meta .rf-pill", { hasText: "Successor, with a caveat" })).toHaveCount(1);
+  settle(seen);
+});
+
+test("no caveat badge is shown when no concern remains for the successor: not in the overview, the candidate card or the conversation", async ({ page }) => {
+  const successor = research2Response("fridge-constraints").successor;
+  const seen = await run(page, "fridge-constraints", { successor: { ...successor, concern: null } });
+  const overview = await open(page, "overview");
+  await expect(overview.locator(".rf-lead-name")).toHaveText(successor.name);
+  await expect(overview).not.toContainText("with a caveat");
+  await expect(overview.locator(".rf-lead-meta .rf-pill", { hasText: "Direct successor" })).toHaveCount(0);
+  await expect(log(page)).toContainText("Closest successor to consider:");
+  await expect(log(page)).not.toContainText("with a caveat");
+  const replacements = await open(page, "replacements");
+  await expect(replacements.locator(".rf-rs-card").first()).toBeVisible();
+  await expect(replacements).not.toContainText("with a caveat");
   settle(seen);
 });
 

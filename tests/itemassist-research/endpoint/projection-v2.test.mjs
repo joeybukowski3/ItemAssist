@@ -728,3 +728,51 @@ test("listings at unrecognised sellers ride on a candidate as plain text: valida
   assert.equal("otherSellerListings" in withListings("not a list").suggestions[0], false);
   assert.equal("otherSellerListings" in base.suggestions[0], false, "absent unless there is something to show");
 });
+
+// ---- candidate prose is held to the engine's own capacity comparison -------------------------------------------------------------------------------
+
+const NEUTRAL = "A comparable product family to consider.";
+const CLAIM = "Matches the capacity, French door layout and water dispenser.";
+// fridge-constraints: r1 is the standard "capacity" requirement; the successor's row for it is MEETS (an estimate) in the golden file.
+const withCapacity = (status, change = () => {}) => project(mutate("fridge-constraints", (body) => {
+  const row = body.successor.comparison.find((item) => item.requirementId === "r1");
+  if (status === null) body.successor.comparison = body.successor.comparison.filter((item) => item !== row); else row.status = status;
+  body.successor.why = `${CLAIM} Continues the same line.`;
+  change(body);
+}));
+
+test("a reason that says a candidate matches the original's capacity is removed when the engine's capacity comparison is unknown, not assessed or a shortfall; the comparison itself is untouched", () => {
+  for (const status of ["UNKNOWN", "SHORTFALL", null]) {
+    const out = withCapacity(status);
+    assert.equal(out.successor.why, "Continues the same line.", String(status));
+    const row = out.successor.comparison.find((item) => item.requirementId === "r1");
+    assert.equal(row ? row.status : null, status, "the code-owned result is not changed");
+  }
+  // An estimated MEETS is the model's own result and is shown as the estimate it is: its prose is left alone.
+  assert.equal(withCapacity("MEETS").successor.why, `${CLAIM} Continues the same line.`);
+  assert.equal(withCapacity("EXCEEDS").successor.why, `${CLAIM} Continues the same line.`);
+});
+
+test("only the capacity claim goes: other statements stay as written, a reason that was only the claim becomes a neutral line, and a difference that was only the claim is omitted", () => {
+  const out = withCapacity("UNKNOWN", (body) => {
+    body.successor.differences = "Same capacity but different shelving.";
+    body.suggestions[0].why = "Offers comparable large capacity and the same layout.";
+    body.suggestions[0].differences = "Slightly smaller total capacity. Different shelving.";
+    const alt = body.suggestions[0].comparison.find((item) => item.requirementId === "r1");
+    if (alt) alt.status = "UNKNOWN"; else body.suggestions[0].comparison.push({ requirementId: "r1", status: "UNKNOWN", basis: "AI_ESTIMATE", evidenceId: null });
+  });
+  assert.equal(out.successor.differences, null, "a difference that was only the claim");
+  assert.ok(out.warnings.includes("DIFFERENCES_MISSING"));
+  const alt = out.suggestions[0];
+  assert.equal(alt.why, NEUTRAL, "a reason made only of the claim");
+  assert.equal(alt.differences, "Slightly smaller total capacity. Different shelving.", "a shortfall statement is not a match claim");
+  // A claim about something other than capacity is never touched.
+  assert.equal(withCapacity("UNKNOWN", (body) => { body.successor.why = "Matches the French door layout and finish."; }).successor.why, "Matches the French door layout and finish.");
+  assert.equal(withCapacity("UNKNOWN", (body) => { body.successor.why = CLAIM; }).successor.why, NEUTRAL);
+});
+
+test("a product type with no capacity requirement, such as a television, keeps its prose and its comparison exactly", () => {
+  const out = project(mutate("tv-premium-oled", (body) => { body.successor.why = "Matches the screen size and similar capacity of the original."; }));
+  assert.equal(out.successor.why, "Matches the screen size and similar capacity of the original.");
+  assert.equal(canon(without(project(engine("fridge-constraints")))), canon(without(GOLDEN.scenarios["fridge-constraints"].engine)), "an honest golden response passes unchanged");
+});
