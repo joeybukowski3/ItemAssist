@@ -9,7 +9,12 @@
   var RF = window.RFShared;
   var Intake = window.RFIntake;
   var D = window.RFDom;
+  // ItemAssist Research (additive): present only if its modules loaded. Without them the page is exactly the classic lookup.
+  var RS = window.RFResearch;
+  var RV = window.RFResearchView;
   var API_URL = "/api/replacement-finder";
+  var RESEARCH_URL = "/api/itemassist-research";
+  var RESEARCH_TIMEOUT_MS = 15000;
   var CLIENT_TIMEOUT_MS = 30000;
   var STAGE_INTERVAL_MS = 3500;
   // Below this width the assistant and the report share one continuous page; above it they sit side by side.
@@ -20,6 +25,14 @@
   var narrowQuery = window.matchMedia(NARROW_QUERY);
 
   var state = { controller: null, stageTimer: null, run: 0, report: null, last: null, enabled: true, intake: Intake.initialState(), exchangeStart: null };
+
+  function localStorageOrNull() {
+    try { return window.localStorage; } catch (error) { return null; }
+  }
+  // Research is OFF until the research route reports itself enabled; `session` is the in-memory conversation about the current item.
+  var research = RS && RV
+    ? { enabled: false, session: RS.initialSession(), view: null, greeting: null, visitorId: RS.createVisitorId(localStorageOrNull()) }
+    : { enabled: false, view: null };
 
   var UNAVAILABLE_ON_ITS_OWN = {
     explain: ["Why this match?", "Run Find Replacement first and I can explain why a model was chosen."],
@@ -79,6 +92,7 @@
    * The conversational parse is a convenience; the proxy still validates every request and its answer wins.
    */
   function onFreeText(text) {
+    if (research.enabled) return researchText(text);
     var message = assistant.userSays(text);
     if (!state.enabled) return assistant.say("Replacement Finder isn't available right now. Please check back soon.");
     if (state.intake.status !== Intake.STATUS.NEEDS_CLARIFICATION) state.exchangeStart = message;
@@ -108,6 +122,10 @@
   }
 
   function onQuick(action, notReady) {
+    if (action === "research-new") {
+      assistant.userSays("New research");
+      return resetResearch();
+    }
     if (action === "find") {
       if (!state.enabled) return assistant.say("Replacement Finder isn't available right now. Please check back soon.");
       state.intake = Intake.reset();
@@ -171,6 +189,7 @@
     state.last = { category: payload.category, model: payload.model, notes: payload.notes };
     // A new lookup replaces the previous report: showing model A's report beside model B's conversation would mislead.
     state.report = null;
+    if (research.view) { research.view = null; syncQuick(false); }
     assistant.setReportReady(false);
     assistant.commitPrompt(payload, source);
     assistant.setBusy(true);
@@ -269,6 +288,199 @@
     focusIdentity();
   }
 
+  /* ---------- ItemAssist Research (the default workflow while the research route is enabled) ---------- */
+
+  /** Shows the Product Intelligence pane for research (true) or anything else (false); the v1 report actions only apply to a v1 report. */
+  function syncQuick(isResearchView) {
+    document.getElementById("rf-assistant").classList.toggle("rf-view-research", Boolean(isResearchView));
+  }
+
+  function showResearchOrEmpty() {
+    if (research.view) {
+      showProduct(research.view.node);
+      syncQuick(true);
+    } else {
+      showProduct(window.RFProduct.renderEmpty());
+      syncQuick(false);
+    }
+  }
+
+  function focusResearch() {
+    if (!research.view) return;
+    var behavior = prefersReducedMotion() ? "auto" : "smooth";
+    if (isNarrow()) research.view.header.scrollIntoView({ block: "start", behavior: behavior });
+    else window.scrollTo({ top: 0, behavior: behavior });
+    research.view.nameHeading.focus({ preventScroll: true });
+  }
+
+  function resetResearch() {
+    research.session = RS.initialSession();
+    research.view = null;
+    // The fine print describes the report on screen; with no report it returns to the standard wording.
+    var fineprint = document.querySelector(".rf-fineprint");
+    if (fineprint) fineprint.textContent = RS.FINEPRINT;
+    showResearchOrEmpty();
+    assistant.say(RS.STARTING_FRESH);
+    assistant.focusComposer();
+  }
+
+  /**
+   * A typed message in research mode. What it means (a new item, more detail on this one, a question about the results, or unclear)
+   * is decided locally by RFResearch.classify, so only a new item or added detail ever costs a research request.
+   */
+  function researchText(text) {
+    var verdict = RS.classify(research.session, text);
+    if (verdict.kind === "empty") return;
+    assistant.userSays(text);
+    assistant.clearChoices();
+    if (verdict.kind === "reset") return resetResearch();
+    if (verdict.kind === "question") {
+      var answer = RS.localAnswer(research.session, text);
+      return assistant.say(answer ? answer.map(function (line) { return D.h("p", { text: line }); }) : RS.FALLBACK_HELP);
+    }
+    if (verdict.kind === "ask" && verdict.reason === "accessory") {
+      // An accessory is never merged into the current item's query: it is researched on its own, or left alone.
+      return assistant.askChoice(RS.ASK_ACCESSORY, [{ label: "Research it separately", value: "new" }, { label: "Stay with my current item", value: "stay" }], function (mode) {
+        if (mode === "stay") return assistant.say(RS.STAY_ON_ITEM);
+        submitResearch(mode, verdict.text);
+      });
+    }
+    if (verdict.kind === "ask") {
+      return assistant.askChoice(RS.ASK_WHICH, [{ label: "More detail on this item", value: "refine" }, { label: "A different item", value: "new" }], function (mode) {
+        submitResearch(mode, verdict.text);
+      });
+    }
+    submitResearch(verdict.kind, verdict.text);
+  }
+
+  function submitResearch(requested, text) {
+    var mode = RS.resolveMode(research.session, requested, text);
+    var composed = RS.composeQuery(research.session, text, mode);
+    if (!composed) return assistant.say(RS.TOO_LONG);
+    runResearch(mode, text, composed);
+  }
+
+  function cancelResearch() {
+    state.run += 1;
+    if (state.controller) state.controller.abort();
+    stopLoading();
+    markLoadingDone();
+    showResearchOrEmpty();
+    assistant.say("Research cancelled. Nothing was changed.");
+    assistant.focusComposer();
+  }
+
+  async function runResearch(mode, text, composed) {
+    var run = ++state.run;
+    var controller = new AbortController();
+    state.controller = controller;
+    assistant.setBusy(true);
+    var loading = assistant.say([
+      D.h("p", { text: "Researching " + composed.query + "..." }),
+      D.h("div", { class: "rf-actions" }, [D.button("Cancel", "rf-secondary", cancelResearch)])
+    ], "rf-msg--loading");
+    loading.setAttribute("role", "status");
+    showProduct(RV.renderResearching(composed.query));
+    syncQuick(false);
+    var timeout = window.setTimeout(function () { controller.abort(); }, RESEARCH_TIMEOUT_MS);
+    var outcome;
+    try {
+      var headers = { "Content-Type": "application/json", Accept: "application/json" };
+      var visitor = research.visitorId();
+      if (visitor) headers["X-Visitor-Id"] = visitor;
+      var response = await fetch(RESEARCH_URL, {
+        method: "POST", headers: headers, body: JSON.stringify({ query: composed.query, website: "" }), signal: controller.signal, credentials: "same-origin"
+      });
+      var parsed = null;
+      try { parsed = await response.json(); } catch (error) { parsed = null; }
+      outcome = { body: parsed };
+    } catch (error) {
+      outcome = { network: true, aborted: controller.signal.aborted };
+    } finally {
+      window.clearTimeout(timeout);
+    }
+    if (run !== state.run) return; // cancelled or superseded
+    stopLoading();
+    markLoadingDone();
+    if (outcome.network) return researchFail(outcome.aborted ? "ENGINE_TIMEOUT" : "NETWORK_ERROR");
+    renderResearch(outcome.body, mode, text, composed);
+  }
+
+  /** Every failure is a short message from fixed copy. The classic lookup is offered when it is a sensible alternative. */
+  function researchFail(code) {
+    showResearchOrEmpty();
+    var children = [D.h("p", { text: RS.errorMessage(code) })];
+    if (RS.offersClassic(code)) {
+      children.push(D.h("div", { class: "rf-actions" }, [D.button("Use classic lookup", "rf-secondary", function () { assistant.openPrompt(state.last || {}); })]));
+    }
+    var node = assistant.say(children, "rf-msg--error");
+    node.setAttribute("role", "alert");
+    assistant.moveFocusTo(node);
+  }
+
+  /** The assistant's reply: the headline, a few plain lines, the questions to answer next, and what is left of today's allowance. */
+  function researchSummary(data) {
+    var reply = RS.reply(data, data.quota);
+    var body = [D.h("p", { class: "rf-msg-kicker", text: reply.kicker })];
+    reply.lines.forEach(function (line) { body.push(D.h("p", { text: line })); });
+    if (reply.questions.length) {
+      body.push(D.h("p", { class: "rf-msg-note-q", text: reply.questions.length === 1 ? "To tighten this up:" : "To tighten this up, tell me:" }));
+      body.push(D.h("ul", { class: "rf-rs-questions" }, reply.questions.map(function (question) { return D.h("li", { text: question }); })));
+    }
+    if (reply.quotaLine) body.push(D.h("p", { class: "rf-msg-line", text: reply.quotaLine }));
+    body.push(D.h("div", { class: "rf-actions" }, [D.button("View product intelligence", "rf-secondary rf-view-product", focusResearch)]));
+    return assistant.say(body, "rf-msg--summary rf-msg--summary-" + reply.tone);
+  }
+
+  function renderResearch(body, mode, text, composed) {
+    if (body && typeof body === "object" && body.status === "ERROR") return researchFail(body.errorCode);
+    if (!RS.isResearchResponse(body)) return researchFail("ENGINE_ERROR");
+    var view;
+    try {
+      view = RV.renderReport(body, { isNarrow: isNarrow });
+    } catch (error) {
+      // A 200 that passed the shape check but cannot be rendered is an engine error, never a half-built report.
+      return researchFail("ENGINE_ERROR");
+    }
+    research.session = RS.adopt(research.session, mode, text, composed, body);
+    research.view = view;
+    var fineprint = document.querySelector(".rf-fineprint");
+    if (fineprint) fineprint.textContent = RS.isV2(body) ? RS.FINEPRINT_V2 : RS.FINEPRINT;
+    state.report = null;
+    assistant.setReportReady(false);
+    showResearchOrEmpty();
+    assistant.foldBefore(researchSummary(body));
+    // Beside the report the conversation continues in the composer; on the single page the finished report starts directly below.
+    if (isNarrow()) focusResearch(); else assistant.focusComposer();
+  }
+
+  /** Turns the workspace into the research experience: same two panes and composer, new greeting, placeholder and a "New research" action. */
+  function enableResearch() {
+    research.enabled = true;
+    document.getElementById("rf-assistant").classList.add("rf-mode-research");
+    var input = document.getElementById("rf-compose-input");
+    input.placeholder = RS.PLACEHOLDER;
+    input.maxLength = RS.MAX_QUERY_CHARS;
+    var fineprint = document.querySelector(".rf-fineprint");
+    if (fineprint) fineprint.textContent = RS.FINEPRINT;
+    var greeting = research.greeting && research.greeting.querySelector(".rf-msg-body p");
+    if (greeting && !document.querySelector(".rf-msg--user")) greeting.textContent = RS.GREETING;
+    var classic = document.querySelector('[data-action="find"]');
+    if (classic) { classic.textContent = "Classic lookup"; classic.classList.remove("rf-qa--primary"); }
+    var chip = D.h("li", {}, [D.h("button", { class: "rf-qa rf-qa--primary", text: "New research", attrs: { type: "button", "data-action": "research-new" } })]);
+    document.getElementById("rf-quick").insertBefore(chip, document.getElementById("rf-quick").firstChild);
+  }
+
+  async function checkResearch() {
+    if (!RS || !RV) return;
+    if (new URLSearchParams(window.location.search).get("research") === "0") return; // an explicit way to use the classic lookup only
+    try {
+      var response = await fetch(RESEARCH_URL, { method: "GET", headers: { Accept: "application/json" }, credentials: "same-origin" });
+      var body = await response.json();
+      if (body && body.enabled === true) enableResearch();
+    } catch (error) { /* the classic lookup stays; research availability is a courtesy check */ }
+  }
+
   /* ---------- Init ---------- */
 
   async function checkAvailability() {
@@ -281,7 +493,10 @@
 
   /** Crossing the breakpoint (rotation, window resize) switches an open report between tabs and jump links in place. */
   function watchLayout() {
-    var syncMode = function () { if (state.report) state.report.syncMode(); };
+    var syncMode = function () {
+      if (state.report) state.report.syncMode();
+      if (research.view) research.view.syncMode();
+    };
     if (narrowQuery.addEventListener) narrowQuery.addEventListener("change", syncMode); else narrowQuery.addListener(syncMode);
     var queued = false;
     window.addEventListener("scroll", function () {
@@ -297,9 +512,10 @@
   function init() {
     showProduct(window.RFProduct.renderEmpty());
     assistant.setReportReady(false);
-    assistant.say("Tell me what item you're researching. You can start with a brand and model number.");
+    research.greeting = assistant.say("Tell me what item you're researching. You can start with a brand and model number.");
     watchLayout();
     checkAvailability();
+    checkResearch();
   }
 
   init();

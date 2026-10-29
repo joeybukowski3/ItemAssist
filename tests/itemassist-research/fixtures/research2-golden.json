@@ -1,0 +1,2114 @@
+{
+  "generatedFrom": "itemassist-pricing-audit lib/itemassist-research/fixture-v2.js through buildResearchResponseV2 (Phase 4 M1)",
+  "referenceDate": "2026-10-22",
+  "note": "Illustrative demo data only. Regenerate with scripts/itemassist-research-export.mjs in the research engine when the research.2 contract changes.",
+  "scenarios": {
+    "tv-premium-oled": {
+      "query": "LG C3 OLED TV",
+      "engine": {
+        "contractVersion": "research.2",
+        "kind": "ITEMASSIST_RESEARCH",
+        "status": "OK",
+        "category": "tv",
+        "profile": "tv",
+        "original": {
+          "identity": "LG C3 series 4K OLED smart TV",
+          "confidence": "HIGH",
+          "characteristics": [
+            "OLED panel with self-lit pixels",
+            "4K resolution",
+            "120 Hz panel",
+            "webOS smart platform"
+          ],
+          "uncertainty": "Screen size was not given."
+        },
+        "requirements": [
+          {
+            "id": "r1",
+            "key": "screenSize",
+            "text": "Screen size class close to the original",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r2",
+            "key": "resolution",
+            "text": "Same or better resolution (4K or higher)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r3",
+            "key": "displayClass",
+            "text": "Same display technology class (OLED, QLED or LED)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r4",
+            "key": "refresh",
+            "text": "Native refresh rate (120 Hz where the original had it)",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r5",
+            "key": "hdmi",
+            "text": "HDMI 2.1 ports for current consoles",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r6",
+            "key": "hdr",
+            "text": "The HDR formats the original supported",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r7",
+            "key": "brightness",
+            "text": "Peak brightness suited to a bright room",
+            "importance": "IMPORTANT",
+            "origin": "AI_ESTIMATE"
+          },
+          {
+            "id": "r8",
+            "key": "smart",
+            "text": "A smart platform with the apps you use",
+            "importance": "MINOR",
+            "origin": "CATEGORY_RULE"
+          }
+        ],
+        "requirementsSource": "AI_ESTIMATE_PLUS_CATEGORY_GUIDANCE",
+        "successor": {
+          "name": "LG C-series OLED, current generation",
+          "why": "The next generation of the same LG C-series OLED line.",
+          "differences": "Newer processor and a brighter panel on some sizes.",
+          "concern": null,
+          "confidence": "HIGH",
+          "standing": "RECOMMENDED",
+          "verified": false,
+          "modelStatus": "LISTED_PROVISIONAL",
+          "comparison": [
+            {
+              "requirementId": "r1",
+              "status": "UNKNOWN",
+              "basis": "AI_ESTIMATE",
+              "evidenceId": null
+            },
+            {
+              "requirementId": "r2",
+              "status": "MEETS",
+              "basis": "AI_ESTIMATE",
+              "evidenceId": null
+            },
+            {
+              "requirementId": "r3",
+              "status": "MEETS",
+              "basis": "AI_ESTIMATE",
+              "evidenceId": null
+            },
+            {
+              "requirementId": "r4",
+              "status": "MEETS",
+              "basis": "AI_ESTIMATE",
+              "evidenceId": null
+            },
+            {
+              "requirementId": "r5",
+              "status": "MEETS",
+              "basis": "AI_ESTIMATE",
+              "evidenceId": null
+            }
+          ]
+        },
+        "suggestions": [
+          {
+            "name": "Samsung S90-series QD-OLED",
+            "why": "Comparable premium OLED-class picture quality.",
+            "differences": "Different smart platform and remote.",
+            "concern": null,
+            "confidence": "MEDIUM",
+            "verified": false,
+            "modelStatus": "LISTED_PROVISIONAL",
+            "comparison": [
+              {
+                "requirementId": "r3",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              },
+              {
+                "requirementId": "r4",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              }
+            ]
+          },
+          {
+            "name": "Sony Bravia 8-series OLED",
+            "why": "Similar tier with strong picture processing.",
+            "differences": "Fewer gaming features on some sizes.",
+            "concern": "Check the HDMI 2.1 port count for your size.",
+            "confidence": "MEDIUM",
+            "verified": false,
+            "modelStatus": "LISTED_PROVISIONAL",
+            "comparison": [
+              {
+                "requirementId": "r3",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              },
+              {
+                "requirementId": "r5",
+                "status": "UNKNOWN",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              }
+            ]
+          }
+        ],
+        "pricing": {
+          "referenceDate": "2026-10-22",
+          "tier": {
+            "level": "PREMIUM",
+            "basis": "MSRP_EVIDENCE"
+          },
+          "prices": [
+            {
+              "id": "p1",
+              "kind": "MSRP",
+              "subject": "ORIGINAL",
+              "candidate": null,
+              "model": "DEMO-C3-65",
+              "amount": {
+                "currency": "USD",
+                "low": 1999,
+                "high": 1999
+              },
+              "asOf": "2023-03-20",
+              "asOfBasis": "PUBLISHED",
+              "verification": "SEARCH_SNIPPET",
+              "evidenceId": "e1"
+            },
+            {
+              "id": "p2",
+              "kind": "CURRENT_RETAIL_NEW",
+              "subject": "REPLACEMENT",
+              "candidate": "SUCCESSOR",
+              "model": "DEMO-C4-65",
+              "amount": {
+                "currency": "USD",
+                "low": 1299,
+                "high": 1299
+              },
+              "asOf": "2026-10-20",
+              "asOfBasis": "OBSERVED",
+              "verification": "SEARCH_LISTING",
+              "evidenceId": "e2"
+            },
+            {
+              "id": "p3",
+              "kind": "CURRENT_RETAIL_NEW",
+              "subject": "REPLACEMENT",
+              "candidate": "ALT_1",
+              "model": "DEMO-S90-65",
+              "amount": {
+                "currency": "USD",
+                "low": 1199,
+                "high": 1199
+              },
+              "asOf": "2026-10-20",
+              "asOfBasis": "OBSERVED",
+              "verification": "SEARCH_LISTING",
+              "evidenceId": "e3"
+            },
+            {
+              "id": "p4",
+              "kind": "CURRENT_RETAIL_NEW",
+              "subject": "REPLACEMENT",
+              "candidate": "ALT_2",
+              "model": "DEMO-BR8-65",
+              "amount": {
+                "currency": "USD",
+                "low": 1399,
+                "high": 1399
+              },
+              "asOf": "2026-10-19",
+              "asOfBasis": "OBSERVED",
+              "verification": "SEARCH_LISTING",
+              "evidenceId": "e4"
+            }
+          ],
+          "evidence": [
+            {
+              "id": "e1",
+              "subject": "ORIGINAL",
+              "sourceName": "CNET",
+              "sourceDomain": "cnet.com",
+              "sourceUrl": "https://www.cnet.com/",
+              "sourceClass": "REVIEW",
+              "firstParty": false,
+              "publishedAt": "2023-03-20",
+              "observedAt": null,
+              "subjectModel": "DEMO-C3-65",
+              "expectedModel": "DEMO-C3-65",
+              "modelRelation": "EXACT"
+            },
+            {
+              "id": "e2",
+              "subject": "SUCCESSOR",
+              "sourceName": "Best Buy",
+              "sourceDomain": "bestbuy.com",
+              "sourceUrl": "https://www.bestbuy.com/",
+              "sourceClass": "RETAILER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-10-20",
+              "subjectModel": "DEMO-C4-65",
+              "expectedModel": "DEMO-C4-65",
+              "modelRelation": "EXACT"
+            },
+            {
+              "id": "e3",
+              "subject": "ALT_1",
+              "sourceName": "Abt",
+              "sourceDomain": "abt.com",
+              "sourceUrl": "https://www.abt.com/",
+              "sourceClass": "RETAILER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-10-20",
+              "subjectModel": "DEMO-S90-65",
+              "expectedModel": "DEMO-S90-65",
+              "modelRelation": "EXACT"
+            },
+            {
+              "id": "e4",
+              "subject": "ALT_2",
+              "sourceName": "The Home Depot",
+              "sourceDomain": "homedepot.com",
+              "sourceUrl": "https://www.homedepot.com/",
+              "sourceClass": "RETAILER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-10-19",
+              "subjectModel": "DEMO-BR8-65",
+              "expectedModel": "DEMO-BR8-65",
+              "modelRelation": "EXACT"
+            }
+          ],
+          "valuation": {
+            "method": "PROVISIONAL_LISTINGS",
+            "basis": "PROVISIONAL_LISTINGS",
+            "verified": false,
+            "range": {
+              "currency": "USD",
+              "low": 1199,
+              "high": 1399
+            },
+            "confidence": "MEDIUM",
+            "asOf": "2026-10-20",
+            "comparables": [
+              {
+                "priceId": "p2",
+                "candidate": "SUCCESSOR",
+                "verification": "SEARCH_LISTING"
+              },
+              {
+                "priceId": "p3",
+                "candidate": "ALT_1",
+                "verification": "SEARCH_LISTING"
+              },
+              {
+                "priceId": "p4",
+                "candidate": "ALT_2",
+                "verification": "SEARCH_LISTING"
+              }
+            ],
+            "excluded": [],
+            "reference": {
+              "priceId": "p1",
+              "kind": "MSRP"
+            },
+            "notes": [
+              {
+                "code": "BASED_ON_LISTINGS",
+                "count": 3
+              },
+              {
+                "code": "LISTINGS_NOT_CONFIRMED"
+              },
+              {
+                "code": "MSRP_CONTEXT_ONLY"
+              },
+              {
+                "code": "CURRENT_BELOW_ORIGINAL",
+                "ratio": 0.7
+              },
+              {
+                "code": "NOT_AN_APPRAISAL"
+              }
+            ]
+          },
+          "rejections": []
+        },
+        "clarify": [
+          "What screen size do you need?"
+        ],
+        "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+        "warnings": [],
+        "meta": {
+          "requestId": "engine-req-1",
+          "elapsedMs": 5,
+          "cached": false,
+          "answerSource": "AI_ESTIMATE",
+          "fixture": true
+        }
+      }
+    },
+    "tv-strong-retail": {
+      "query": "Samsung S90D 65",
+      "engine": {
+        "contractVersion": "research.2",
+        "kind": "ITEMASSIST_RESEARCH",
+        "status": "OK",
+        "category": "tv",
+        "profile": "tv",
+        "original": {
+          "identity": "Samsung S90C 65-inch QD-OLED smart TV",
+          "confidence": "HIGH",
+          "characteristics": [
+            "OLED panel with self-lit pixels",
+            "4K resolution",
+            "120 Hz panel",
+            "webOS smart platform"
+          ],
+          "uncertainty": null
+        },
+        "requirements": [
+          {
+            "id": "r1",
+            "key": "screenSize",
+            "text": "Screen size class close to the original",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r2",
+            "key": "resolution",
+            "text": "Same or better resolution (4K or higher)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r3",
+            "key": "displayClass",
+            "text": "Same display technology class (OLED, QLED or LED)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r4",
+            "key": "refresh",
+            "text": "Native refresh rate (120 Hz where the original had it)",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r5",
+            "key": "hdmi",
+            "text": "HDMI 2.1 ports for current consoles",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r6",
+            "key": "hdr",
+            "text": "The HDR formats the original supported",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r7",
+            "key": "brightness",
+            "text": "Peak brightness suited to a bright room",
+            "importance": "IMPORTANT",
+            "origin": "AI_ESTIMATE"
+          },
+          {
+            "id": "r8",
+            "key": "smart",
+            "text": "A smart platform with the apps you use",
+            "importance": "MINOR",
+            "origin": "CATEGORY_RULE"
+          }
+        ],
+        "requirementsSource": "AI_ESTIMATE_PLUS_CATEGORY_GUIDANCE",
+        "successor": {
+          "name": "Samsung S90-series QD-OLED, current generation",
+          "why": "The maker’s current line of the same QD-OLED family.",
+          "differences": "Newer processor and a brighter panel.",
+          "concern": null,
+          "confidence": "HIGH",
+          "standing": "RECOMMENDED",
+          "verified": false,
+          "modelStatus": "VERIFIED_LISTING",
+          "comparison": [
+            {
+              "requirementId": "r1",
+              "status": "MEETS",
+              "basis": "CONFIRMED",
+              "evidenceId": "e2"
+            },
+            {
+              "requirementId": "r2",
+              "status": "MEETS",
+              "basis": "AI_ESTIMATE",
+              "evidenceId": null
+            },
+            {
+              "requirementId": "r3",
+              "status": "MEETS",
+              "basis": "CONFIRMED",
+              "evidenceId": "e2"
+            }
+          ]
+        },
+        "suggestions": [
+          {
+            "name": "Sony Bravia 8-series OLED",
+            "why": "A comparable premium OLED line with strong processing.",
+            "differences": "Different smart platform and speaker design.",
+            "concern": null,
+            "confidence": "MEDIUM",
+            "verified": false,
+            "modelStatus": "VERIFIED_LISTING",
+            "comparison": [
+              {
+                "requirementId": "r1",
+                "status": "MEETS",
+                "basis": "CONFIRMED",
+                "evidenceId": "e4"
+              },
+              {
+                "requirementId": "r4",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              }
+            ]
+          }
+        ],
+        "pricing": {
+          "referenceDate": "2026-10-22",
+          "tier": {
+            "level": "PREMIUM",
+            "basis": "MSRP_EVIDENCE"
+          },
+          "prices": [
+            {
+              "id": "p1",
+              "kind": "MSRP",
+              "subject": "ORIGINAL",
+              "candidate": null,
+              "model": "DEMO-S90C-65",
+              "amount": {
+                "currency": "USD",
+                "low": 2199,
+                "high": 2199
+              },
+              "asOf": "2023-04-05",
+              "asOfBasis": "PUBLISHED",
+              "verification": "VERIFIED_PAGE",
+              "evidenceId": "e1"
+            },
+            {
+              "id": "p2",
+              "kind": "CURRENT_RETAIL_NEW",
+              "subject": "REPLACEMENT",
+              "candidate": "SUCCESSOR",
+              "model": "DEMO-S90-65",
+              "amount": {
+                "currency": "USD",
+                "low": 1599,
+                "high": 1599
+              },
+              "asOf": "2026-10-21",
+              "asOfBasis": "OBSERVED",
+              "verification": "VERIFIED_PAGE",
+              "evidenceId": "e2"
+            },
+            {
+              "id": "p3",
+              "kind": "CURRENT_RETAIL_NEW",
+              "subject": "REPLACEMENT",
+              "candidate": "SUCCESSOR",
+              "model": "DEMO-S90-65",
+              "amount": {
+                "currency": "USD",
+                "low": 1649,
+                "high": 1649
+              },
+              "asOf": "2026-10-21",
+              "asOfBasis": "OBSERVED",
+              "verification": "VERIFIED_PAGE",
+              "evidenceId": "e3"
+            },
+            {
+              "id": "p4",
+              "kind": "CURRENT_RETAIL_NEW",
+              "subject": "REPLACEMENT",
+              "candidate": "ALT_1",
+              "model": "DEMO-BR8-65",
+              "amount": {
+                "currency": "USD",
+                "low": 1499,
+                "high": 1499
+              },
+              "asOf": "2026-10-19",
+              "asOfBasis": "OBSERVED",
+              "verification": "VERIFIED_PAGE",
+              "evidenceId": "e4"
+            }
+          ],
+          "evidence": [
+            {
+              "id": "e1",
+              "subject": "ORIGINAL",
+              "sourceName": "Samsung",
+              "sourceDomain": "samsung.com",
+              "sourceUrl": "https://www.samsung.com/us/",
+              "sourceClass": "MANUFACTURER",
+              "firstParty": true,
+              "publishedAt": "2023-04-05",
+              "observedAt": null,
+              "subjectModel": "DEMO-S90C-65",
+              "expectedModel": "DEMO-S90C-65",
+              "modelRelation": "EXACT"
+            },
+            {
+              "id": "e2",
+              "subject": "SUCCESSOR",
+              "sourceName": "Best Buy",
+              "sourceDomain": "bestbuy.com",
+              "sourceUrl": "https://www.bestbuy.com/",
+              "sourceClass": "RETAILER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-10-21",
+              "subjectModel": "DEMO-S90-65",
+              "expectedModel": "DEMO-S90-65",
+              "modelRelation": "EXACT"
+            },
+            {
+              "id": "e3",
+              "subject": "SUCCESSOR",
+              "sourceName": "Samsung",
+              "sourceDomain": "samsung.com",
+              "sourceUrl": "https://www.samsung.com/us/",
+              "sourceClass": "MANUFACTURER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-10-21",
+              "subjectModel": "DEMO-S90-65",
+              "expectedModel": "DEMO-S90-65",
+              "modelRelation": "EXACT"
+            },
+            {
+              "id": "e4",
+              "subject": "ALT_1",
+              "sourceName": "Abt",
+              "sourceDomain": "abt.com",
+              "sourceUrl": "https://www.abt.com/",
+              "sourceClass": "RETAILER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-10-19",
+              "subjectModel": "DEMO-BR8-65",
+              "expectedModel": "DEMO-BR8-65",
+              "modelRelation": "EXACT"
+            }
+          ],
+          "valuation": {
+            "method": "VERIFIED_MULTI",
+            "basis": "VERIFIED_CURRENT_RETAIL",
+            "verified": true,
+            "range": {
+              "currency": "USD",
+              "low": 1499,
+              "high": 1649
+            },
+            "confidence": "HIGH",
+            "asOf": "2026-10-21",
+            "comparables": [
+              {
+                "priceId": "p2",
+                "candidate": "SUCCESSOR",
+                "verification": "VERIFIED_PAGE"
+              },
+              {
+                "priceId": "p3",
+                "candidate": "SUCCESSOR",
+                "verification": "VERIFIED_PAGE"
+              },
+              {
+                "priceId": "p4",
+                "candidate": "ALT_1",
+                "verification": "VERIFIED_PAGE"
+              }
+            ],
+            "excluded": [],
+            "reference": {
+              "priceId": "p1",
+              "kind": "MSRP"
+            },
+            "notes": [
+              {
+                "code": "BASED_ON_VERIFIED",
+                "count": 3
+              },
+              {
+                "code": "MSRP_CONTEXT_ONLY"
+              },
+              {
+                "code": "NOT_AN_APPRAISAL"
+              }
+            ]
+          },
+          "rejections": []
+        },
+        "clarify": [],
+        "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+        "warnings": [],
+        "meta": {
+          "requestId": "engine-req-1",
+          "elapsedMs": 5,
+          "cached": false,
+          "answerSource": "AI_ESTIMATE",
+          "fixture": true
+        }
+      }
+    },
+    "fridge-constraints": {
+      "query": "Samsung RF28 refrigerator",
+      "engine": {
+        "contractVersion": "research.2",
+        "kind": "ITEMASSIST_RESEARCH",
+        "status": "OK",
+        "category": "refrigerator",
+        "profile": "refrigerator",
+        "original": {
+          "identity": "Samsung RF28 series French door refrigerator",
+          "confidence": "MEDIUM",
+          "characteristics": [
+            "French door layout",
+            "About 28 cubic feet of capacity",
+            "Bottom freezer drawer",
+            "Ice and water in the door"
+          ],
+          "uncertainty": "The exact finish and dispenser setup were not given."
+        },
+        "requirements": [
+          {
+            "id": "r1",
+            "key": "capacity",
+            "text": "Total capacity close to the original (cubic feet)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r2",
+            "key": "layout",
+            "text": "Same door layout (French door, side-by-side, top or bottom freezer)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r3",
+            "key": "fit",
+            "text": "Width, height and depth that fit the opening, with door clearance",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r4",
+            "key": "dispenser",
+            "text": "The same ice and water dispenser setup",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r5",
+            "key": "finish",
+            "text": "A similar finish",
+            "importance": "MINOR",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r6",
+            "key": "efficiency",
+            "text": "Comparable energy efficiency",
+            "importance": "MINOR",
+            "origin": "CATEGORY_RULE"
+          }
+        ],
+        "requirementsSource": "CATEGORY_GUIDANCE",
+        "successor": {
+          "name": "Samsung Bespoke French door series",
+          "why": "A newer Samsung French door line with the same layout and capacity class.",
+          "differences": "Updated cooling and a refreshed control panel.",
+          "concern": "Depth and door swing can differ between generations, so measure the opening first.",
+          "confidence": "MEDIUM",
+          "standing": "CONDITIONAL",
+          "verified": false,
+          "modelStatus": "VERIFIED_LISTING",
+          "comparison": [
+            {
+              "requirementId": "r1",
+              "status": "MEETS",
+              "basis": "CONFIRMED",
+              "evidenceId": "e2"
+            },
+            {
+              "requirementId": "r2",
+              "status": "MEETS",
+              "basis": "CONFIRMED",
+              "evidenceId": "e2"
+            },
+            {
+              "requirementId": "r3",
+              "status": "UNKNOWN",
+              "basis": "AI_ESTIMATE",
+              "evidenceId": null
+            }
+          ]
+        },
+        "suggestions": [
+          {
+            "name": "LG French door series",
+            "why": "Comparable capacity and layout.",
+            "differences": "Different drawer arrangement and finish options.",
+            "concern": null,
+            "confidence": "MEDIUM",
+            "verified": false,
+            "modelStatus": "FAMILY_LEVEL",
+            "comparison": [
+              {
+                "requirementId": "r1",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              },
+              {
+                "requirementId": "r2",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              },
+              {
+                "requirementId": "r3",
+                "status": "UNKNOWN",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              }
+            ]
+          },
+          {
+            "name": "GE side-by-side series",
+            "why": "Similar total capacity and a through-the-door dispenser.",
+            "differences": "A side-by-side layout instead of French doors.",
+            "concern": "The door layout is different from the original.",
+            "confidence": "MEDIUM",
+            "verified": false,
+            "modelStatus": "VERIFIED_LISTING",
+            "comparison": [
+              {
+                "requirementId": "r1",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              },
+              {
+                "requirementId": "r2",
+                "status": "SHORTFALL",
+                "basis": "CONFIRMED",
+                "evidenceId": "e4"
+              }
+            ]
+          }
+        ],
+        "pricing": {
+          "referenceDate": "2026-10-22",
+          "tier": {
+            "level": "PREMIUM",
+            "basis": "MSRP_EVIDENCE"
+          },
+          "prices": [
+            {
+              "id": "p1",
+              "kind": "MSRP",
+              "subject": "ORIGINAL",
+              "candidate": null,
+              "model": "DEMO-RF28",
+              "amount": {
+                "currency": "USD",
+                "low": 2799,
+                "high": 2799
+              },
+              "asOf": "2021-06-10",
+              "asOfBasis": "PUBLISHED",
+              "verification": "VERIFIED_PAGE",
+              "evidenceId": "e1"
+            },
+            {
+              "id": "p2",
+              "kind": "CURRENT_RETAIL_NEW",
+              "subject": "REPLACEMENT",
+              "candidate": "SUCCESSOR",
+              "model": "DEMO-BESPOKE-28",
+              "amount": {
+                "currency": "USD",
+                "low": 2399,
+                "high": 2399
+              },
+              "asOf": "2026-10-21",
+              "asOfBasis": "OBSERVED",
+              "verification": "VERIFIED_PAGE",
+              "evidenceId": "e2"
+            },
+            {
+              "id": "p3",
+              "kind": "CURRENT_RETAIL_NEW",
+              "subject": "REPLACEMENT",
+              "candidate": "ALT_2",
+              "model": "DEMO-GE-SBS1",
+              "amount": {
+                "currency": "USD",
+                "low": 3299,
+                "high": 3299
+              },
+              "asOf": "2026-10-21",
+              "asOfBasis": "OBSERVED",
+              "verification": "VERIFIED_PAGE",
+              "evidenceId": "e3"
+            }
+          ],
+          "evidence": [
+            {
+              "id": "e1",
+              "subject": "ORIGINAL",
+              "sourceName": "Samsung",
+              "sourceDomain": "samsung.com",
+              "sourceUrl": "https://www.samsung.com/us/",
+              "sourceClass": "MANUFACTURER",
+              "firstParty": true,
+              "publishedAt": "2021-06-10",
+              "observedAt": null,
+              "subjectModel": "DEMO-RF28",
+              "expectedModel": "DEMO-RF28",
+              "modelRelation": "EXACT"
+            },
+            {
+              "id": "e2",
+              "subject": "SUCCESSOR",
+              "sourceName": "Lowe’s",
+              "sourceDomain": "lowes.com",
+              "sourceUrl": "https://www.lowes.com/",
+              "sourceClass": "RETAILER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-10-21",
+              "subjectModel": "DEMO-BESPOKE-28",
+              "expectedModel": "DEMO-BESPOKE-28",
+              "modelRelation": "EXACT"
+            },
+            {
+              "id": "e3",
+              "subject": "ALT_2",
+              "sourceName": "The Home Depot",
+              "sourceDomain": "homedepot.com",
+              "sourceUrl": "https://www.homedepot.com/",
+              "sourceClass": "RETAILER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-10-21",
+              "subjectModel": "DEMO-GE-SBS1",
+              "expectedModel": "DEMO-GE-SBS1",
+              "modelRelation": "EXACT"
+            },
+            {
+              "id": "e4",
+              "subject": "ALT_2",
+              "sourceName": "GE Appliances",
+              "sourceDomain": "geappliances.com",
+              "sourceUrl": "https://www.geappliances.com/",
+              "sourceClass": "MANUFACTURER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-10-21",
+              "subjectModel": "DEMO-GE-SBS1",
+              "expectedModel": "DEMO-GE-SBS1",
+              "modelRelation": "EXACT"
+            }
+          ],
+          "valuation": {
+            "method": "VERIFIED_SINGLE",
+            "basis": "VERIFIED_CURRENT_RETAIL",
+            "verified": true,
+            "range": {
+              "currency": "USD",
+              "low": 2399,
+              "high": 2399
+            },
+            "confidence": "MEDIUM",
+            "asOf": "2026-10-21",
+            "comparables": [
+              {
+                "priceId": "p2",
+                "candidate": "SUCCESSOR",
+                "verification": "VERIFIED_PAGE"
+              }
+            ],
+            "excluded": [
+              {
+                "candidate": "ALT_1",
+                "reason": "NO_CURRENT_PRICE"
+              },
+              {
+                "candidate": "ALT_2",
+                "reason": "CONFIRMED_ESSENTIAL_SHORTFALL"
+              }
+            ],
+            "reference": {
+              "priceId": "p1",
+              "kind": "MSRP"
+            },
+            "notes": [
+              {
+                "code": "BASED_ON_VERIFIED",
+                "count": 1
+              },
+              {
+                "code": "ONE_COMPARABLE"
+              },
+              {
+                "code": "EXCLUDED_NO_CURRENT_PRICE",
+                "candidate": "ALT_1"
+              },
+              {
+                "code": "EXCLUDED_CONFIRMED_SHORTFALL",
+                "candidate": "ALT_2"
+              },
+              {
+                "code": "MSRP_CONTEXT_ONLY"
+              },
+              {
+                "code": "NOT_AN_APPRAISAL"
+              }
+            ]
+          },
+          "rejections": []
+        },
+        "clarify": [
+          "What are the width and height of the opening?"
+        ],
+        "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+        "warnings": [
+          "CANDIDATE_EXCLUDED_ESSENTIAL"
+        ],
+        "meta": {
+          "requestId": "engine-req-1",
+          "elapsedMs": 5,
+          "cached": false,
+          "answerSource": "AI_ESTIMATE",
+          "fixture": true
+        }
+      }
+    },
+    "washer-dimensions": {
+      "query": "front load washer 27 inch",
+      "engine": {
+        "contractVersion": "research.2",
+        "kind": "ITEMASSIST_RESEARCH",
+        "status": "OK",
+        "category": "appliance",
+        "profile": "washer",
+        "original": {
+          "identity": "Front load washer, 27 inch wide, about 4.5 cubic feet",
+          "confidence": "MEDIUM",
+          "characteristics": [
+            "Front load",
+            "About 4.5 cubic feet",
+            "27 inch wide cabinet",
+            "Steam and smart features"
+          ],
+          "uncertainty": "The exact maker and model were not given."
+        },
+        "requirements": [
+          {
+            "id": "r1",
+            "key": "capacity",
+            "text": "Drum capacity close to the original (cubic feet)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r2",
+            "key": "loading",
+            "text": "Same loading type (front or top load)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r3",
+            "key": "fit",
+            "text": "Width, depth and height that fit the space, including stacking height if used",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r4",
+            "key": "connections",
+            "text": "Matching water and drain connections",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r5",
+            "key": "spin",
+            "text": "Spin speed and the wash features you use",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r6",
+            "key": "height",
+            "text": "Total height with the stacked dryer under the cabinet limit",
+            "importance": "IMPORTANT",
+            "origin": "AI_ESTIMATE"
+          },
+          {
+            "id": "r7",
+            "key": "smart",
+            "text": "Smart or app features",
+            "importance": "MINOR",
+            "origin": "CATEGORY_RULE"
+          }
+        ],
+        "requirementsSource": "AI_ESTIMATE_PLUS_CATEGORY_GUIDANCE",
+        "successor": {
+          "name": "LG front load washer series",
+          "why": "Matching capacity and a 27 inch cabinet.",
+          "differences": "Slightly different cycle options.",
+          "concern": null,
+          "confidence": "MEDIUM",
+          "standing": "RECOMMENDED",
+          "verified": false,
+          "modelStatus": "VERIFIED_LISTING",
+          "comparison": [
+            {
+              "requirementId": "r1",
+              "status": "MEETS",
+              "basis": "AI_ESTIMATE",
+              "evidenceId": null
+            },
+            {
+              "requirementId": "r2",
+              "status": "MEETS",
+              "basis": "AI_ESTIMATE",
+              "evidenceId": null
+            },
+            {
+              "requirementId": "r3",
+              "status": "MEETS",
+              "basis": "CONFIRMED",
+              "evidenceId": "e2"
+            }
+          ]
+        },
+        "suggestions": [
+          {
+            "name": "Samsung front load washer series",
+            "why": "Comparable capacity and a 27 inch cabinet.",
+            "differences": "Different wash-cycle naming and controls.",
+            "concern": null,
+            "confidence": "MEDIUM",
+            "verified": false,
+            "modelStatus": "LISTED_PROVISIONAL",
+            "comparison": [
+              {
+                "requirementId": "r1",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              },
+              {
+                "requirementId": "r2",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              },
+              {
+                "requirementId": "r3",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              }
+            ]
+          },
+          {
+            "name": "Whirlpool front load washer series",
+            "why": "Comparable capacity at a lower advertised price.",
+            "differences": "A wider 29 inch cabinet.",
+            "concern": "It is wider than the 27 inch space.",
+            "confidence": "MEDIUM",
+            "verified": false,
+            "modelStatus": "VERIFIED_LISTING",
+            "comparison": [
+              {
+                "requirementId": "r1",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              },
+              {
+                "requirementId": "r2",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              },
+              {
+                "requirementId": "r3",
+                "status": "SHORTFALL",
+                "basis": "CONFIRMED",
+                "evidenceId": "e4"
+              }
+            ]
+          }
+        ],
+        "pricing": {
+          "referenceDate": "2026-10-22",
+          "tier": {
+            "level": "STANDARD",
+            "basis": "AI_ESTIMATE"
+          },
+          "prices": [
+            {
+              "id": "p1",
+              "kind": "HISTORICAL_RETAIL",
+              "subject": "ORIGINAL",
+              "candidate": null,
+              "model": "DEMO-WASH-27",
+              "amount": {
+                "currency": "USD",
+                "low": 1049,
+                "high": 1049
+              },
+              "asOf": "2022-02-01",
+              "asOfBasis": "PUBLISHED",
+              "verification": "SEARCH_SNIPPET",
+              "evidenceId": "e1"
+            },
+            {
+              "id": "p2",
+              "kind": "CURRENT_RETAIL_NEW",
+              "subject": "REPLACEMENT",
+              "candidate": "SUCCESSOR",
+              "model": "DEMO-LG-WASH-27",
+              "amount": {
+                "currency": "USD",
+                "low": 1099,
+                "high": 1099
+              },
+              "asOf": "2026-10-21",
+              "asOfBasis": "OBSERVED",
+              "verification": "VERIFIED_PAGE",
+              "evidenceId": "e2"
+            },
+            {
+              "id": "p3",
+              "kind": "CURRENT_RETAIL_NEW",
+              "subject": "REPLACEMENT",
+              "candidate": "ALT_1",
+              "model": "DEMO-SS-WASH-27",
+              "amount": {
+                "currency": "USD",
+                "low": 999,
+                "high": 999
+              },
+              "asOf": "2026-10-21",
+              "asOfBasis": "OBSERVED",
+              "verification": "SEARCH_LISTING",
+              "evidenceId": "e3"
+            },
+            {
+              "id": "p4",
+              "kind": "CURRENT_RETAIL_NEW",
+              "subject": "REPLACEMENT",
+              "candidate": "ALT_2",
+              "model": "DEMO-WP-WASH-29",
+              "amount": {
+                "currency": "USD",
+                "low": 799,
+                "high": 799
+              },
+              "asOf": "2026-10-21",
+              "asOfBasis": "OBSERVED",
+              "verification": "VERIFIED_PAGE",
+              "evidenceId": "e4"
+            }
+          ],
+          "evidence": [
+            {
+              "id": "e1",
+              "subject": "ORIGINAL",
+              "sourceName": "RTINGS",
+              "sourceDomain": "rtings.com",
+              "sourceUrl": "https://www.rtings.com/tv",
+              "sourceClass": "TECH_DATABASE",
+              "firstParty": false,
+              "publishedAt": "2022-02-01",
+              "observedAt": null,
+              "subjectModel": "DEMO-WASH-27",
+              "expectedModel": "DEMO-WASH-27",
+              "modelRelation": "EXACT"
+            },
+            {
+              "id": "e2",
+              "subject": "SUCCESSOR",
+              "sourceName": "Best Buy",
+              "sourceDomain": "bestbuy.com",
+              "sourceUrl": "https://www.bestbuy.com/",
+              "sourceClass": "RETAILER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-10-21",
+              "subjectModel": "DEMO-LG-WASH-27",
+              "expectedModel": "DEMO-LG-WASH-27",
+              "modelRelation": "EXACT"
+            },
+            {
+              "id": "e3",
+              "subject": "ALT_1",
+              "sourceName": "Abt",
+              "sourceDomain": "abt.com",
+              "sourceUrl": "https://www.abt.com/",
+              "sourceClass": "RETAILER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-10-21",
+              "subjectModel": "DEMO-SS-WASH-27",
+              "expectedModel": "DEMO-SS-WASH-27",
+              "modelRelation": "EXACT"
+            },
+            {
+              "id": "e4",
+              "subject": "ALT_2",
+              "sourceName": "The Home Depot",
+              "sourceDomain": "homedepot.com",
+              "sourceUrl": "https://www.homedepot.com/",
+              "sourceClass": "RETAILER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-10-21",
+              "subjectModel": "DEMO-WP-WASH-29",
+              "expectedModel": "DEMO-WP-WASH-29",
+              "modelRelation": "EXACT"
+            }
+          ],
+          "valuation": {
+            "method": "MIXED_VERIFIED_AND_LISTINGS",
+            "basis": "MIXED_CURRENT_RETAIL",
+            "verified": false,
+            "range": {
+              "currency": "USD",
+              "low": 999,
+              "high": 1099
+            },
+            "confidence": "MEDIUM",
+            "asOf": "2026-10-21",
+            "comparables": [
+              {
+                "priceId": "p2",
+                "candidate": "SUCCESSOR",
+                "verification": "VERIFIED_PAGE"
+              },
+              {
+                "priceId": "p3",
+                "candidate": "ALT_1",
+                "verification": "SEARCH_LISTING"
+              }
+            ],
+            "excluded": [
+              {
+                "candidate": "ALT_2",
+                "reason": "CONFIRMED_ESSENTIAL_SHORTFALL"
+              }
+            ],
+            "reference": {
+              "priceId": "p1",
+              "kind": "HISTORICAL_RETAIL"
+            },
+            "notes": [
+              {
+                "code": "BASED_ON_VERIFIED",
+                "count": 1
+              },
+              {
+                "code": "BASED_ON_LISTINGS",
+                "count": 1
+              },
+              {
+                "code": "LISTINGS_NOT_CONFIRMED"
+              },
+              {
+                "code": "EXCLUDED_CONFIRMED_SHORTFALL",
+                "candidate": "ALT_2"
+              },
+              {
+                "code": "MSRP_CONTEXT_ONLY"
+              },
+              {
+                "code": "NOT_AN_APPRAISAL"
+              }
+            ]
+          },
+          "rejections": []
+        },
+        "clarify": [
+          "Who makes it, and what is the model number on the door frame label?"
+        ],
+        "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+        "warnings": [
+          "CANDIDATE_EXCLUDED_ESSENTIAL"
+        ],
+        "meta": {
+          "requestId": "engine-req-1",
+          "elapsedMs": 5,
+          "cached": false,
+          "answerSource": "AI_ESTIMATE",
+          "fixture": true
+        }
+      }
+    },
+    "ambiguous-model": {
+      "query": "Samsung 65 inch TV",
+      "engine": {
+        "contractVersion": "research.2",
+        "kind": "ITEMASSIST_RESEARCH",
+        "status": "PARTIAL",
+        "category": "tv",
+        "profile": "tv",
+        "original": {
+          "identity": "Samsung 65-inch television, model not identified",
+          "confidence": "LOW",
+          "characteristics": [
+            "65 inch screen class",
+            "Samsung smart TV"
+          ],
+          "uncertainty": "The model, panel technology and model year were not given, so the original’s tier cannot be placed."
+        },
+        "requirements": [
+          {
+            "id": "r1",
+            "key": "screenSize",
+            "text": "Screen size class close to the original",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r2",
+            "key": "resolution",
+            "text": "Same or better resolution (4K or higher)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r3",
+            "key": "displayClass",
+            "text": "Same display technology class (OLED, QLED or LED)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r4",
+            "key": "refresh",
+            "text": "Native refresh rate (120 Hz where the original had it)",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r5",
+            "key": "hdmi",
+            "text": "HDMI 2.1 ports for current consoles",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r6",
+            "key": "hdr",
+            "text": "The HDR formats the original supported",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r7",
+            "key": "smart",
+            "text": "A smart platform with the apps you use",
+            "importance": "MINOR",
+            "origin": "CATEGORY_RULE"
+          }
+        ],
+        "requirementsSource": "CATEGORY_GUIDANCE",
+        "successor": null,
+        "suggestions": [],
+        "pricing": {
+          "referenceDate": "2026-10-22",
+          "tier": {
+            "level": "UNKNOWN",
+            "basis": "UNKNOWN"
+          },
+          "prices": [
+            {
+              "id": "p1",
+              "kind": "AI_ESTIMATE",
+              "subject": "ORIGINAL",
+              "candidate": null,
+              "model": null,
+              "amount": {
+                "currency": "USD",
+                "low": 400,
+                "high": 1500
+              },
+              "asOf": null,
+              "asOfBasis": "UNKNOWN",
+              "verification": "NONE",
+              "evidenceId": null
+            },
+            {
+              "id": "p2",
+              "kind": "AI_ESTIMATE",
+              "subject": "REPLACEMENT",
+              "candidate": null,
+              "model": null,
+              "amount": {
+                "currency": "USD",
+                "low": 450,
+                "high": 1400
+              },
+              "asOf": null,
+              "asOfBasis": "UNKNOWN",
+              "verification": "NONE",
+              "evidenceId": null
+            }
+          ],
+          "evidence": [],
+          "valuation": {
+            "method": "AI_ESTIMATE_ONLY",
+            "basis": "AI_ESTIMATE",
+            "verified": false,
+            "range": {
+              "currency": "USD",
+              "low": 450,
+              "high": 1400
+            },
+            "confidence": "LOW",
+            "asOf": null,
+            "comparables": [
+              {
+                "priceId": "p2",
+                "candidate": null,
+                "verification": "NONE"
+              }
+            ],
+            "excluded": [],
+            "reference": null,
+            "notes": [
+              {
+                "code": "AI_ESTIMATE_ONLY"
+              },
+              {
+                "code": "NOT_AN_APPRAISAL"
+              }
+            ]
+          },
+          "rejections": []
+        },
+        "clarify": [
+          "What is the model number on the back of the TV or in its settings menu?",
+          "Is it an OLED, QLED or standard LED model?"
+        ],
+        "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+        "warnings": [
+          "VALUATION_ESTIMATE_ONLY"
+        ],
+        "meta": {
+          "requestId": "engine-req-1",
+          "elapsedMs": 5,
+          "cached": false,
+          "answerSource": "AI_ESTIMATE",
+          "fixture": true
+        }
+      }
+    },
+    "sparse-estimate": {
+      "query": "Bosch dishwasher",
+      "engine": {
+        "contractVersion": "research.2",
+        "kind": "ITEMASSIST_RESEARCH",
+        "status": "OK",
+        "category": "appliance",
+        "profile": "dishwasher",
+        "original": {
+          "identity": "Bosch 500 series 24 inch built-in dishwasher",
+          "confidence": "MEDIUM",
+          "characteristics": [
+            "24 inch built-in width",
+            "Third rack",
+            "Stainless steel tub"
+          ],
+          "uncertainty": "No current retail price is included in this research for comparable models."
+        },
+        "requirements": [
+          {
+            "id": "r1",
+            "key": "width",
+            "text": "The same built-in width (typically 24 inches)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r2",
+            "key": "fit",
+            "text": "Height, depth and cutout that fit the opening",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r3",
+            "key": "connections",
+            "text": "Matching water, drain and power connections",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r4",
+            "key": "rackNoise",
+            "text": "Rack layout (such as a third rack) and noise level",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r5",
+            "key": "tub",
+            "text": "Tub material and drying method",
+            "importance": "MINOR",
+            "origin": "CATEGORY_RULE"
+          }
+        ],
+        "requirementsSource": "CATEGORY_GUIDANCE",
+        "successor": null,
+        "suggestions": [
+          {
+            "name": "Bosch 500 series, current line",
+            "why": "The same maker’s current mid-tier dishwasher line.",
+            "differences": "Updated controls and cycle options.",
+            "concern": null,
+            "confidence": "LOW",
+            "verified": false,
+            "modelStatus": "FAMILY_LEVEL",
+            "comparison": [
+              {
+                "requirementId": "r1",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              },
+              {
+                "requirementId": "r2",
+                "status": "UNKNOWN",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              }
+            ]
+          }
+        ],
+        "pricing": {
+          "referenceDate": "2026-10-22",
+          "tier": {
+            "level": "STANDARD",
+            "basis": "MSRP_EVIDENCE"
+          },
+          "prices": [
+            {
+              "id": "p1",
+              "kind": "MSRP",
+              "subject": "ORIGINAL",
+              "candidate": null,
+              "model": "DEMO-DW-500",
+              "amount": {
+                "currency": "USD",
+                "low": 949,
+                "high": 949
+              },
+              "asOf": "2020-06-01",
+              "asOfBasis": "PUBLISHED",
+              "verification": "SEARCH_SNIPPET",
+              "evidenceId": "e1"
+            }
+          ],
+          "evidence": [
+            {
+              "id": "e1",
+              "subject": "ORIGINAL",
+              "sourceName": "CNET",
+              "sourceDomain": "cnet.com",
+              "sourceUrl": "https://www.cnet.com/",
+              "sourceClass": "REVIEW",
+              "firstParty": false,
+              "publishedAt": "2020-06-01",
+              "observedAt": null,
+              "subjectModel": "DEMO-DW-500",
+              "expectedModel": "DEMO-DW-500",
+              "modelRelation": "EXACT"
+            }
+          ],
+          "valuation": {
+            "method": "HISTORICAL_TIER_ESTIMATE",
+            "basis": "TIER_ESTIMATE",
+            "verified": false,
+            "range": {
+              "currency": "USD",
+              "low": 620,
+              "high": 1000
+            },
+            "confidence": "LOW",
+            "asOf": null,
+            "comparables": [],
+            "excluded": [
+              {
+                "candidate": "ALT_1",
+                "reason": "NO_CURRENT_PRICE"
+              }
+            ],
+            "reference": {
+              "priceId": "p1",
+              "kind": "MSRP"
+            },
+            "notes": [
+              {
+                "code": "TIER_ESTIMATE_BAND",
+                "low": 0.65,
+                "high": 1.05
+              },
+              {
+                "code": "NOT_AN_APPRAISAL"
+              }
+            ]
+          },
+          "rejections": []
+        },
+        "clarify": [
+          "What is the model number on the door frame label?"
+        ],
+        "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+        "warnings": [
+          "VALUATION_ESTIMATE_ONLY"
+        ],
+        "meta": {
+          "requestId": "engine-req-1",
+          "elapsedMs": 5,
+          "cached": false,
+          "answerSource": "AI_ESTIMATE",
+          "fixture": true
+        }
+      }
+    },
+    "unsupported-claims": {
+      "query": "unsupported price claims tv",
+      "engine": {
+        "contractVersion": "research.2",
+        "kind": "ITEMASSIST_RESEARCH",
+        "status": "OK",
+        "category": "tv",
+        "profile": "tv",
+        "original": {
+          "identity": "LG C3 series 4K OLED smart TV",
+          "confidence": "HIGH",
+          "characteristics": [
+            "OLED panel with self-lit pixels",
+            "4K resolution",
+            "120 Hz panel",
+            "webOS smart platform"
+          ],
+          "uncertainty": "Screen size was not given."
+        },
+        "requirements": [
+          {
+            "id": "r1",
+            "key": "screenSize",
+            "text": "Screen size class close to the original",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r2",
+            "key": "resolution",
+            "text": "Same or better resolution (4K or higher)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r3",
+            "key": "displayClass",
+            "text": "Same display technology class (OLED, QLED or LED)",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r4",
+            "key": "refresh",
+            "text": "Native refresh rate (120 Hz where the original had it)",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r5",
+            "key": "hdmi",
+            "text": "HDMI 2.1 ports for current consoles",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r6",
+            "key": "hdr",
+            "text": "The HDR formats the original supported",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r7",
+            "key": "brightness",
+            "text": "Peak brightness suited to a bright room",
+            "importance": "IMPORTANT",
+            "origin": "AI_ESTIMATE"
+          },
+          {
+            "id": "r8",
+            "key": "smart",
+            "text": "A smart platform with the apps you use",
+            "importance": "MINOR",
+            "origin": "CATEGORY_RULE"
+          }
+        ],
+        "requirementsSource": "AI_ESTIMATE_PLUS_CATEGORY_GUIDANCE",
+        "successor": {
+          "name": "LG OLED77C4PUA",
+          "why": "The next generation of the same LG C-series OLED line.",
+          "differences": null,
+          "concern": null,
+          "confidence": "MEDIUM",
+          "standing": "RECOMMENDED",
+          "verified": false,
+          "modelStatus": "UNVERIFIED_MODEL",
+          "comparison": [
+            {
+              "requirementId": "r3",
+              "status": "MEETS",
+              "basis": "AI_ESTIMATE",
+              "evidenceId": null
+            }
+          ]
+        },
+        "suggestions": [
+          {
+            "name": "Samsung S90-series QD-OLED",
+            "why": "Comparable premium OLED-class picture quality.",
+            "differences": "Different smart platform and remote.",
+            "concern": null,
+            "confidence": "MEDIUM",
+            "verified": false,
+            "modelStatus": "LISTED_PROVISIONAL",
+            "comparison": [
+              {
+                "requirementId": "r4",
+                "status": "MEETS",
+                "basis": "AI_ESTIMATE",
+                "evidenceId": null
+              }
+            ]
+          }
+        ],
+        "pricing": {
+          "referenceDate": "2026-10-22",
+          "tier": {
+            "level": "PREMIUM",
+            "basis": "AI_ESTIMATE"
+          },
+          "prices": [
+            {
+              "id": "p4",
+              "kind": "HISTORICAL_RETAIL",
+              "subject": "REPLACEMENT",
+              "candidate": "ALT_1",
+              "model": null,
+              "amount": {
+                "currency": "USD",
+                "low": 1149,
+                "high": 1149
+              },
+              "asOf": "2026-09-12",
+              "asOfBasis": "OBSERVED",
+              "verification": "SEARCH_LISTING",
+              "evidenceId": "e3"
+            },
+            {
+              "id": "p7",
+              "kind": "AI_ESTIMATE",
+              "subject": "REPLACEMENT",
+              "candidate": null,
+              "model": null,
+              "amount": {
+                "currency": "USD",
+                "low": 900,
+                "high": 1600
+              },
+              "asOf": null,
+              "asOfBasis": "UNKNOWN",
+              "verification": "NONE",
+              "evidenceId": null
+            }
+          ],
+          "evidence": [
+            {
+              "id": "e3",
+              "subject": "ALT_1",
+              "sourceName": "Best Buy",
+              "sourceDomain": "bestbuy.com",
+              "sourceUrl": "https://www.bestbuy.com/",
+              "sourceClass": "RETAILER",
+              "firstParty": true,
+              "publishedAt": null,
+              "observedAt": "2026-09-12",
+              "subjectModel": "DEMO-S90-65",
+              "expectedModel": "DEMO-S90-65",
+              "modelRelation": "EXACT"
+            }
+          ],
+          "valuation": {
+            "method": "AI_ESTIMATE_ONLY",
+            "basis": "AI_ESTIMATE",
+            "verified": false,
+            "range": {
+              "currency": "USD",
+              "low": 900,
+              "high": 1600
+            },
+            "confidence": "LOW",
+            "asOf": null,
+            "comparables": [
+              {
+                "priceId": "p7",
+                "candidate": null,
+                "verification": "NONE"
+              }
+            ],
+            "excluded": [
+              {
+                "candidate": "SUCCESSOR",
+                "reason": "NO_CURRENT_PRICE"
+              },
+              {
+                "candidate": "ALT_1",
+                "reason": "NO_CURRENT_PRICE"
+              }
+            ],
+            "reference": null,
+            "notes": [
+              {
+                "code": "AI_ESTIMATE_ONLY"
+              },
+              {
+                "code": "STALE_PRICES_NOT_CURRENT",
+                "count": 1
+              },
+              {
+                "code": "NOT_AN_APPRAISAL"
+              }
+            ]
+          },
+          "rejections": [
+            {
+              "scope": "EVIDENCE",
+              "reason": "SOURCE_INVALID",
+              "action": "REJECTED",
+              "count": 1
+            },
+            {
+              "scope": "EVIDENCE",
+              "reason": "SOURCE_NOT_ALLOWED",
+              "action": "REJECTED",
+              "count": 1
+            },
+            {
+              "scope": "PRICE",
+              "reason": "DATE_REQUIRED",
+              "action": "REJECTED",
+              "count": 1
+            },
+            {
+              "scope": "PRICE",
+              "reason": "ESTIMATE_CITES_SOURCE",
+              "action": "REJECTED",
+              "count": 1
+            },
+            {
+              "scope": "PRICE",
+              "reason": "MODEL_UNVERIFIED",
+              "action": "REJECTED",
+              "count": 1
+            },
+            {
+              "scope": "PRICE",
+              "reason": "SOURCE_FABRICATED",
+              "action": "REJECTED",
+              "count": 2
+            },
+            {
+              "scope": "PRICE",
+              "reason": "STALE_CURRENT_PRICE",
+              "action": "DOWNGRADED",
+              "count": 1
+            },
+            {
+              "scope": "PRICE",
+              "reason": "WRONG_PRODUCT",
+              "action": "REJECTED",
+              "count": 1
+            },
+            {
+              "scope": "REQUIREMENT",
+              "reason": "ESSENTIAL_FROM_AI_DOWNGRADED",
+              "action": "DOWNGRADED",
+              "count": 1
+            },
+            {
+              "scope": "TIER",
+              "reason": "TIER_BASIS_DOWNGRADED",
+              "action": "DOWNGRADED",
+              "count": 1
+            }
+          ]
+        },
+        "clarify": [
+          "What screen size do you need?"
+        ],
+        "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+        "warnings": [
+          "UNSAFE_CLAIMS_REMOVED",
+          "DIFFERENCES_MISSING",
+          "PRICE_EVIDENCE_REJECTED",
+          "MODEL_NOT_VERIFIED",
+          "VALUATION_ESTIMATE_ONLY"
+        ],
+        "meta": {
+          "requestId": "engine-req-1",
+          "elapsedMs": 5,
+          "cached": false,
+          "answerSource": "AI_ESTIMATE",
+          "fixture": true
+        }
+      }
+    },
+    "insufficient": {
+      "query": "something I cannot describe",
+      "engine": {
+        "contractVersion": "research.2",
+        "kind": "ITEMASSIST_RESEARCH",
+        "status": "GUIDANCE_ONLY",
+        "category": "unknown",
+        "profile": "unknown",
+        "original": {
+          "identity": null,
+          "confidence": "LOW",
+          "characteristics": [],
+          "uncertainty": "This item could not be identified from the description."
+        },
+        "requirements": [
+          {
+            "id": "r1",
+            "key": "type",
+            "text": "Same type of product",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r2",
+            "key": "size",
+            "text": "Similar size or capacity",
+            "importance": "ESSENTIAL",
+            "origin": "CATEGORY_RULE"
+          },
+          {
+            "id": "r3",
+            "key": "features",
+            "text": "The key features you use most",
+            "importance": "IMPORTANT",
+            "origin": "CATEGORY_RULE"
+          }
+        ],
+        "requirementsSource": "CATEGORY_GUIDANCE",
+        "successor": null,
+        "suggestions": [],
+        "pricing": {
+          "referenceDate": "2026-10-22",
+          "tier": {
+            "level": "UNKNOWN",
+            "basis": "UNKNOWN"
+          },
+          "prices": [],
+          "evidence": [],
+          "valuation": {
+            "method": "INSUFFICIENT",
+            "basis": "NONE",
+            "verified": false,
+            "range": null,
+            "confidence": "LOW",
+            "asOf": null,
+            "comparables": [],
+            "excluded": [],
+            "reference": null,
+            "notes": [
+              {
+                "code": "INSUFFICIENT"
+              },
+              {
+                "code": "NOT_AN_APPRAISAL"
+              }
+            ]
+          },
+          "rejections": []
+        },
+        "clarify": [
+          "What is the brand and model number?"
+        ],
+        "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+        "warnings": [
+          "PRODUCT_NOT_IDENTIFIED",
+          "VALUATION_INSUFFICIENT"
+        ],
+        "meta": {
+          "requestId": "engine-req-1",
+          "elapsedMs": 5,
+          "cached": false,
+          "answerSource": "AI_ESTIMATE",
+          "fixture": true
+        }
+      }
+    }
+  }
+}

@@ -14,19 +14,34 @@ const errorBody = (errorCode, status = errorCode === "UNSUPPORTED" ? "UNSUPPORTE
  * Mocks the same-origin proxy. `reply` receives the parsed POST body and returns { status, body, delayMs } (or "abort").
  * Fonts are stubbed so an offline run has no failed requests, and every request/console problem is collected.
  */
-async function prepare(page, { enabled = true, reply = () => ({ status: 200, body: contracts.engineComplete() }) } = {}) {
-  const seen = { posts: [], consoleErrors: [], pageErrors: [], analytics: [], failedApi: 0 };
+async function prepare(page, { enabled = true, reply = () => ({ status: 200, body: contracts.engineComplete() }), research = null } = {}) {
+  const seen = { posts: [], researchPosts: [], consoleErrors: [], pageErrors: [], analytics: [], failedApi: 0 };
 
   // A mocked non-2xx API reply makes the browser log "Failed to load resource" for that URL. That is expected; the same message for any other URL is a real problem.
   page.on("console", (message) => {
     if (message.type() !== "error") return;
-    if (message.location().url.endsWith("/api/replacement-finder")) return;
+    if (message.location().url.endsWith("/api/replacement-finder") || message.location().url.endsWith("/api/itemassist-research")) return;
     seen.consoleErrors.push(message.text());
   });
   page.on("pageerror", (error) => seen.pageErrors.push(error.message));
   page.context().on("request", (request) => { if (isAnalyticsRequestUrl(request.url())) seen.analytics.push(request.url()); });
 
   await page.route(/fonts\.(googleapis|gstatic)\.com/, (route) => route.fulfill({ status: 200, contentType: "text/css", body: "" }));
+  // ItemAssist Research route. By default it reports itself disabled, so the page is the classic lookup; `research: { reply }` enables it.
+  // `reply` receives the parsed POST body and returns { status, body, delayMs } (or "abort").
+  await page.route("**/api/itemassist-research", async (route) => {
+    const request = route.request();
+    if (request.method() === "GET") {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ enabled: Boolean(research), dailyLimit: 5 }) });
+      return;
+    }
+    const body = request.postDataJSON();
+    seen.researchPosts.push({ body, headers: request.headers() });
+    const response = research ? await research.reply(body) : { status: 503, body: { status: "ERROR", errorCode: "API_DISABLED" } };
+    if (response === "abort") { seen.failedApi += 1; await route.abort(); return; }
+    if (response.delayMs) await new Promise((resolve) => setTimeout(resolve, response.delayMs));
+    await route.fulfill({ status: response.status, contentType: "application/json", body: typeof response.body === "string" ? response.body : JSON.stringify(response.body) });
+  });
   await page.route(API, async (route) => {
     const request = route.request();
     if (request.method() === "GET") {

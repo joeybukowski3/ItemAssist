@@ -1,0 +1,99 @@
+/*
+ * ItemAssist Research additions to the workspace. Additive only: it reuses the existing .rf-* tokens and components (rf-ph, rf-tabbar,
+ * rf-block, rf-lead, rf-pill, rf-partial) and adds just the few pieces the research report needs. Amber carries "unverified", never mint.
+ */
+
+/* ---------- Assistant: research mode ---------- */
+/* While a research report is on screen the v1 report actions (verify, compare, price, explain) have nothing to act on. */
+.rf-assistant.rf-view-research .rf-quick li:has(> [data-needs-report]) { display: none; }
+.rf-msg--summary .rf-msg-note-q { font-weight: 600; color: var(--rf-ink); }
+.rf-rs-questions { margin: 0.25rem 0 0; padding-left: 1.125rem; }
+.rf-rs-questions li + li { margin-top: 0.25rem; }
+.rf-rs-reply-lines { margin: 0; padding-left: 0; list-style: none; }
+
+/* ---------- Product pane: research report ---------- */
+.rf-report--research .rf-ph-model { font-size: clamp(1.25rem, 3.4cqi, 1.75rem); letter-spacing: -0.015em; }
+.rf-rs-banner { margin: 0 var(--rf-gutter) 0.875rem; }
+.rf-rs-list { margin: 0; padding-left: 1.125rem; display: grid; gap: 0.375rem; font-size: 0.9375rem; line-height: 1.5; color: var(--text-body); }
+.rf-rs-identity { margin: 0 0 0.5rem; font-size: 1.0625rem; font-weight: 650; color: var(--rf-ink); overflow-wrap: anywhere; }
+.rf-rs-sub { margin: 0.875rem 0 0.375rem; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rf-muted); }
+.rf-rs-unsure { margin: 0.875rem 0 0; padding: 0.625rem 0.75rem; background: var(--rf-warn-bg); border: 1px solid var(--rf-warn-line); border-radius: 6px; font-size: 0.875rem; color: var(--rf-warn-text); }
+.rf-rs-reqs { margin: 0.75rem 0 0; padding-left: 1.375rem; display: grid; gap: 0.5rem; font-size: 0.9375rem; line-height: 1.5; color: var(--text-body); }
+.rf-rs-reqs li::marker { font-weight: 700; color: var(--rf-info-text); }
+.rf-rs-alts { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.625rem; }
+.rf-rs-alts li { display: grid; gap: 0.125rem; padding-top: 0.625rem; border-top: 1px solid var(--rf-line); }
+.rf-rs-alts li:first-child { padding-top: 0; border-top: 0; }
+.rf-rs-alt-name { font-weight: 650; color: var(--rf-ink); overflow-wrap: anywhere; }
+.rf-rs-alt-why { font-size: 0.875rem; color: var(--rf-muted); }
+
+.rf-rs-cards { display: grid; gap: 0.875rem; }
+.rf-rs-card { display: grid; gap: 0.5rem; padding: 0.875rem 1rem; background: var(--white); border: 1px solid var(--rf-line-strong); border-left: 4px solid var(--rf-warn-text); border-radius: var(--rf-radius); }
+.rf-rs-card > * { margin: 0; }
+.rf-rs-card-name { font-size: 1.0625rem; font-weight: 700; color: var(--rf-ink); overflow-wrap: anywhere; }
+.rf-rs-why, .rf-rs-diff { font-size: 0.9375rem; line-height: 1.5; color: var(--text-body); }
+.rf-rs-diff--none { color: var(--rf-muted); }
+.rf-rs-concern { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.5rem 0.625rem; background: var(--rf-warn-bg); border: 1px solid var(--rf-warn-line); border-radius: 6px; font-size: 0.875rem; color: var(--rf-warn-text); }
+.rf-rs-concern .rf-ic { margin-top: 2px; }
+
+/* ---------- Narrow: one continuous page; the tab row is not needed because every section is on the page ---------- */
+@media (max-width: 960px) {
+  .rf-report--research .rf-tabbar { display: none; }
+  .rf-report--research .rf-tabpanel { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+  .rf-rs-banner { margin: 0 var(--rf-gutter) 0.5rem; }
+}
+
+/* ---------- research.2: valuation, prices, requirements, comparison ---------- */
+/* Amber is "estimate or not confirmed"; the success colour appears only on a valuation made from confirmed current prices. */
+.rf-rs-value { display: grid; gap: 0.5rem; margin: 0 0 0.875rem; padding: 1rem 1.125rem; background: var(--white); border: 1px solid var(--rf-line-strong); border-left: 4px solid var(--rf-warn-text); border-radius: var(--rf-radius); }
+.rf-rs-value--confirmed { border-left-color: var(--rf-ok-bright); }
+.rf-rs-value > * { margin: 0; }
+.rf-rs-value-kicker { color: var(--rf-warn-text); }
+.rf-rs-value--confirmed .rf-rs-value-kicker { color: var(--rf-ok-text); }
+.rf-rs-range { font-size: clamp(1.625rem, 5.4cqi, 2.375rem); line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; color: var(--rf-ink); overflow-wrap: anywhere; }
+.rf-rs-range--none { font-size: 1.125rem; letter-spacing: 0; color: var(--rf-muted); }
+.rf-rs-compat { padding: 0.375rem 0.625rem; background: var(--rf-warn-bg); border-radius: 6px; box-shadow: inset 0 0 0 1px var(--rf-warn-line); font-size: 0.875rem; line-height: 1.45; font-weight: 600; color: var(--rf-warn-text); }
+.rf-rs-value-line { font-size: 0.9375rem; line-height: 1.5; color: var(--text-body); }
+.rf-rs-tier { margin: 0; font-size: 0.875rem; color: var(--text-body); }
+.rf-rs-notes { margin: 0.25rem 0 0; padding-left: 1.125rem; display: grid; gap: 0.25rem; font-size: 0.8125rem; line-height: 1.45; color: var(--rf-muted); }
+.rf-rs-demo-note { padding: 0.375rem 0.625rem; background: var(--rf-info-bg); border-radius: 6px; font-size: 0.8125rem; color: var(--rf-info-text); }
+
+.rf-rs-prices { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.625rem; }
+.rf-rs-prices--inline { margin-top: 0.125rem; }
+.rf-rs-price { display: grid; gap: 0.375rem; padding: 0.625rem 0.75rem; background: var(--white); border: 1px solid var(--rf-line); border-radius: 6px; }
+.rf-rs-price > * { margin: 0; }
+.rf-rs-price-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.rf-rs-price-amount { font-size: 1.0625rem; font-weight: 700; color: var(--rf-ink); }
+.rf-rs-price-meta { font-size: 0.875rem; color: var(--text-body); overflow-wrap: anywhere; }
+.rf-rs-price-status { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.rf-rs-price-date { font-size: 0.8125rem; color: var(--rf-muted); }
+.rf-rs-price-source { font-size: 0.8125rem; color: var(--rf-muted); overflow-wrap: anywhere; }
+/* Pills in the research panels carry longer, honest wording than classic ones, so they wrap instead of widening the page. */
+.rf-rs-price .rf-pill, .rf-rs-value .rf-pill, .rf-rs-card .rf-pill, .rf-rs-cmp-row .rf-pill, .rf-rs-reqlist .rf-pill, .rf-lead-meta .rf-pill { white-space: normal; text-align: left; }
+.rf-rs-price-role { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.rf-rs-price-why { font-size: 0.8125rem; overflow-wrap: anywhere; }
+.rf-rs-pricegroups { display: grid; gap: 0.25rem; }
+.rf-rs-pricegroup .rf-rs-sub { margin-top: 0.5rem; }
+.rf-rs-pricegroup--excluded .rf-rs-price { background: var(--rf-warn-bg); border-color: var(--rf-warn-line); }
+.rf-rs-reconcile { margin: 0 0 0.5rem; font-size: 0.875rem; font-weight: 600; color: var(--rf-ink); }
+
+.rf-rs-sources { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.625rem; }
+.rf-rs-sources li { display: grid; gap: 0.125rem; padding-top: 0.625rem; border-top: 1px solid var(--rf-line); }
+.rf-rs-sources li:first-child { padding-top: 0; border-top: 0; }
+.rf-rs-source-meta { font-size: 0.8125rem; color: var(--rf-muted); }
+
+.rf-rs-weight-note { margin: 0.625rem 0 0; }
+.rf-rs-reqgroup { margin-top: 0.875rem; padding-left: 0.75rem; border-left: 3px solid var(--rf-line-strong); }
+.rf-rs-reqgroup--essential { border-left-color: var(--rf-info-text); }
+.rf-rs-reqgroup .rf-rs-sub { margin-top: 0; }
+.rf-rs-reqlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; font-size: 0.9375rem; line-height: 1.5; color: var(--text-body); }
+.rf-rs-reqlist li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem 0.625rem; }
+
+.rf-rs-cmp { display: grid; gap: 0.375rem; margin-top: 0.25rem; padding-top: 0.625rem; border-top: 1px solid var(--rf-line); }
+.rf-rs-cmp > * { margin: 0; }
+.rf-rs-cmp-summary { font-size: 0.8125rem; font-weight: 600; color: var(--rf-ink); }
+.rf-rs-cmp-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.375rem; }
+.rf-rs-cmp-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0.25rem 0.625rem; font-size: 0.875rem; color: var(--text-body); }
+.rf-rs-cmp-imp { font-size: 0.75rem; color: var(--rf-muted); }
+.rf-rs-cmp-source { grid-column: 1 / -1; font-size: 0.8125rem; }
+.rf-rs-excluded { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.5rem 0.625rem; background: var(--rf-warn-bg); border: 1px solid var(--rf-warn-line); border-radius: 6px; font-size: 0.875rem; font-weight: 600; color: var(--rf-warn-text); }
+.rf-rs-excluded .rf-ic { margin-top: 2px; }

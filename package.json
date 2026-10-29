@@ -2,10 +2,13 @@
   "name": "itemassist",
   "private": true,
   "scripts": {
-    "test": "node --test tests/inbound-email.test.mjs tests/request-intake/unit/**/*.test.mjs tests/request-intake/endpoint/**/*.test.mjs \"tests/replacement-finder/unit/*.test.mjs\" \"tests/replacement-finder/endpoint/*.test.mjs\"",
+    "test": "node --test tests/inbound-email.test.mjs tests/request-intake/unit/**/*.test.mjs tests/request-intake/endpoint/**/*.test.mjs \"tests/replacement-finder/unit/*.test.mjs\" \"tests/replacement-finder/endpoint/*.test.mjs\" \"tests/itemassist-research/unit/*.test.mjs\" \"tests/itemassist-research/endpoint/*.test.mjs\"",
     "test:request-intake": "node --test tests/request-intake/unit/**/*.test.mjs tests/request-intake/endpoint/**/*.test.mjs",
     "test:e2e:request-intake": "playwright test --config=tests/request-intake/e2e/playwright.config.js",
     "test:replacement-finder": "node --test \"tests/replacement-finder/unit/*.test.mjs\" \"tests/replacement-finder/endpoint/*.test.mjs\"",
+    "test:itemassist-research": "node --test \"tests/itemassist-research/unit/*.test.mjs\" \"tests/itemassist-research/endpoint/*.test.mjs\"",
+    "test:e2e:itemassist-research": "playwright test --config=tests/itemassist-research/e2e/playwright.config.js",
+    "test:preview:itemassist-research": "playwright test --config=tests/itemassist-research/preview/playwright.preview.config.js",
     "test:e2e:replacement-finder": "playwright test --config=tests/replacement-finder/e2e/playwright.config.js"
   },
   "dependencies": {
