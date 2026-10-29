@@ -338,6 +338,13 @@
       var answer = RS.localAnswer(research.session, text);
       return assistant.say(answer ? answer.map(function (line) { return D.h("p", { text: line }); }) : RS.FALLBACK_HELP);
     }
+    if (verdict.kind === "ask" && verdict.reason === "accessory") {
+      // An accessory is never merged into the current item's query: it is researched on its own, or left alone.
+      return assistant.askChoice(RS.ASK_ACCESSORY, [{ label: "Research it separately", value: "new" }, { label: "Stay with my current item", value: "stay" }], function (mode) {
+        if (mode === "stay") return assistant.say(RS.STAY_ON_ITEM);
+        submitResearch(mode, verdict.text);
+      });
+    }
     if (verdict.kind === "ask") {
       return assistant.askChoice(RS.ASK_WHICH, [{ label: "More detail on this item", value: "refine" }, { label: "A different item", value: "new" }], function (mode) {
         submitResearch(mode, verdict.text);
@@ -346,7 +353,8 @@
     submitResearch(verdict.kind, verdict.text);
   }
 
-  function submitResearch(mode, text) {
+  function submitResearch(requested, text) {
+    var mode = RS.resolveMode(research.session, requested, text);
     var composed = RS.composeQuery(research.session, text, mode);
     if (!composed) return assistant.say(RS.TOO_LONG);
     runResearch(mode, text, composed);

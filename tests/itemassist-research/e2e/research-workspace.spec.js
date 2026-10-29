@@ -325,6 +325,96 @@ test("a message naming only another brand is ambiguous: it asks, and each choice
   settle(seen);
 });
 
+// ---- turn intent: a different product is a new research context, never merged into the current one --------------------------------
+
+const playstation = () => researchResponse({
+  category: "electronics",
+  original: { identity: "Sony PlayStation 2 game console", confidence: "HIGH", characteristics: ["DVD drive", "Controller ports"], uncertainty: null },
+  requirements: ["Same type of game console", "Plays the same game discs", "Controller ports or wireless controllers"],
+  successor: null, suggestions: [], clarify: [], quota: { limit: 5, remaining: 3, charged: true }
+});
+const byProduct = (body) => ok(/playstation/i.test(body.query) ? playstation() : researchResponse());
+
+test('"LG C3 55-inch TV" then "playstation 2" starts new research: the request, report and conversation carry only the console', async ({ page }) => {
+  const seen = await prepare(page, research(byProduct));
+  await ready(page);
+  await send(page, 'LG c3 55" tv');
+  await expect(page.locator("#rf-product-name")).toHaveText("LG C3 series 4K OLED smart TV");
+  await expect(log(page)).toContainText("Which screen size do you have?"); // a clarifying question is open, as in the reported session
+  await send(page, "playstation 2");
+  await expect(page.locator("#rf-product-name")).toHaveText("Sony PlayStation 2 game console");
+  expect(seen.researchPosts.map((post) => post.body.query)).toEqual(['LG c3 55" tv', "playstation 2"]);
+  // Nothing of the television follows the console: not its description, specifications or candidates.
+  await expect(page.locator("#rf-product-root")).not.toContainText("LG C3");
+  await expect(page.locator("#rf-product-root")).not.toContainText("OLED");
+  await expect(userMessages(page)).toHaveCount(2);
+  settle(seen);
+});
+
+test("after the switch the new product is the current one: a follow-up refines the console, never the television", async ({ page }) => {
+  const seen = await prepare(page, research(byProduct));
+  await ready(page);
+  await send(page, 'LG c3 55" tv');
+  await expect(page.locator("#rf-product-name")).toBeVisible();
+  await send(page, "playstation 2");
+  await expect(page.locator("#rf-product-name")).toHaveText("Sony PlayStation 2 game console");
+  await send(page, "slim model");
+  await expect.poll(() => seen.researchPosts.length).toBe(3);
+  expect(seen.researchPosts[2].body.query).toBe("playstation 2, slim model");
+  expect(seen.researchPosts[2].body.query).not.toMatch(/LG|tv/i);
+  settle(seen);
+});
+
+test("a different kind of product, a question and a request about the results never merge two products", async ({ page }) => {
+  const seen = await prepare(page, research(() => ok()));
+  await ready(page);
+  await send(page, 'LG c3 55" tv');
+  await expect(page.locator("#rf-product-name")).toBeVisible();
+  // Follow-ups continue the current context locally: no research request.
+  await send(page, "Does it support Dolby Vision?");
+  await send(page, "What about the 65-inch version?");
+  await send(page, "Find a cheaper alternative");
+  expect(seen.researchPosts).toHaveLength(1);
+  await expect(userMessages(page)).toHaveCount(4);
+  // A different kind of product is its own request.
+  await send(page, "Samsung refrigerator");
+  await expect.poll(() => seen.researchPosts.length).toBe(2);
+  expect(seen.researchPosts[1].body.query).toBe("Samsung refrigerator");
+  settle(seen);
+});
+
+test("an accessory-like message asks first, sends nothing, and is either researched on its own or left alone", async ({ page }) => {
+  const seen = await prepare(page, research(() => ok()));
+  await ready(page);
+  await send(page, 'LG c3 55" tv');
+  await expect(page.locator("#rf-product-name")).toBeVisible();
+  await send(page, "soundbar");
+  await expect(log(page)).toContainText("accessory or a separate item");
+  expect(seen.researchPosts).toHaveLength(1);
+  await page.getByRole("button", { name: "Stay with my current item" }).click();
+  await expect(log(page)).toContainText("I'll stay with your current item");
+  expect(seen.researchPosts).toHaveLength(1);
+  await send(page, "wall mount for it");
+  await page.getByRole("button", { name: "Research it separately" }).click();
+  await expect.poll(() => seen.researchPosts.length).toBe(2);
+  expect(seen.researchPosts[1].body.query).toBe("wall mount for it");
+  settle(seen);
+});
+
+test("an unfamiliar name is asked about rather than guessed, and \"A different item\" researches it alone", async ({ page }) => {
+  const seen = await prepare(page, research(byProduct));
+  await ready(page);
+  await send(page, 'LG c3 55" tv');
+  await expect(page.locator("#rf-product-name")).toBeVisible();
+  await send(page, "Dyson Airwrap"); // unfamiliar: asked about, not guessed
+  await expect(log(page)).toContainText("more detail about this item, or a different item");
+  expect(seen.researchPosts).toHaveLength(1);
+  await page.getByRole("button", { name: "A different item" }).click();
+  await expect.poll(() => seen.researchPosts.length).toBe(2);
+  expect(seen.researchPosts[1].body.query).toBe("Dyson Airwrap");
+  settle(seen);
+});
+
 // ---- research is on only when the status endpoint says so -----------------------------------------------------------------------
 
 test("research stays off unless the status endpoint answers exactly enabled:true (anything else leaves the classic lookup)", async ({ page }) => {

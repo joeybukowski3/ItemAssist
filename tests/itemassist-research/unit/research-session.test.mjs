@@ -216,3 +216,89 @@ test("the visitor ID is random, valid, stable and stored only in the browser's o
   store.set(RS.VISITOR_KEY, "short");
   assert.notEqual(RS.createVisitorId(storage)(), "short", "a malformed stored value is replaced");
 });
+
+// ---- turn intent: a different product starts a new research context; nothing is merged ---------------------------------------------
+
+const tvSession = (clarify = ["Which screen size do you have?"]) => researched('LG c3 55" tv', researchResponse({ clarify }));
+const intent = (session, text) => RS.turnIntent(session, text);
+
+test("the reported session: after an LG C3 TV, \"playstation 2\" is a new product, with or without an open question", () => {
+  for (const session of [tvSession(), tvSession([])]) {
+    assert.equal(intent(session, "playstation 2"), "NEW_PRODUCT");
+    assert.deepEqual(RS.classify(session, "playstation 2"), { kind: "new", text: "playstation 2" });
+    assert.equal(RS.resolveMode(session, "new", "playstation 2"), "new");
+  }
+  // The old behaviour sent one query naming both products.
+  const verdict = RS.classify(tvSession(), "playstation 2");
+  assert.equal(composedFor(tvSession(), verdict.kind, verdict.text).query, "playstation 2");
+});
+
+test("a clearly different product is NEW_PRODUCT: another kind of product, a game console, or another model", () => {
+  const session = tvSession();
+  for (const text of ["playstation 2", "Playstation 5", "xbox series x", "Nintendo Switch", "Samsung refrigerator", "iPhone 12", "Dyson V8 vacuum", "roomba 675", "Sony A95L", "my dishwasher is broken too"]) {
+    assert.equal(intent(session, text), "NEW_PRODUCT", text);
+  }
+});
+
+test("questions and refinements about the current product are FOLLOW_UP, answered locally or appended to the same query", () => {
+  const session = tvSession();
+  for (const text of ["What about the 65-inch version?", "Does it support Dolby Vision?", "Find a cheaper alternative", "show me something similar", "is there a bigger one?"]) {
+    assert.equal(intent(session, text), "FOLLOW_UP", text);
+    assert.equal(RS.classify(session, text).kind, "question", text);
+  }
+  for (const text of ["65 inch", "stainless", "it is a 2023 model", "LG", "yes", "in the den"]) assert.equal(intent(session, text), "FOLLOW_UP", text);
+  const fridge = researched("Samsung RF28 refrigerator", researchResponse({ clarify: [] }));
+  assert.equal(intent(fridge, "What if it's counter-depth?"), "FOLLOW_UP");
+  assert.equal(intent(fridge, "counter depth"), "FOLLOW_UP");
+});
+
+test("\"Find a cheaper alternative\" is answered from the current results and never sent as research", () => {
+  const session = tvSession();
+  assert.equal(RS.classify(session, "Find a cheaper alternative").kind, "question");
+  assert.ok(RS.localAnswer(session, "Find a cheaper alternative"), "the buying topic has a local answer");
+});
+
+test("an accessory or add-on is AMBIGUOUS with an accessory reason; a question about one stays a follow-up", () => {
+  const session = tvSession();
+  for (const text of ["soundbar", "a Samsung soundbar", "wall mount for it", "HDMI cable", "the remote"]) {
+    assert.deepEqual(RS.classify(session, text), { kind: "ask", text, reason: "accessory" }, text);
+    assert.equal(intent(session, text), "AMBIGUOUS", text);
+  }
+  assert.equal(intent(session, "does it come with a remote?"), "FOLLOW_UP");
+  assert.equal(RS.classify(session, "about 55 inches, wall mounted in the den").kind, "refine", "\"wall mounted\" is a detail, not a mount");
+  assert.equal(RS.classify(researched("Samsung RF28 refrigerator", researchResponse({ clarify: [] })), "water filter").reason, "accessory");
+  assert.match(RS.ASK_ACCESSORY, /accessory or a separate item/);
+});
+
+test("an unfamiliar short name is asked about, never appended as detail (it would put two products in one query)", () => {
+  for (const session of [tvSession(), tvSession([])]) {
+    for (const text of ["Dyson Airwrap", "Ninja Foodi", "Peloton"]) assert.equal(intent(session, text), "AMBIGUOUS", text);
+  }
+});
+
+test("\"More detail on this item\" never merges another model or another kind of product into the current query", () => {
+  const session = tvSession();
+  assert.equal(RS.resolveMode(session, "refine", "playstation 2"), "new");
+  assert.equal(RS.resolveMode(session, "refine", "Samsung QN55Q80C"), "new");
+  assert.equal(RS.resolveMode(session, "refine", "65 inch"), "refine", "a real detail stays a refinement");
+  assert.equal(RS.resolveMode(session, "new", "65 inch"), "new");
+  assert.equal(RS.resolveMode(empty, "refine", "anything"), "refine");
+});
+
+test("switching products carries nothing forward: the new session holds only the new product, its questions and its response", () => {
+  const first = tvSession();
+  const consoleResponse = researchResponse({ original: { identity: "Sony PlayStation 2 game console", confidence: "HIGH", characteristics: [], uncertainty: null }, successor: null, suggestions: [], clarify: [] });
+  const verdict = RS.classify(first, "playstation 2");
+  const next = RS.adopt(first, RS.resolveMode(first, verdict.kind, verdict.text), verdict.text, composedFor(first, verdict.kind, verdict.text), consoleResponse);
+  assert.deepEqual([next.base, [...next.refinements], [...next.pending]], ["playstation 2", [], []]);
+  assert.equal(next.last.original.identity, "Sony PlayStation 2 game console");
+  assert.equal(next.last.successor, null);
+  assert.ok(!JSON.stringify(next).includes("LG"), "no part of the television remains");
+  // The next detail refines the console.
+  assert.equal(composedFor(next, "refine", "slim model").query, "playstation 2, slim model");
+});
+
+test("classification is deterministic and local: no network, no AI call", () => {
+  const source = require("node:fs").readFileSync(new URL("../../../assets/js/rf-research.js", import.meta.url), "utf8");
+  assert.ok(!/\bfetch\s*\(|XMLHttpRequest|generateContent/.test(source), "rf-research.js makes no request");
+});

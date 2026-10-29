@@ -21,6 +21,16 @@
 
   const NEW_PATTERN = /^(?:new(?:\s+(?:research|item|search))?|start\s+(?:over|again|fresh)|different\s+item|another\s+item|reset|cancel|never\s*mind)\b[\s:,.-]*/i;
   const QUESTION_PATTERN = /\?\s*$|^(?:why|how|what|which|who|can|could|does|do|is|are|should|will|tell\s+me|explain)\b/i;
+  // A request about the current results ("find a cheaper alternative"): answered from them, never sent as research with the words appended.
+  const REQUEST_PATTERN = /^(?:find|show|give|list|suggest|recommend|look\s+for|compare|is\s+there|are\s+there|any\s+(?:other|cheaper|better|similar))\b/i;
+  // A part or add-on rather than a product of its own: it is never merged into the current item's query (see classify).
+  const ACCESSORY_PATTERN = /\b(?:soundbar|sound\s+bar|subwoofer|remote(?:\s+control)?|stand|wall\s+mount|mount|bracket|cable|cord|charger|adapter|controller|gamepad|filter|shelf|shelves|drawer|handle|gasket|bulb|lid|rack|dock|battery|headset|case|cover)\b/i;
+  // What a detail about the current item looks like: a size with its unit, a bare number, a year, or a plain descriptor. Anything short that
+  // is none of these is not assumed to be a detail: an unfamiliar name ("roomba 675") is asked about, not appended.
+  const DETAIL_NUMBER = /\b\d+(?:\.\d+)?\s*(?:"|-?\s?(?:inch|inches|in|cu|ft|k|hz|gb|tb|lb|lbs|w|v|l|cm|mm))(?![a-z])|^(?:the\s+)?\d{1,3}(?:\s|$)|\b(?:19|20)\d{2}\b/i;
+  const DETAIL_WORDS = /\b(?:inch|inches|size|sized|color|colour|finish|stainless|steel|black|white|silver|gray|grey|slate|bisque|red|blue|green|gold|matte|glossy|model|version|series|year|older|newer|new|old|used|wall|mounted|counter|depth|french|door|side|top|bottom|freezer|smart|portable|built|front|load|gas|electric|frame|panel|curved|flat|oled|qled|led|lcd|plasma|hdr|dolby|gaming)\b/i;
+  // A reply to the open clarifying question usually starts like an answer.
+  const ANSWER_LEAD = /^(?:yes|yeah|yep|no|nope|not\s+sure|i\s+(?:don'?t|do\s+not)\s+know|idk|about|around|roughly|approximately|probably|maybe|it(?:'s|\s+is|\s+was)|its|mine|i\s+(?:have|think|believe|measured|bought)|in|on|at)\b/i;
   // Spec and feature tokens are not model codes ("4k", "120hz", "hdr10"); a model code mixes letters and digits ("c3", "qn55q80c").
   const SPEC_TOKEN = /^\d+(?:k|p|x|hz|gb|tb|mb|w|v|l|mm|cm|in|ft|lb|lbs|cu|ms|nits)$/;
   const FEATURE_TOKEN = /^(?:hdr|hdmi|wifi|usb|gen|dolby|atmos|bt|cat)\d*\+?$/;
@@ -36,6 +46,8 @@
   const PLACEHOLDER = "Describe the item or answer my question...";
   const FINEPRINT = "ItemAssist Research gives AI estimates from general product knowledge. Specifications, availability and pricing are not verified; confirm them before buying.";
   const ASK_WHICH = "Is that more detail about this item, or a different item?";
+  const ASK_ACCESSORY = "That sounds like an accessory or a separate item. Research it on its own?";
+  const STAY_ON_ITEM = "Okay. I'll stay with your current item.";
   const FALLBACK_HELP = "I can explain what I found, or refine it if you add detail such as size, color or finish. Type \"new research\" to start over.";
   const TOO_LONG = "That's a bit long for me to research as one description. Please keep it under 160 characters, or type \"new research\" to start over.";
   const STARTING_FRESH = "Starting fresh. What item should I research?";
@@ -352,12 +364,28 @@
     ["tv", /\b(?:tv|tvs|television|televisions|oled|qled)\b/], ["refrigerator", /\b(?:refrigerator|refrigerators|fridge|fridges|freezer)\b/],
     ["washer", /\b(?:washer|washers|washing machine)\b/], ["dryer", /\bdryers?\b/], ["dishwasher", /\bdishwashers?\b/],
     ["range", /\b(?:range|oven|stove|cooktop)\b/], ["microwave", /\bmicrowaves?\b/], ["computer", /\b(?:laptop|computer|pc|desktop)\b/],
-    ["phone", /\b(?:phone|smartphone|iphone)\b/], ["hvac", /\b(?:furnace|hvac|air conditioner|heat pump)\b/], ["water heater", /\bwater heaters?\b/]
+    ["phone", /\b(?:phone|smartphone|iphone)\b/], ["hvac", /\b(?:furnace|hvac|air conditioner|heat pump)\b/], ["water heater", /\bwater heaters?\b/],
+    ["game console", /\b(?:playstation|ps[1-5]|xbox|nintendo|wii|gameboy|game\s+boy|game\s+console|console)\b/], ["camera", /\b(?:camera|camcorder|gopro)\b/],
+    ["headphones", /\b(?:headphones?|earbuds?|airpods)\b/], ["speaker", /\bspeakers?\b/], ["tablet", /\b(?:tablet|ipad)\b/], ["printer", /\bprinters?\b/],
+    ["watch", /\b(?:smartwatch|watch)\b/], ["vacuum", /\b(?:vacuum|roomba)\b/], ["monitor", /\bmonitors?\b/], ["grill", /\bgrills?\b/],
+    ["small appliance", /\b(?:blender|toaster|air\s+fryer|coffee\s+maker|mixer)\b/], ["furniture", /\b(?:mattress|sofa|couch|recliner)\b/]
   ];
 
   const brandsIn = (text) => clean(text).toLowerCase().split(/[^a-z0-9]+/).filter(function (word) { return BRANDS.indexOf(word) !== -1; });
   const typesIn = (text) => TYPES.filter(function (entry) { return entry[1].test(clean(text).toLowerCase()); }).map(function (entry) { return entry[0]; });
   const disjoint = (a, b) => a.length > 0 && b.length > 0 && !a.some(function (item) { return b.indexOf(item) !== -1; });
+  const ACCESSORY_MAX_WORDS = 8;
+  const wordsIn = (text) => clean(text).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  /** True when the message repeats a word of the current item's own description ("LG", "OLED"): it is about that item. */
+  const sharesWord = (session, text) => { const own = wordsIn(session.base); return wordsIn(text).some(function (word) { return word.length >= 2 && own.indexOf(word) !== -1; }); };
+  // A bare model code for an item described without one ("C3" after "old LG OLED tv") completes that item's description.
+  const bareCodeForCodelessItem = (session, text) => { const codes = modelCodes(text); return codes.length > 0 && modelCodes(session.base).length === 0 && wordsIn(text).every(function (word) { return codes.indexOf(word) !== -1; }); };
+  const looksLikeDetail = (session, text) => DETAIL_NUMBER.test(text) || DETAIL_WORDS.test(text) || sharesWord(session, text) || bareCodeForCodelessItem(session, text);
+  /** A model code that matches none of the current item's codes (an item described without a code has nothing to contradict). */
+  function namesAnotherModel(session, codes) {
+    const baseCodes = modelCodes(session.base);
+    return codes.length > 0 && baseCodes.length > 0 && !codes.some(function (code) { return baseCodes.some(function (base) { return sameCode(code, base); }); });
+  }
 
   /**
    * What a typed message is, decided without any AI call.
@@ -366,9 +394,10 @@
    *   new      a new item (text is the description, with any "new research:" prefix removed)
    *   refine   more detail on the current item
    *   question a question about the current results, answered locally from them
-   *   ask      ambiguous: the page asks which of refine / new was meant
+   *   ask      ambiguous: the page asks which of refine / new was meant (`reason: "accessory"` for a part or add-on)
+   * `turnIntent` names the same decision as NEW_PRODUCT, FOLLOW_UP (refine or question), AMBIGUOUS, RESET or EMPTY.
    */
-  function classify(session, input) {
+  function decide(session, input) {
     const text = clean(input);
     if (!text) return { kind: "empty" };
     const marker = NEW_PATTERN.exec(text);
@@ -378,12 +407,14 @@
     }
     if (!session.base) return { kind: "new", text: text };
     const codes = modelCodes(text);
-    const baseCodes = modelCodes(session.base);
+    const asksAboutResults = QUESTION_PATTERN.test(text) || REQUEST_PATTERN.test(text);
     // Explicitly naming a different product wins over any open question, and over a question's phrasing:
     //  - a model code that matches none of the current item's codes (a code when the item had none is just a detail), or
-    //  - a different kind of product (a refrigerator when researching a TV).
-    if (codes.length && baseCodes.length && !codes.some(function (code) { return baseCodes.some(function (base) { return sameCode(code, base); }); })) {
-      return { kind: "new", text: text };
+    //  - a different kind of product (a refrigerator or a game console when researching a TV).
+    if (namesAnotherModel(session, codes)) return { kind: "new", text: text };
+    // A part or add-on ("soundbar", "wall mount for it") is not a detail of the item and not clearly a product of its own: ask, never merge.
+    if (!asksAboutResults && !codes.length && ACCESSORY_PATTERN.test(text) && text.split(/\s+/).length <= ACCESSORY_MAX_WORDS && !sharesWord(session, text)) {
+      return { kind: "ask", text: text, reason: "accessory" };
     }
     if (disjoint(typesIn(text), typesIn(session.base))) return { kind: "new", text: text };
     // Only a different brand: it could be a different item or a preference ("I'd like a Samsung"), so the page asks instead of guessing.
@@ -393,10 +424,30 @@
       const aboutACandidate = QUESTION_PATTERN.test(text) && !disjoint(brandsIn(text), brandsIn(candidates));
       if (!aboutACandidate) return { kind: "ask", text: text };
     }
-    if (session.last && QUESTION_PATTERN.test(text)) return { kind: "question", text: text };
-    if (session.pending.length && text.length <= CLARIFY_REPLY_CHARS) return { kind: "refine", text: text };
-    if (text.length <= SHORT_REPLY_CHARS) return { kind: "refine", text: text };
+    if (session.last && asksAboutResults) return { kind: "question", text: text };
+    // Detail on the current item is appended to its query, so only a message that looks like detail (or answers the open question) is
+    // taken as one. An unfamiliar short name is asked about: guessing "detail" would put two products in one query.
+    const detail = looksLikeDetail(session, text);
+    if (session.pending.length && text.length <= CLARIFY_REPLY_CHARS && (detail || ANSWER_LEAD.test(text))) return { kind: "refine", text: text };
+    if (!session.pending.length && text.length <= SHORT_REPLY_CHARS && detail) return { kind: "refine", text: text };
     return { kind: "ask", text: text };
+  }
+
+  // How a verdict reads as a turn: a different product starts a new research context, a follow-up continues the current one,
+  // anything unclear is asked about.
+  const INTENTS = Object.freeze({ empty: "EMPTY", reset: "RESET", new: "NEW_PRODUCT", refine: "FOLLOW_UP", question: "FOLLOW_UP", ask: "AMBIGUOUS" });
+
+  const classify = decide;
+  const turnIntent = (session, input) => INTENTS[decide(session, input).kind];
+
+  /**
+   * The mode a message is actually sent in. "More detail on this item" (chosen after a question from the page) never merges a message that names
+   * another model or another kind of product into the current item's query: that is a new item.
+   */
+  function resolveMode(session, mode, input) {
+    if (mode !== "refine" || !session.base) return mode;
+    const text = clean(input);
+    return namesAnotherModel(session, modelCodes(text)) || disjoint(typesIn(text), typesIn(session.base)) ? "new" : mode;
   }
 
   /**
@@ -605,9 +656,9 @@
 
   const api = {
     MAX_QUERY_CHARS: MAX_QUERY_CHARS, VISITOR_KEY: VISITOR_KEY, VISITOR_PATTERN: VISITOR_PATTERN,
-    SUMMARY_TITLE: SUMMARY_TITLE, SUMMARY_NOTE: SUMMARY_NOTE, DEMO_LABEL: DEMO_LABEL, GREETING: GREETING, PLACEHOLDER: PLACEHOLDER, FINEPRINT: FINEPRINT, FINEPRINT_V2: FINEPRINT_V2, ASK_WHICH: ASK_WHICH, FALLBACK_HELP: FALLBACK_HELP, TOO_LONG: TOO_LONG, STARTING_FRESH: STARTING_FRESH,
+    SUMMARY_TITLE: SUMMARY_TITLE, SUMMARY_NOTE: SUMMARY_NOTE, DEMO_LABEL: DEMO_LABEL, GREETING: GREETING, PLACEHOLDER: PLACEHOLDER, FINEPRINT: FINEPRINT, FINEPRINT_V2: FINEPRINT_V2, ASK_WHICH: ASK_WHICH, ASK_ACCESSORY: ASK_ACCESSORY, STAY_ON_ITEM: STAY_ON_ITEM, FALLBACK_HELP: FALLBACK_HELP, TOO_LONG: TOO_LONG, STARTING_FRESH: STARTING_FRESH,
     ERROR_MESSAGES: ERROR_MESSAGES, errorMessage: errorMessage, offersClassic: offersClassic,
-    initialSession: initialSession, classify: classify, composeQuery: composeQuery, adopt: adopt, localAnswer: localAnswer,
+    initialSession: initialSession, classify: classify, turnIntent: turnIntent, resolveMode: resolveMode, composeQuery: composeQuery, adopt: adopt, localAnswer: localAnswer,
     reply: reply, categoryLabel: categoryLabel, isResearchResponse: isResearchResponse, createVisitorId: createVisitorId, modelCodes: modelCodes,
     isV2: isV2, SUMMARY_NOTE_V2: SUMMARY_NOTE_V2, DEMO_PRICE_NOTE: DEMO_PRICE_NOTE, label: label, noteText: noteText, formatMoney: formatMoney, formatRange: formatRange, formatDay: formatDay,
     valuationLine: valuationLine, compatibilityLine: compatibilityLine, isListingAnchor: isListingAnchor, shortfallCount: shortfallCount, referencePrice: referencePrice, originalPrices: originalPrices, historySummary: historySummary, priceRole: priceRole, pricesByRole: pricesByRole,
