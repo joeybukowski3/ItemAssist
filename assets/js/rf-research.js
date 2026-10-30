@@ -33,7 +33,8 @@
   const ANSWER_LEAD = /^(?:yes|yeah|yep|no|nope|not\s+sure|i\s+(?:don'?t|do\s+not)\s+know|idk|about|around|roughly|approximately|probably|maybe|it(?:'s|\s+is|\s+was)|its|mine|i\s+(?:have|think|believe|measured|bought)|in|on|at)\b/i;
   // Spec and feature tokens are not model codes ("4k", "120hz", "hdr10"); a model code mixes letters and digits ("c3", "qn55q80c").
   const SPEC_TOKEN = /^\d+(?:k|p|x|hz|gb|tb|mb|w|v|l|mm|cm|in|ft|lb|lbs|cu|ms|nits)$/;
-  const FEATURE_TOKEN = /^(?:hdr|hdmi|wifi|usb|gen|dolby|atmos|bt|cat)\d*\+?$/;
+  // A processor class ("i5") or memory type ("ddr5") describes a machine's parts; it is never the model of another product.
+  const FEATURE_TOKEN = /^(?:hdr|hdmi|wifi|usb|gen|dolby|atmos|bt|cat|ddr|lpddr)\d*\+?$|^(?:i[3579]|m[1-4])$/;
 
   /* ---------- Wording ---------- */
 
@@ -122,6 +123,8 @@
     ORIGINAL_LISTING: "A price seen for the original model on a seller's page, with no reliable date. It may be a sale, clearance or discontinued price. It is not a list price, and it never sets the replacement range.",
     OTHER_FAMILY: "A current price for a different candidate family. It is listed separately and does not set the headline range.",
     SIZE_NOT_CONFIRMED: "A retail example whose size is not confirmed against the original. It does not confirm a match and does not set the range.",
+    CONFIG_NOT_CONFIRMED: "A laptop listing whose processor, memory and storage are not matched to what you described. It is an example, not a match, and it does not set the range.",
+    SPREAD_TRIMMED: "Priced too far from the other listings to be the same product or configuration, so it does not set the range.",
     CURRENT_COMPARABLE: "A current price for a candidate with no essential requirement known to fall short. It is not confirmed as an exact match.",
     ESTIMATE_ANCHOR: "The estimate band scales this price. No current retail price is included in this research.",
     ESTIMATE_RANGE: "An AI estimate. No source supports it."
@@ -155,6 +158,7 @@
     MSRP_CONTEXT_ONLY: (note, context) => "The original's " + (context && context.referenceKind === "HISTORICAL_RETAIL" ? "past retail price" : "list price") + " is context only. It does not set the replacement range.",
     OTHER_FAMILIES_SEPARATE: (note) => (note.count === 1 ? "Prices for another candidate family are" : "Prices for " + note.count + " other candidate families are") + " listed separately. They do not set this range.",
     COMPATIBILITY_NOT_ESTABLISHED: () => COMPATIBILITY_TEXT,
+    LISTINGS_SPREAD_TRIMMED: (note) => plural(note.count, "listing was", "listings were") + " left out because " + (note.count === 1 ? "its price is" : "their prices are") + " too far from the others to be the same product or configuration.",
     CURRENT_BELOW_ORIGINAL: (note) => "Current prices are about " + percent(note.ratio) + " of the original's list price.",
     ORIGINAL_DATE_UNKNOWN: () => "The date of the original's price is not stated, so a wider band is used.",
     TIER_UNKNOWN_WIDENED: () => "The market tier is not known, so the band is wider.",
@@ -269,6 +273,7 @@
     if (!value || !price) return null;
     // A listing that states no screen size is shown as an example, whatever else is true of its candidate.
     if (price.sizeConfirmed === false) return { role: "CONTEXT_ONLY", note: "SIZE_NOT_CONFIRMED", exclusion: null };
+    if (price.configConfirmed === false) return { role: "CONTEXT_ONLY", note: "CONFIG_NOT_CONFIRMED", exclusion: null };
     if ((value.comparables || []).some(function (row) { return row.priceId === price.id; })) {
       return { role: "USED_IN_RANGE", note: price.kind === "AI_ESTIMATE" ? "ESTIMATE_RANGE" : "CURRENT_COMPARABLE", exclusion: null };
     }
@@ -281,7 +286,10 @@
     // A current price for a candidate family none of the range's comparables belong to: listed apart from the headline, not discarded.
     const otherFamily = price.kind === "CURRENT_RETAIL_NEW" && price.candidate && (value.comparables || []).length > 0
       && !(value.comparables || []).some(function (row) { return row.candidate === price.candidate; });
+    // Listings the engine set aside because they sit too far from the rest to be one product (its own note says so).
+    const spreadTrimmed = price.kind === "CURRENT_RETAIL_NEW" && (value.notes || []).some(function (entry) { return entry && entry.code === "LISTINGS_SPREAD_TRIMMED"; });
     if (otherFamily) note = "OTHER_FAMILY";
+    else if (spreadTrimmed) note = "SPREAD_TRIMMED";
     else if (price.kind === "AI_ESTIMATE") note = price.subject === "ORIGINAL" ? "ORIGINAL_ESTIMATE" : "AI_ESTIMATE";
     else if (price.kind === "ORIGINAL_LISTING") note = "ORIGINAL_LISTING";
     else if (price.subject === "ORIGINAL") note = "ORIGINAL_CONTEXT";
@@ -528,7 +536,7 @@
     if (topic === "confidence") {
       const level = { HIGH: "high", MEDIUM: "medium", LOW: "low" }[data.original.confidence] || "low";
       return [
-        data.original.identity ? "My confidence in the identification is " + level + "." : "I wasn't able to identify the product.",
+        data.original.identity ? "My confidence in the identification is " + level + "." : providerIncomplete(data) ? "The research step didn't finish, so I can't say yet." : "I wasn't able to identify the product.",
         data.original.uncertainty || null,
         data.disclosure
       ].filter(Boolean);
@@ -549,6 +557,17 @@
 
   /* ---------- Conversation copy ---------- */
 
+  /**
+   * True when the request failed at the provider (the engine reports PROVIDER_UNAVAILABLE). That says nothing about the product: it is never
+   * worded as "not identified", and a name the engine could still recognise is shown as recognised, not as researched.
+   */
+  function providerIncomplete(data) {
+    return Boolean(data) && Array.isArray(data.warnings) && data.warnings.indexOf("PROVIDER_UNAVAILABLE") !== -1;
+  }
+
+  const INCOMPLETE_KICKER = "Research didn't finish";
+  const INCOMPLETE_RETRY = "That's not a finding about the product. Please try again in a moment; a request that fails this way doesn't use up your daily allowance.";
+
   const CATEGORY_LABELS = Object.freeze({ tv: "Television", refrigerator: "Refrigerator", appliance: "Appliance", electronics: "Electronics", other: "Item", unknown: "Item" });
 
   /**
@@ -563,6 +582,12 @@
     if (data.status === "UNAVAILABLE") {
       kicker = "Research unavailable";
       lines.push("I couldn't research this one just now, so the panel shows general requirements for this type of item. Nothing there is researched.");
+    } else if (providerIncomplete(data)) {
+      kicker = INCOMPLETE_KICKER;
+      lines.push(identified
+        ? "I recognised this as " + data.original.identity + ", but the research step didn't finish, so I have no replacement suggestions or prices to show."
+        : "The research step didn't finish, so I can't say anything about this item yet.");
+      lines.push(INCOMPLETE_RETRY);
     } else if (!identified) {
       kicker = "Product not identified";
       lines.push("I couldn't identify this item from the description. The panel shows general requirements for this type of item.");
@@ -661,6 +686,7 @@
     initialSession: initialSession, classify: classify, turnIntent: turnIntent, resolveMode: resolveMode, composeQuery: composeQuery, adopt: adopt, localAnswer: localAnswer,
     reply: reply, categoryLabel: categoryLabel, isResearchResponse: isResearchResponse, createVisitorId: createVisitorId, modelCodes: modelCodes,
     isV2: isV2, SUMMARY_NOTE_V2: SUMMARY_NOTE_V2, DEMO_PRICE_NOTE: DEMO_PRICE_NOTE, label: label, noteText: noteText, formatMoney: formatMoney, formatRange: formatRange, formatDay: formatDay,
+    providerIncomplete: providerIncomplete, INCOMPLETE_KICKER: INCOMPLETE_KICKER, INCOMPLETE_RETRY: INCOMPLETE_RETRY,
     valuationLine: valuationLine, compatibilityLine: compatibilityLine, isListingAnchor: isListingAnchor, shortfallCount: shortfallCount, referencePrice: referencePrice, originalPrices: originalPrices, historySummary: historySummary, priceRole: priceRole, pricesByRole: pricesByRole,
     PRICE_ROLE_LABELS: PRICE_ROLE_LABELS, PRICE_ROLE_REASONS: PRICE_ROLE_REASONS,
     PRICE_KIND_LABELS: PRICE_KIND_LABELS, VERIFICATION_LABELS: VERIFICATION_LABELS, DATE_LABELS: DATE_LABELS, METHOD_LABELS: METHOD_LABELS, TIER_LABELS: TIER_LABELS,

@@ -134,7 +134,7 @@
         h("span", { class: "rf-rs-price-amount rf-mono", text: amount || "" })
       ]),
       h("p", { class: "rf-rs-price-meta" }, [subjectText(price) + (price.model ? " · " + price.model : "")]),
-      h("div", { class: "rf-rs-price-status" }, [verificationPill(price.verification), price.sizeConfirmed === false ? D.pill("warn", "q", "Size not confirmed") : null, h("span", { class: "rf-rs-price-date", text: dateText(price) })].filter(Boolean)),
+      h("div", { class: "rf-rs-price-status" }, [verificationPill(price.verification), price.sizeConfirmed === false ? D.pill("warn", "q", "Size not confirmed") : null, price.configConfirmed === false ? D.pill("warn", "q", "Configuration not confirmed") : null, h("span", { class: "rf-rs-price-date", text: dateText(price) })].filter(Boolean)),
       link ? h("p", { class: "rf-rs-price-source" }, [link, source ? " · " + label(Res.SOURCE_CLASS_LABELS, source.sourceClass) + ", " + label(Res.MODEL_RELATION_LABELS, source.modelRelation).toLowerCase() : ""]) : h("p", { class: "rf-rs-price-source rf-muted", text: "No source: this is an estimate." })
     ].concat(roleLines(data, price)));
   }
