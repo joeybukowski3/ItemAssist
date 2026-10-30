@@ -203,7 +203,8 @@ test("a provider failure shows general guidance, clearly not researched", async 
   await ready(page);
   await send(page, "some old TV");
   await expect(page.locator("#rf-product-root .rf-rs-banner")).toContainText("Research unavailable");
-  await expect(page.locator("#rf-product-name")).toHaveText("Product not identified");
+  // A provider failure is not an unknown product: the header says the research was unavailable, in step with the banner above it.
+  await expect(page.locator("#rf-product-name")).toHaveText("Research unavailable");
   await expect(log(page)).toContainText("Nothing there is researched");
   await expect(page.locator("#rf-rpanel-requirements li")).not.toHaveCount(0);
   settle(seen);

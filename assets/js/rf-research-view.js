@@ -54,6 +54,9 @@
     if (data.status === "UNAVAILABLE") {
       title = "Research unavailable";
       text = "ItemAssist Research couldn't complete this request. These are general requirements for this type of item, not researched results.";
+    } else if (Research.providerIncomplete(data)) {
+      title = Research.INCOMPLETE_KICKER;
+      text = "ItemAssist Research couldn't complete this request, so there are no replacement suggestions or prices. " + (data.original.identity ? "The name below comes from your wording and web results only. " : "") + Research.INCOMPLETE_RETRY;
     } else if (data.status === "GUIDANCE_ONLY") {
       title = "Product not identified";
       text = "The item couldn't be identified from the description, so these are general requirements for this type of item. " + (Research.isV2(data) ? Research.SUMMARY_NOTE_V2 : Research.SUMMARY_NOTE);
@@ -66,11 +69,11 @@
     var confidence = identified ? R.confidence(data.original.confidence) : null;
     return [
       h("p", { class: "rf-ph-brand", text: Research.categoryLabel(data.category) + " research" }),
-      D.heading("h3", "rf-product-name", identified ? data.original.identity : "Product not identified", "rf-ph-model"),
+      D.heading("h3", "rf-product-name", identified ? data.original.identity : data.status === "UNAVAILABLE" ? "Research unavailable" : Research.providerIncomplete(data) ? Research.INCOMPLETE_KICKER : "Product not identified", "rf-ph-model"),
       h("div", { class: "rf-status-row", attrs: { role: "group", "aria-label": "Research status" } }, [
         // Shown only when the server marked the answer as canned Preview data; the text is fixed here, never taken from the response.
         data.meta && data.meta.fixture === true ? D.pill("info", "info", Research.DEMO_LABEL, "rf-rs-demo") : null,
-        D.pill("warn", "q", data.status === "UNAVAILABLE" ? "General guidance only" : (Research.isV2(data) ? "Candidates not verified" : "AI estimate, not verified")),
+        D.pill("warn", "q", data.status === "UNAVAILABLE" ? "General guidance only" : Research.providerIncomplete(data) ? "Research incomplete" : (Research.isV2(data) ? "Candidates not verified" : "AI estimate, not verified")),
         confidence
       ].filter(Boolean))
     ];
@@ -136,7 +139,16 @@
     return block("rf-confirm-h", "Still to confirm", [list(items)]);
   }
 
+  /** What stands in place of a value and a lead candidate when the request failed at the provider: a plain statement, nothing researched. */
+  function incompleteNote(data) {
+    return block("rf-incomplete-h", Research.INCOMPLETE_KICKER, [
+      h("p", { text: data.original.identity ? "Only the name could be recognised. There is no value estimate and no candidate to show yet." : "There is nothing to show yet." }),
+      h("p", { class: "rf-muted", text: Research.INCOMPLETE_RETRY })
+    ]);
+  }
+
   function overviewPanel(data) {
+    if (Research.providerIncomplete(data)) return [incompleteNote(data), toConfirm(data)];
     var children = Research.isV2(data) ? [P.valuationCard(data), lead(data)] : [lead(data)];
     if (data.suggestions.length) {
       children.push(block("rf-alts-h", "Alternatives to explore (" + data.suggestions.length + ")", [h("ul", { class: "rf-rs-alts" }, data.suggestions.map(function (item) {
@@ -148,6 +160,8 @@
   }
 
   function originalPanel(data) {
+    // A request that failed at the provider says nothing about the item: it is never reported as an item that could not be identified.
+    if (!data.original.identity && (data.status === "UNAVAILABLE" || Research.providerIncomplete(data))) return [D.emptyNote(data.status === "UNAVAILABLE" ? "Research unavailable" : Research.INCOMPLETE_KICKER, "The research step didn't finish, so nothing is known about this item yet. " + Research.INCOMPLETE_RETRY)];
     if (!data.original.identity) return [D.emptyNote("Product not identified", "The item couldn't be identified from the description. Add a brand, model number or key detail in the conversation.")];
     var children = [h("p", { class: "rf-rs-identity", text: data.original.identity }), R.confidence(data.original.confidence)];
     children.push(data.original.characteristics.length ? h("div", {}, [h("p", { class: "rf-rs-sub", text: "Key characteristics" }), list(data.original.characteristics)]) : h("p", { class: "rf-muted", text: "No characteristics were stated." }));

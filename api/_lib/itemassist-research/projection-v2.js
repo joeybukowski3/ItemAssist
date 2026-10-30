@@ -77,7 +77,7 @@ const NOTE_PARAMS = Object.freeze({
   BASED_ON_VERIFIED: ["count"], BASED_ON_LISTINGS: ["count"], ONE_COMPARABLE: [], LISTINGS_NOT_CONFIRMED: [], TIER_ESTIMATE_BAND: ["low", "high"],
   AI_ESTIMATE_ONLY: [], INSUFFICIENT: [], MSRP_CONTEXT_ONLY: [], CURRENT_BELOW_ORIGINAL: ["ratio"], ORIGINAL_DATE_UNKNOWN: [], TIER_UNKNOWN_WIDENED: [],
   EXCLUDED_CONFIRMED_SHORTFALL: ["candidate"], EXCLUDED_SUSPECTED_SHORTFALL: ["candidate"], EXCLUDED_NO_CURRENT_PRICE: ["candidate"],
-  STALE_PRICES_NOT_CURRENT: ["count"], OTHER_FAMILIES_SEPARATE: ["count"], COMPATIBILITY_NOT_ESTABLISHED: [], NOT_AN_APPRAISAL: []
+  STALE_PRICES_NOT_CURRENT: ["count"], OTHER_FAMILIES_SEPARATE: ["count"], COMPATIBILITY_NOT_ESTABLISHED: [], LISTINGS_SPREAD_TRIMMED: ["count"], NOT_AN_APPRAISAL: []
 });
 const METHOD_ONLY_NOTES = Object.freeze({
   BASED_ON_VERIFIED: ["VERIFIED_MULTI", "VERIFIED_SINGLE", "MIXED_VERIFIED_AND_LISTINGS"],
@@ -274,8 +274,10 @@ function projectPrices(raw, { evidence, keys, names, referenceDate, trustPageVer
     }
     // `sizeConfirmed: false` (a television listing that states no screen size) exists on a current listing only; anywhere else it is dropped.
     const unsizedExample = entry.sizeConfirmed === false && kind === "CURRENT_RETAIL_NEW" && level === "SEARCH_LISTING" && subject === "REPLACEMENT" && candidate !== null;
+    // `configConfirmed: false` is the same mark for a laptop listing whose configuration was not matched to what the person described.
+    const unconfiguredExample = entry.configConfirmed === false && kind === "CURRENT_RETAIL_NEW" && level === "SEARCH_LISTING" && subject === "REPLACEMENT" && candidate !== null;
     seen.add(entry.id);
-    items.push({ id: entry.id, kind, subject, candidate, model, amount, asOf, asOfBasis, verification: level, evidenceId, ...(unsizedExample ? { sizeConfirmed: false } : {}) });
+    items.push({ id: entry.id, kind, subject, candidate, model, amount, asOf, asOfBasis, verification: level, evidenceId, ...(unsizedExample ? { sizeConfirmed: false } : {}), ...(unconfiguredExample ? { configConfirmed: false } : {}) });
     if (items.length >= MAX_PRICES) break;
   }
   return items;
@@ -404,8 +406,8 @@ function projectValuation(raw, { prices, candidates, requirements }) {
     const price = isObject(row) ? byId.get(row.priceId) : null;
     if (!price || row.candidate !== price.candidate || row.verification !== price.verification || comparables.some((other) => other.priceId === price.id)) return null;
     if (price.candidate !== null && excluded.some((entry) => entry.candidate === price.candidate)) return null;
-    // A listing that does not confirm the screen size is an example only: it can never set or widen the range.
-    if (price.sizeConfirmed === false) return null;
+    // A listing that does not confirm the screen size, or a laptop's configuration, is an example only: it can never set or widen the range.
+    if (price.sizeConfirmed === false || price.configConfirmed === false) return null;
     comparables.push({ priceId: price.id, candidate: price.candidate, verification: price.verification });
   }
   const resolved = comparables.map((row) => byId.get(row.priceId));
@@ -595,7 +597,8 @@ function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = fa
   const warnings = (Array.isArray(body.warnings) ? body.warnings : []).filter((code) => BASE_WARNING_CODES.includes(code)).slice(0, BASE_WARNING_CODES.length);
   const addWarning = (code) => { if (!warnings.includes(code)) warnings.push(code); };
   const derived = [];
-  if (unidentified) derived.push("PRODUCT_NOT_IDENTIFIED");
+  // A request that failed at the provider says nothing about the product: it is reported as PROVIDER_UNAVAILABLE alone, never as "not identified".
+  if (unidentified && !warnings.includes("PROVIDER_UNAVAILABLE")) derived.push("PRODUCT_NOT_IDENTIFIED");
   if (candidates.some((entry) => !entry.differences)) derived.push("DIFFERENCES_MISSING");
   if (rejections.some((row) => row.action === "REJECTED" && ["EVIDENCE", "PRICE", "COMPARISON"].includes(row.scope))) derived.push("PRICE_EVIDENCE_REJECTED");
   if (valuation.excluded.some((row) => row.reason.endsWith("ESSENTIAL_SHORTFALL"))) derived.push("CANDIDATE_EXCLUDED_ESSENTIAL");
