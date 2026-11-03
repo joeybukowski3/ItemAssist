@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const { Resend } = require("resend");
 
 const { validateConsultation } = require("./_lib/consultation/validation");
-const { buildInternalNotification, LEAD_TYPE } = require("./_lib/consultation/email");
+const { buildInternalNotification, profileFor, GENERIC_LEAD_TYPE } = require("./_lib/consultation/email");
 const { checkRateLimit } = require("./_lib/consultation/ratelimit");
 const { claimSubmission, releaseSubmission } = require("./_lib/consultation/dedupe");
 const { verifyTurnstile } = require("./_lib/age-verification/turnstile");
@@ -13,10 +13,13 @@ function json(res, status, payload) {
   res.send(JSON.stringify(payload));
 }
 
-/** CI-YYYYMMDD-XXXXXXXX: correlates the notification email with the log line without naming the visitor. */
-function generateLeadId(now) {
+/**
+ * PP-YYYYMMDD-XXXXXXXX: correlates the notification email with the log line without naming the visitor.
+ * The prefix is fixed per request type (CI consultation, RR research request, EI exploring options).
+ */
+function generateLeadId(now, prefix = "CI") {
   const day = now.toISOString().slice(0, 10).replace(/-/g, "");
-  return `CI-${day}-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+  return `${prefix}-${day}-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
 }
 
 function clientIp(req) {
@@ -25,12 +28,14 @@ function clientIp(req) {
 }
 
 /**
- * Builds the consultation-inquiry handler with every external client
+ * Builds the homepage inquiry handler (free consultation, research request or
+ * exploring options) with every external client
  * injectable, so tests exercise the whole request lifecycle against fakes
  * and never reach Resend, Turnstile or Redis.
  *
- * Marketing inquiries stay apart from assignment submissions: their own
- * endpoint, subject line, email tag and log event. Nothing is stored beyond
+ * Marketing inquiries stay apart from the detailed /api/contact assignment
+ * submissions, which are unchanged: their own endpoint, subject line, email tag
+ * and log event. The request type picks the subject, tag and wording. Nothing is stored beyond
  * the notification email; the only Redis keys are the rate-limit counter and
  * a hashed double-submit guard.
  *
@@ -47,7 +52,7 @@ function createHandler(overrides = {}) {
   const now = overrides.now || (() => new Date());
   const doVerifyTurnstile = overrides.verifyTurnstile || verifyTurnstile;
   const logError = overrides.logError || ((...args) => console.error(...args));
-  const logEvent = overrides.logEvent || ((event) => console.info(JSON.stringify({ event: "itemassist_lead", leadType: LEAD_TYPE, ...event })));
+  const logEvent = overrides.logEvent || ((event) => console.info(JSON.stringify({ event: "itemassist_lead", leadType: GENERIC_LEAD_TYPE, ...event })));
 
   return async function handler(req, res) {
     if (req.method === "GET") {
@@ -136,7 +141,8 @@ function createHandler(overrides = {}) {
     }
 
     const receivedAt = now().toISOString();
-    const leadId = generateLeadId(now());
+    const profile = profileFor(fields.reason);
+    const leadId = generateLeadId(now(), profile.idPrefix);
     const notification = buildInternalNotification(fields, { leadId, receivedAt });
 
     try {
@@ -155,7 +161,7 @@ function createHandler(overrides = {}) {
       }
     } catch (error) {
       logError("consultation-request notification failed", leadId, error.message);
-      logEvent({ outcome: "send_failed", leadId });
+      logEvent({ outcome: "send_failed", leadId, leadType: profile.leadType, reason: fields.reason });
       if (claimed) {
         await releaseSubmission(fields.submissionId, { redis: overrides.redis }).catch(() => {});
       }
@@ -165,6 +171,7 @@ function createHandler(overrides = {}) {
     logEvent({
       outcome: "submitted",
       leadId,
+      leadType: profile.leadType,
       reason: fields.reason,
       hasCompany: Boolean(fields.company),
       hasPhone: Boolean(fields.phone),

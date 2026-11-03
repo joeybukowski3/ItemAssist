@@ -1,16 +1,15 @@
 /**
- * Validation and normalization for the short "Request a Free Consultation"
- * form. Pure functions only: no network, no environment, so every rule is
+ * Validation and normalization for the homepage inquiry form ("Request
+ * Research or a Free Consultation"). Pure functions only: no network, no environment, so every rule is
  * unit-testable. The browser repeats these checks for convenience, but this
  * module is the authority.
  */
 
+/** What the visitor is asking for. The wire field is still called `reason`. */
 const REASONS = {
-  contents_research: "Contents research for a claim or inventory",
-  individual_item: "A difficult or disputed item comparison",
-  ongoing_support: "Ongoing or recurring research support",
-  question: "A question about the service or pricing",
-  other: "Something else"
+  consultation: "Free consultation",
+  research_request: "Research request / assignment",
+  exploring: "Exploring options"
 };
 
 const ITEM_COUNT_BANDS = {
@@ -118,9 +117,9 @@ function validateConsultation(body) {
   }
 
   if (!reason) {
-    errors.reason = "Please choose a reason for your inquiry.";
+    errors.reason = "Please choose a request type.";
   } else if (!Object.prototype.hasOwnProperty.call(REASONS, reason)) {
-    errors.reason = "Please choose one of the listed reasons.";
+    errors.reason = "Please choose one of the listed request types.";
   }
 
   if (company.length > LIMITS.company) {
@@ -135,7 +134,9 @@ function validateConsultation(body) {
     errors.item_count = "Please choose one of the listed item counts, or leave it blank.";
   }
 
-  if (description.length > LIMITS.description) {
+  if (!description) {
+    errors.description = "Please add a short description of what you need.";
+  } else if (description.length > LIMITS.description) {
     errors.description = `Please keep the description under ${LIMITS.description} characters.`;
   }
 

@@ -21,7 +21,7 @@ test("a valid inquiry posts JSON once to the consultation endpoint and shows an 
   expect(body).toMatchObject({
     name: "Jane Smith",
     email: "jane@example.com",
-    reason: "contents_research",
+    reason: "consultation",
     company: "Smith Adjusting",
     phone: "(555) 555-5555",
     item_count: "11-50",
@@ -36,15 +36,15 @@ test("a valid inquiry posts JSON once to the consultation endpoint and shows an 
   );
 });
 
-test("only name, email and a reason are required", async ({ page }) => {
+test("only name, email, request type and description are required", async ({ page }) => {
   const calls = await stubSite(page);
   await openHome(page);
   await fillConsultation(page);
   await submit(page).click();
   await expect(page.locator("#consult-success")).toBeVisible();
   expect(calls.consultation).toHaveLength(1);
-  expect(calls.consultation[0].body).toMatchObject({ company: "", phone: "", item_count: "", description: "" });
-  for (const id of ["#consult-company", "#consult-phone", "#consult-count", "#consult-description"]) {
+  expect(calls.consultation[0].body).toMatchObject({ company: "", phone: "", item_count: "", description: "About thirty items." });
+  for (const id of ["#consult-company", "#consult-phone", "#consult-count"]) {
     await expect(page.locator(id)).not.toHaveAttribute("required", "");
   }
 });
@@ -57,7 +57,8 @@ test("submitting an empty form explains each missing field, focuses the first, a
   const messages = {
     name: "Please enter your name.",
     email: "Please enter your email address.",
-    reason: "Please choose a reason for your inquiry."
+    reason: "Please choose a request type.",
+    description: "Please add a short description of what you need."
   };
   for (const [id, message] of Object.entries(messages)) {
     await expect(page.locator(`#consult-${id}`)).toHaveAttribute("aria-invalid", "true");
@@ -191,13 +192,13 @@ test("a direct visit sends no source, and nothing the visitor types is kept in b
   expect(stored).not.toMatch(/Jane|jane@example|Private note/);
 });
 
-test("service cards that start a consultation preselect the matching reason", async ({ page }) => {
+test("service cards that start a request preselect the matching request type", async ({ page }) => {
   await stubSite(page);
   await openHome(page);
-  await page.locator('[data-consult-reason="individual_item"]').click();
-  await expect(page.locator("#consult-reason")).toHaveValue("individual_item");
-  await page.locator('[data-consult-reason="ongoing_support"]').click();
-  await expect(page.locator("#consult-reason")).toHaveValue("ongoing_support");
+  await page.locator('[data-consult-reason="research_request"]').first().click();
+  await expect(page.locator("#consult-reason")).toHaveValue("research_request");
+  await page.locator('[data-consult-reason="consultation"]').click();
+  await expect(page.locator("#consult-reason")).toHaveValue("consultation");
   await expect(page).toHaveURL(/#consultation$/);
 });
 
@@ -205,7 +206,7 @@ test("every field has a visible label, and the spam trap is hidden from people a
   await stubSite(page);
   await openHome(page);
   const form = page.locator("#consultation-form");
-  for (const label of ["Name", "Email", "Reason for inquiry", "Company", "Phone", "Approximate item count", "Short description"]) {
+  for (const label of ["Name", "Email", "Request type", "Company", "Phone", "Approximate item count", "Short description"]) {
     await expect(form.getByLabel(label)).toBeVisible();
   }
   await expect(form.locator(".form-honeypot")).toHaveAttribute("aria-hidden", "true");
@@ -215,22 +216,73 @@ test("every field has a visible label, and the spam trap is hidden from people a
   await expect(page.locator("#consult-status")).toHaveAttribute("aria-live", "polite");
 });
 
-test("the assignment form still submits to its own endpoint and never touches the consultation endpoint", async ({ page }) => {
-  const calls = await stubSite(page);
-  await page.goto("/");
-  await expect(page.locator("#contact-form")).toBeAttached();
-  await page.locator("#contact-name").fill("Alex Adjuster");
-  await page.locator("#email").fill("alex@example.com");
-  await page.locator("#assignment-notes").fill("Forty items, mostly electronics.");
-  await page.waitForFunction(() => document.querySelector("#contact-form .form-turnstile"), null, { timeout: 5000 });
-  await page.locator("#contact-form .form-submit").scrollIntoViewIfNeeded();
-  await expect.poll(() => page.locator("#form-status").textContent(), { timeout: 5000 }).not.toMatch(/could not load/);
-  await page.locator("#contact-form .form-submit").click();
+test("each request type is sent as chosen, so the server can label the notification", async ({ page }) => {
+  for (const reason of ["consultation", "research_request", "exploring"]) {
+    const calls = await stubSite(page);
+    await openHome(page);
+    await fillConsultation(page, { reason });
+    await submit(page).click();
+    await expect(page.locator("#consult-success")).toBeVisible();
+    expect(calls.consultation, reason).toHaveLength(1);
+    expect(calls.consultation[0].body.reason).toBe(reason);
+    expect(calls.contact).toHaveLength(0);
+    await page.unrouteAll({ behavior: "ignoreErrors" });
+  }
+});
 
-  await expect(page.locator("#form-status")).toContainText("Contents list received");
-  expect(calls.contact).toHaveLength(1);
-  expect(calls.contact[0].headers["content-type"]).toContain("multipart/form-data");
-  expect(calls.contact[0].body).toContain("Alex Adjuster");
-  expect(calls.contact[0].body).toContain("Forty items, mostly electronics.");
+test("the description is required and its message appears with the other missing fields", async ({ page }) => {
+  const calls = await stubSite(page);
+  await openHome(page);
+  await fillConsultation(page, { description: "" });
+  await page.locator("#consult-description").fill("   ");
+  await submit(page).click();
+  await expect(page.locator("#consult-description")).toHaveAttribute("aria-invalid", "true");
+  await expect(page.locator("#consult-description-error")).toHaveText("Please add a short description of what you need.");
+  await expect(page.locator("#consult-description")).toBeFocused();
   expect(calls.consultation).toHaveLength(0);
+  await page.locator("#consult-description").fill("Twenty items.");
+  await expect(page.locator("#consult-description-error")).toBeHidden();
+});
+
+test("the old assignment anchor and request-type links land on the unified form with the right type selected", async ({ page }) => {
+  await stubSite(page);
+  await page.goto("/index.html#submit-assignment");
+  await expect(page.locator("#consult-reason")).toHaveValue("research_request");
+  await expect(page.locator("#consultation-form")).toBeInViewport();
+
+  await page.goto("/index.html?consult=consultation");
+  await expect(page.locator("#consult-reason")).toHaveValue("consultation");
+  await page.goto("/index.html?consult=exploring");
+  await expect(page.locator("#consult-reason")).toHaveValue("exploring");
+  // The retired reason values from the earlier form are ignored, not guessed at.
+  await page.goto("/index.html?consult=individual_item");
+  await expect(page.locator("#consult-reason")).toHaveValue("");
+
+  // Same-page link to the old anchor after the visitor chose something else.
+  await page.goto("/index.html");
+  await page.locator("#consult-reason").selectOption("exploring");
+  await page.evaluate(() => { window.location.hash = "#submit-assignment"; });
+  await expect(page.locator("#consult-reason")).toHaveValue("research_request");
+});
+
+test("the assignment and consultation offers choose the matching request type", async ({ page }) => {
+  await stubSite(page);
+  await openHome(page);
+  await page.locator('#pricing a[href="#consultation"][data-consult-reason="research_request"]').first().click();
+  await expect(page.locator("#consult-reason")).toHaveValue("research_request");
+  await page.locator('#pricing a[data-consult-reason="consultation"]').click();
+  await expect(page.locator("#consult-reason")).toHaveValue("consultation");
+  await expect(page).toHaveURL(/#consultation$/);
+});
+
+test("the form stays usable on a narrow screen: single column, no overflow, button reachable", async ({ page }, testInfo) => {
+  await stubSite(page);
+  await openHome(page);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+  const box = await page.locator("#consultation-form").boundingBox();
+  expect(box.x).toBeGreaterThanOrEqual(-0.5);
+  expect(box.x + box.width).toBeLessThanOrEqual(testInfo.project.use.viewport.width + 0.5);
+  await submit(page).scrollIntoViewIfNeeded();
+  await expect(submit(page)).toBeInViewport();
 });

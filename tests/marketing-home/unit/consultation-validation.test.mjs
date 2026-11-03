@@ -7,17 +7,23 @@ const v = require("../../../api/_lib/consultation/validation.js");
 const { buildInternalNotification, escapeHtml } = require("../../../api/_lib/consultation/email.js");
 const { dedupeKey, claimSubmission, releaseSubmission } = require("../../../api/_lib/consultation/dedupe.js");
 
-const base = { name: "Jane Smith", email: "jane@example.com", reason: "other" };
+const base = { name: "Jane Smith", email: "jane@example.com", reason: "exploring", description: "A short note." };
 
 test("a minimal valid body has no errors and trims every field", () => {
-  const { errors, fields } = v.validateConsultation({ name: "  Jane  Smith ", email: " jane@example.com ", reason: " other " });
+  const { errors, fields } = v.validateConsultation({ name: "  Jane  Smith ", email: " jane@example.com ", reason: " exploring ", description: " A short note. " });
   assert.deepEqual(errors, {});
   assert.equal(fields.name, "Jane Smith");
   assert.equal(fields.email, "jane@example.com");
-  assert.equal(fields.reason, "other");
+  assert.equal(fields.reason, "exploring");
+  assert.equal(fields.description, "A short note.");
 });
 
-test("every published reason and item-count band is accepted", () => {
+test("the request types are exactly consultation, research request and exploring options", () => {
+  assert.deepEqual(v.REASONS, { consultation: "Free consultation", research_request: "Research request / assignment", exploring: "Exploring options" });
+  assert.deepEqual(Object.keys(v.validateConsultation({ ...base, reason: "", description: "" }).errors).sort(), ["description", "reason"]);
+});
+
+test("every published request type and item-count band is accepted", () => {
   for (const reason of Object.keys(v.REASONS)) assert.deepEqual(v.validateConsultation({ ...base, reason }).errors, {});
   for (const item_count of Object.keys(v.ITEM_COUNT_BANDS)) assert.deepEqual(v.validateConsultation({ ...base, item_count }).errors, {});
 });
@@ -60,11 +66,11 @@ test("a malformed submission id is blanked", () => {
 
 test("the notification body lists only what was provided, escapes it, and states what it is", () => {
   const { fields } = v.validateConsultation({ ...base, name: "A <b>Name</b>", description: "line one\nline two" });
-  const mail = buildInternalNotification(fields, { leadId: "CI-20261103-AAAAAAAA", receivedAt: "2026-11-03T15:00:00.000Z" });
+  const mail = buildInternalNotification(fields, { leadId: "EI-20261103-AAAAAAAA", receivedAt: "2026-11-03T15:00:00.000Z" });
   assert.ok(mail.html.includes("A &lt;b&gt;Name&lt;/b&gt;"));
   assert.ok(mail.html.includes("line one<br>line two"));
   assert.ok(!mail.text.includes("Phone:"));
-  assert.match(mail.text, /not an assignment submission/);
+  assert.match(mail.text, /No files, claim numbers, or policyholder information were collected/);
   assert.equal(escapeHtml(`<>&"'`), "&lt;&gt;&amp;&quot;&#39;");
 });
 

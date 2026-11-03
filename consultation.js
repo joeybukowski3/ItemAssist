@@ -1,5 +1,5 @@
-/* Free-consultation lead form (homepage). Posts JSON to /api/consultation-request.
-   Kept apart from script.js, which owns the detailed assignment form. The server
+/* Homepage inquiry form (free consultation, research request or exploring options). Posts JSON to /api/consultation-request.
+   Kept apart from script.js, which still owns the detailed assignment form on the About page. The server
    repeats every check here and is the authority. Nothing typed into the form is
    stored in the browser; only an explicit campaign tag (utm_source, utm_medium,
    utm_campaign or ref) is kept for the session so it survives moving between pages. */
@@ -41,7 +41,7 @@
       required: "Please enter your email address.",
       check: (v) => (v.length > 254 || !EMAIL_PATTERN.test(v) ? "Please enter a valid email address." : "")
     },
-    { id: "reason", required: "Please choose a reason for your inquiry.", check: () => "" },
+    { id: "reason", required: "Please choose a request type.", check: () => "" },
     { id: "company", check: (v) => (v.length > 120 ? "Please keep the company name under 120 characters." : "") },
     {
       id: "phone",
@@ -53,7 +53,7 @@
       }
     },
     { id: "count", check: () => "" },
-    { id: "description", check: (v) => (v.length > 1000 ? "Please keep the description under 1,000 characters." : "") }
+    { id: "description", required: "Please add a short description of what you need.", check: (v) => (v.length > 1000 ? "Please keep the description under 1,000 characters." : "") }
   ];
 
   const SERVER_FIELD_IDS = { name: "name", email: "email", reason: "reason", company: "company", phone: "phone", item_count: "count", description: "description" };
@@ -360,7 +360,8 @@
     }
   });
 
-  /* Preselect a reason when a link names one: on this page (data-consult-reason) or from another page (?consult=). */
+  /* Preselect a request type when a link names one: on this page (data-consult-reason), from another page (?consult=),
+     or by landing on the retired #submit-assignment anchor, which now leads to this form as a research request. */
   const selectReason = (wanted) => {
     const select = field("reason");
 
@@ -379,6 +380,18 @@
   } catch {
     /* no query string support: nothing to preselect */
   }
+
+  const LEGACY_ANCHOR_REASONS = { "#submit-assignment": "research_request" };
+  const applyAnchorReason = () => {
+    const wanted = LEGACY_ANCHOR_REASONS[window.location.hash];
+
+    if (wanted) {
+      selectReason(wanted);
+    }
+  };
+
+  applyAnchorReason();
+  window.addEventListener("hashchange", applyAnchorReason);
 
   document.querySelectorAll('a[href="#consultation"]').forEach((link) => {
     link.addEventListener("click", () => {

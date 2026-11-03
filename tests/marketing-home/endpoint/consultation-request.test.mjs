@@ -103,18 +103,60 @@ test("a valid inquiry sends exactly one internal notification and nothing to the
   assert.equal(events.at(-1).outcome, "submitted");
 });
 
-test("the notification is labelled a consultation inquiry, distinct from an assignment submission", async () => {
+test("a free-consultation request is labelled as one, distinct from an assignment submission", async () => {
   const { handler, resend } = build();
-  await post(handler, validConsultationBody());
+  await post(handler, validConsultationBody({ reason: "consultation" }));
   const [mail] = resend.sent;
-  assert.match(mail.subject, /^New Consultation Inquiry CI-20261103-[0-9A-F]{8} — ItemAssist$/);
+  assert.match(mail.subject, /^New Consultation Request CI-20261103-[0-9A-F]{8} — ItemAssist$/);
   assert.ok(!/Contents List Submission|Work Order/.test(mail.subject));
   assert.deepEqual(mail.tags, [{ name: "lead_type", value: "consultation_inquiry" }]);
-  assert.match(mail.text, /CONSULTATION INQUIRY \(marketing lead\) - not an assignment submission\./);
-  assert.match(mail.html, /Consultation inquiry &middot; marketing lead/);
-  assert.match(mail.text, /Reason for inquiry: Contents research for a claim or inventory/);
+  assert.match(mail.text, /FREE CONSULTATION REQUEST \(marketing lead\) - not an assignment submission\./);
+  assert.match(mail.html, /Free consultation request &middot; marketing lead/);
+  assert.match(mail.text, /Request type: Free consultation/);
+  assert.match(mail.text, /Suggested next step: Follow up to discuss scope, turnaround, and pricing\./);
   assert.match(mail.text, /Approximate item count: 11–50 items/);
   assert.match(mail.text, /Marketing source: source: linkedin, medium: social, campaign: launch-nov/);
+});
+
+test("a research request is labelled as ready-to-submit work, with its own subject, id prefix, tag and next step", async () => {
+  const { handler, resend, events } = build();
+  const res = await post(handler, validConsultationBody({ reason: "research_request" }));
+  assert.match(res.json().leadId, /^RR-20261103-[0-9A-F]{8}$/);
+  const [mail] = resend.sent;
+  assert.match(mail.subject, /^New Research Request RR-20261103-[0-9A-F]{8} — ItemAssist$/);
+  assert.deepEqual(mail.tags, [{ name: "lead_type", value: "research_request" }]);
+  assert.match(mail.text, /^RESEARCH REQUEST \/ ASSIGNMENT INQUIRY - the sender says they are ready to submit work\./);
+  assert.match(mail.html, /Research request &middot; ready to submit work/);
+  assert.match(mail.text, /Request type: Research request \/ assignment/);
+  assert.match(mail.text, /Suggested next step: Reply to confirm scope, turnaround, and price, and to arrange how the item list or files will be sent\./);
+  assert.match(mail.text, /no scope, price, or files have been agreed or received/);
+  assert.ok(!/FREE CONSULTATION REQUEST/.test(mail.text));
+  assert.equal(events.at(-1).leadType, "research_request");
+});
+
+test("an exploring-options inquiry is distinct from both and offers a consultation as the next step", async () => {
+  const { handler, resend, events } = build();
+  const res = await post(handler, validConsultationBody({ reason: "exploring" }));
+  assert.match(res.json().leadId, /^EI-20261103-[0-9A-F]{8}$/);
+  const [mail] = resend.sent;
+  assert.match(mail.subject, /^New Inquiry \(Exploring Options\) EI-20261103-[0-9A-F]{8} — ItemAssist$/);
+  assert.deepEqual(mail.tags, [{ name: "lead_type", value: "exploring_inquiry" }]);
+  assert.match(mail.text, /Request type: Exploring options/);
+  assert.match(mail.text, /offer a free consultation/);
+  assert.equal(events.at(-1).leadType, "exploring_inquiry");
+});
+
+test("the three request types never share a subject label, tag or banner", async () => {
+  const seen = new Set();
+  for (const reason of ["consultation", "research_request", "exploring"]) {
+    const { handler, resend } = build();
+    await post(handler, validConsultationBody({ reason }));
+    const [mail] = resend.sent;
+    seen.add(mail.subject.split(" ").slice(0, 3).join(" "));
+    seen.add(mail.tags[0].value);
+    seen.add(mail.text.split("\n")[0]);
+  }
+  assert.equal(seen.size, 9);
 });
 
 test("the log line carries the lead type and the source but no name, email, phone or description", async () => {
@@ -124,7 +166,8 @@ test("the log line carries the lead type and the source but no name, email, phon
   assert.deepEqual(event, {
     outcome: "submitted",
     leadId: event.leadId,
-    reason: "contents_research",
+    leadType: "consultation_inquiry",
+    reason: "consultation",
     hasCompany: true,
     hasPhone: true,
     source: "linkedin",
@@ -137,7 +180,7 @@ test("the log line carries the lead type and the source but no name, email, phon
   }
 });
 
-test("the default log wrapper tags every line as a consultation inquiry", async () => {
+test("the default log wrapper tags lines with the lead type, and early rejections with a generic one", async () => {
   const lines = [];
   const original = console.info;
   console.info = (line) => lines.push(line);
@@ -151,14 +194,26 @@ test("the default log wrapper tags every line as a consultation inquiry", async 
   assert.equal(parsed.event, "itemassist_lead");
   assert.equal(parsed.leadType, "consultation_inquiry");
   assert.equal(parsed.outcome, "submitted");
+
+  const early = [];
+  console.info = (line) => early.push(line);
+  try {
+    const handler = createHandler({ resend: createFakeResend(), redis: createFakeGuardRedis(), ratelimit: createFakeRatelimit({ allow: false }), verifyTurnstile: createFakeTurnstileVerify() });
+    await post(handler, validConsultationBody());
+  } finally {
+    console.info = original;
+  }
+  assert.equal(JSON.parse(early.at(-1)).leadType, "website_inquiry");
+  assert.equal(JSON.parse(early.at(-1)).outcome, "rate_limited");
 });
 
-test("only name, email and a reason are required", async () => {
+test("only name, email, a request type and a short description are required", async () => {
   const { handler, resend } = build();
   const res = await post(handler, minimalConsultationBody());
   assert.equal(res.statusCode, 200);
   assert.equal(resend.sent.length, 1);
-  assert.ok(!/Company:|Phone:|item count:|Short description:/.test(resend.sent[0].text));
+  assert.ok(!/Company:|Phone:|item count:/.test(resend.sent[0].text));
+  assert.match(resend.sent[0].text, /Short description: Just looking at options\./);
   assert.match(resend.sent[0].text, /Marketing source: Not provided/);
 });
 
@@ -177,16 +232,28 @@ test("missing required fields are rejected with one message per field and no ema
   assert.equal(res.statusCode, 400);
   const body = res.json();
   assert.equal(body.ok, false);
-  assert.deepEqual(Object.keys(body.errors).sort(), ["email", "name", "reason"]);
+  assert.deepEqual(Object.keys(body.errors).sort(), ["description", "email", "name", "reason"]);
   assert.equal(body.error, body.errors.name);
   assert.equal(resend.sent.length, 0);
 });
 
-test("invalid email, reason, phone and item count are each rejected", async () => {
+test("invalid email, request type, phone and item count are each rejected", async () => {
   const { handler, resend } = build();
   const res = await post(handler, validConsultationBody({ email: "jane@", reason: "free-money", phone: "12", item_count: "a lot" }));
   assert.equal(res.statusCode, 400);
   assert.deepEqual(Object.keys(res.json().errors).sort(), ["email", "item_count", "phone", "reason"]);
+  assert.equal(resend.sent.length, 0);
+});
+
+test("a blank or whitespace-only description is rejected, and the retired reason values are no longer accepted", async () => {
+  const { handler, resend } = build();
+  const blank = await post(handler, validConsultationBody({ description: "   \n " }));
+  assert.equal(blank.statusCode, 400);
+  assert.deepEqual(Object.keys(blank.json().errors), ["description"]);
+  for (const reason of ["contents_research", "individual_item", "ongoing_support", "question", "other"]) {
+    const res = await post(handler, validConsultationBody({ reason, submission_id: "sub_" + "z".repeat(20) }));
+    assert.equal(res.statusCode, 400, reason);
+  }
   assert.equal(resend.sent.length, 0);
 });
 

@@ -50,58 +50,98 @@ test("title, description and social descriptions describe the service and carry 
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://itemassist.com/");
 });
 
-test("the similar-versus-comparable section shows three labelled examples with a three-tier layout", async ({ page }) => {
+test("the similar-versus-comparable section shows exactly two examples, refrigerators and televisions", async ({ page }) => {
   await page.goto("/");
   const section = page.locator("#comparable");
-  await expect(section.locator(".comparable-card")).toHaveCount(3);
-  await expect(section.locator(".comparable-card h3")).toHaveText(["Refrigerators", "Televisions", "Home electronics: AV receivers"]);
-  await expect(section.locator(".comparable-tag")).toHaveCount(3);
+  await expect(section.locator(".comparable-card")).toHaveCount(2);
+  await expect(section.locator(".comparable-card h3")).toHaveText(["Refrigerators", "Televisions"]);
+  await expect(section.locator(".comparable-tag")).toHaveCount(2);
   for (const tag of await section.locator(".comparable-tag").allTextContents()) expect(tag).toMatch(/illustrative example/i);
+  // The AV receiver comparison is gone from this section.
+  await expect(section).not.toContainText(/receiver/i);
+  await expect(section.locator('a[href="/discontinued-av-receiver-replacement-research"]')).toHaveCount(0);
   for (const card of await section.locator(".comparable-card").all()) {
     await expect(card.locator(".comparable-ladder > li")).toHaveCount(3);
-    await expect(card.locator(".comparable-spread")).toHaveCount(1);
-    await expect(card.locator(".comparable-factors")).toContainText("What affects comparability");
+    await expect(card.locator(".comparable-ladder-mid")).toHaveCount(1);
+    await expect(card.locator(".comparable-alt")).toHaveCount(2);
+    await expect(card.locator(".comparable-differences")).toContainText("What separates them");
+    await expect(card.locator(".comparable-evidence")).toHaveCount(1);
     await expect(card.locator(".comparable-disclosure")).toHaveCount(1);
   }
-
-  // The documented refrigerator example is unchanged.
-  const fridge = section.locator(".comparable-card").nth(0);
-  await expect(fridge.locator(".comparable-price")).toHaveText(["$1,699.99", "$1,799.99", "$2,299.99"]);
-  await expect(fridge.locator(".comparable-model")).toHaveText(["Samsung RF32CG5100SR/AA", "Samsung RF32CG5300SR", "Samsung Bespoke RF29BB8600QL"]);
-  await expect(fridge.locator(".comparable-tag")).toContainText("retail prices referenced August 13, 2026");
-  await expect(fridge.locator(".comparable-spread strong")).toHaveText("$600.00");
-  await expect(fridge.locator(".comparable-disclosure")).toContainText("Documented prices");
-  await expect(fridge.locator(".comparable-link")).toHaveAttribute("href", "/what-does-lkq-mean-contents-claims");
-  await expect(fridge.locator(".comparable-factors li")).toHaveText(["Capacity", "Door layout", "Configuration", "Features"]);
-
-  // Television and AV receiver figures are labelled hypothetical, with no retailer, SKU, date or source link.
-  const hypothetical = [
-    { index: 1, roles: ["Entry tier", "Midrange tier", "Premium tier"], models: ["55-inch LED/LCD", "55-inch QLED / Mini-LED", "55-inch OLED"], factors: ["Panel technology", "Brightness", "Picture processing", "Refresh rate", "Original tier"] },
-    { index: 2, roles: ["Entry tier", "Mainstream tier", "Premium tier"], models: ["Entry-level 5.2-channel class", "Mainstream 7.2-channel class", "Premium expanded-channel / processing class"], factors: ["Channel count", "Amplification", "Room correction", "Connectivity", "Original tier"] }
-  ];
-  for (const spec of hypothetical) {
-    const card = section.locator(".comparable-card").nth(spec.index);
-    await expect(card.locator(".comparable-tag")).toContainText("hypothetical prices, not verified");
-    await expect(card.locator(".comparable-role")).toHaveText(spec.roles);
-    await expect(card.locator(".comparable-model")).toHaveText(spec.models);
-    const prices = await card.locator(".comparable-price").evaluateAll((nodes) => nodes.map((n) => n.firstChild.textContent.trim()));
-    expect(prices).toEqual(["$249", "$699", "$1,499"]);
-    await expect(card.locator(".comparable-price-flag")).toHaveText(["illustrative", "illustrative", "illustrative"]);
-    await expect(card.locator(".comparable-spread")).toContainText("Illustrative spread");
-    await expect(card.locator(".comparable-spread strong")).toHaveText("$1,250");
-    await expect(card.locator(".comparable-disclosure")).toContainText("Hypothetical educational figures");
-    await expect(card.locator(".comparable-disclosure")).toContainText("not retailer prices");
-    await expect(card.locator(".comparable-factors li")).toHaveText(spec.factors);
-    await expect(card).not.toContainText(/most supportable|best buy|lowe[’']s|amazon|walmart|costco|home depot|20\d\d/i);
-    await expect(card.locator("ul.comparable-ladder a")).toHaveCount(0);
-  }
-  // Only the documented refrigerator example highlights a supportable comparable.
-  await expect(section.locator(".comparable-ladder-mid")).toHaveCount(1);
-  await expect(section.locator(".comparable-card").nth(2).locator(".comparable-link")).toHaveAttribute("href", "/discontinued-av-receiver-replacement-research");
   await expect(section).not.toContainText(/%|\bsav(e|ed|ings?)\b/i);
   await expect(section.locator(".comparable-note")).toContainText("not determinations about any actual claim");
-  await expect(section.locator(".comparable-note")).toContainText("hypothetical");
-  await expect(section.locator(".comparable-note")).toContainText("not verified retail observations");
+});
+
+test("the refrigerator example keeps its dated retail evidence and names the original it assumes", async ({ page }) => {
+  await page.goto("/");
+  const fridge = page.locator("#comparable .comparable-card").nth(0);
+  await expect(fridge.locator(".comparable-tag")).toContainText("retail prices referenced August 13, 2026");
+  await expect(fridge.locator(".comparable-role")).toHaveText(["Lower-priced alternative", "Selected comparison example", "Higher-priced alternative"]);
+  await expect(fridge.locator(".comparable-model")).toHaveText(["Samsung RF32CG5100SR/AA", "Samsung RF32CG5300SR", "Samsung Bespoke RF29BB8600QL"]);
+  await expect(fridge.locator(".comparable-price")).toHaveText(["$1,699.99", "$1,799.99", "$2,299.99"]);
+  await expect(fridge.locator(".comparable-spec")).toHaveText([
+    "3-door, dual ice, smart · Best Buy",
+    "Adds a beverage center · Lowe’s",
+    "4-door, FlexZone, Bespoke tier · Lowe’s"
+  ]);
+  await expect(fridge.locator(".comparable-ladder-mid .comparable-model")).toHaveText("Samsung RF32CG5300SR");
+  await expect(fridge.locator(".comparable-ladder-mid .comparable-price")).toHaveText("$1,799.99");
+  await expect(fridge.locator(".comparable-disclosure")).toContainText("Documented prices from the retailers shown, referenced August 13, 2026");
+  await expect(fridge.locator(".comparable-link")).toHaveAttribute("href", "/what-does-lkq-mean-contents-claims");
+  // It is not presented as universally correct: the original it assumes is stated, and the pick is tied to it.
+  await expect(fridge.locator(".comparable-lede")).toContainText("assumes an original French-door refrigerator with dual ice and a beverage center");
+  await expect(fridge.locator(".comparable-evidence")).toContainText("supportable only against the original item described above");
+  await expect(fridge).not.toContainText(/universal|always the right|best choice/i);
+});
+
+test("the television example is labelled hypothetical, invents nothing, and does not call the midrange tier correct", async ({ page }) => {
+  await page.goto("/");
+  const tv = page.locator("#comparable .comparable-card").nth(1);
+  await expect(tv.locator(".comparable-tag")).toContainText("hypothetical prices, not verified");
+  await expect(tv.locator(".comparable-role")).toHaveText(["Lower alternative", "Selected midrange comparison example", "Higher alternative"]);
+  await expect(tv.locator(".comparable-model")).toHaveText(["55-inch entry LED/LCD", "55-inch QLED / Mini-LED", "55-inch premium OLED"]);
+  const prices = await tv.locator(".comparable-price").evaluateAll((nodes) => nodes.map((n) => n.firstChild.textContent.trim()));
+  expect(prices).toEqual(["$249", "$699", "$1,499"]);
+  await expect(tv.locator(".comparable-price-flag")).toHaveText(["illustrative", "illustrative", "illustrative"]);
+  await expect(tv.locator(".comparable-ladder-mid .comparable-model")).toHaveText("55-inch QLED / Mini-LED");
+  await expect(tv.locator(".comparable-disclosure")).toContainText("Hypothetical educational figures, not observed retailer prices");
+  await expect(tv.locator(".comparable-disclosure")).toContainText("name no product, SKU, seller, date, or link");
+  await expect(tv.locator(".comparable-differences")).toContainText("panel technology, brightness, processing, refresh rate, original tier");
+  await expect(tv.locator(".comparable-evidence")).toContainText("not presumed correct");
+  await expect(tv.locator(".comparable-evidence")).toContainText("original TV’s specifications and product tier");
+  // No retailer, SKU, date or link on the television card, and it never claims "most supportable".
+  await expect(tv).not.toContainText(/most supportable|best buy|lowe’s|amazon|walmart|costco|home depot|20\d\d/i);
+  await expect(tv.locator("a")).toHaveCount(0);
+  await expect(page.locator("#comparable .comparable-note")).toContainText("television figures are hypothetical");
+  await expect(page.locator("#comparable .comparable-note")).toContainText("not verified retail observations");
+});
+
+test("the selected comparison dominates: larger and higher in the hierarchy than the lower and higher alternatives", async ({ page }) => {
+  await page.goto("/");
+  for (const index of [0, 1]) {
+    const card = page.locator("#comparable .comparable-card").nth(index);
+    const metrics = await card.evaluate((el) => {
+      const px = (node, prop) => parseFloat(getComputedStyle(node)[prop]);
+      const box = (node) => node.getBoundingClientRect();
+      const focus = el.querySelector(".comparable-ladder-mid");
+      const alts = Array.from(el.querySelectorAll(".comparable-alt"));
+      return {
+        focusPrice: px(focus.querySelector(".comparable-price"), "fontSize"),
+        altPrices: alts.map((alt) => px(alt.querySelector(".comparable-price"), "fontSize")),
+        focusHeight: box(focus).height,
+        altHeights: alts.map((alt) => box(alt).height),
+        order: [box(alts[0]).top, box(focus).top, box(alts[1]).top],
+        focusBorder: px(focus, "borderTopWidth")
+      };
+    });
+    for (const altPrice of metrics.altPrices) expect(metrics.focusPrice, "central price is at least twice the alternatives'").toBeGreaterThanOrEqual(altPrice * 2);
+    // On narrow screens the alternatives wrap, so only require the selected block to be the tallest.
+    for (const altHeight of metrics.altHeights) expect(metrics.focusHeight).toBeGreaterThan(altHeight);
+    // Lower alternative above, selected comparison in the middle, higher alternative below.
+    expect(metrics.order[0]).toBeLessThan(metrics.order[1]);
+    expect(metrics.order[1]).toBeLessThan(metrics.order[2]);
+    expect(metrics.focusBorder).toBeGreaterThanOrEqual(2);
+  }
 });
 
 test("the section after it names both ways a poor comparison goes wrong", async ({ page }) => {
@@ -112,23 +152,63 @@ test("the section after it names both ways a poor comparison goes wrong", async 
   await expect(section).toContainText("inadequately comparable");
 });
 
-test("deliverables list the seven parts of a completed assignment and point to the sample", async ({ page }) => {
+test("one benefits section replaces the deliverables grid and the category grid", async ({ page }) => {
   await page.goto("/");
-  const section = page.locator("#deliverables");
-  await expect(section.locator(".deliverable-card:not(.deliverable-card--cta) h3")).toHaveText([
-    "Original item identification and available age evidence",
-    "Important original specifications",
-    "Current comparable replacement model",
-    "Dated retail price and supporting source",
-    "Explanation of material matches and differences",
-    "Confidence qualifications and unresolved information",
-    "Consolidated PDF report, with Excel when appropriate"
+  await expect(page.getByRole("heading", { name: "What a Completed Assignment May Include" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "What We Research" })).toHaveCount(0);
+  for (const selector of ["#deliverables", ".deliverables-section", ".deliverable-card", ".deliverable-grid", ".research-scope-section", ".research-scope-grid"]) {
+    await expect(page.locator(selector), selector).toHaveCount(0);
+  }
+  await expect(page.locator("main h2", { hasText: "What Item Assist Provides" })).toHaveCount(1);
+
+  const section = page.locator("#provides");
+  await expect(section.locator("h2")).toHaveText("What Item Assist Provides");
+  await expect(section.locator(".trust-header p")).toHaveText(
+    "Practical contents research support for insurance professionals who need consistent replacement comparisons, reliable pricing documentation, and more time to focus on the rest of the claim."
+  );
+});
+
+test("the six service-benefit cards carry the specified headings and copy, with one line icon each", async ({ page }) => {
+  await page.goto("/");
+  const cards = page.locator("#provides .provides-card");
+  await expect(cards).toHaveCount(6);
+  await expect(cards.locator("h3")).toHaveText([
+    "Less Time on Manual Research",
+    "Original Item Identification",
+    "Supportable Replacement Comparisons",
+    "Documented Retail Pricing",
+    "Consistent Comparison Reasoning",
+    "Organized Research Reports"
   ]);
-  await expect(section.locator(".deliverable-sample")).toHaveCount(7);
-  await expect(section.locator(".deliverable-card--cta a")).toHaveAttribute("href", "/report");
-  await expect(section).toContainText("labels the result as an estimate");
+  await expect(cards.locator("p")).toHaveText([
+    "Delegate time-consuming identification and pricing research across individual items or larger contents lists.",
+    "Research the brand, model, available age evidence, and specifications that influence replacement value.",
+    "Evaluate current models based on relevant product features, performance class, and original market tier.",
+    "Capture relevant retailer prices, supporting sources, and research dates where available.",
+    "Document material matches, differences, assumptions, and evidence gaps using a structured approach.",
+    "Receive clear findings in a consolidated report, with spreadsheet output when appropriate."
+  ]);
+  for (const card of await cards.all()) {
+    await expect(card.locator('.ia-icon svg[aria-hidden="true"]')).toHaveCount(1);
+  }
+});
+
+test("the supporting range section is compact, names no category catalog, and keeps a visible sample-report CTA", async ({ page }) => {
+  await page.goto("/");
+  const range = page.locator("#provides .provides-range");
+  await expect(range.locator("h3")).toHaveText("From Difficult Individual Items to Extensive Contents Inventories");
+  await expect(range.locator("p")).toHaveText(
+    "Item Assist supports electronics, appliances, furniture, tools, equipment, and other standard household contents when sufficient product information is available. Unusual or specialty items can be discussed during scope review."
+  );
+  const cta = range.locator("a");
+  await expect(cta).toHaveText("View a Sample Research Report");
+  await expect(cta).toHaveAttribute("href", "/report");
+  await expect(cta).toHaveClass(/btn-primary/);
+  await expect(cta).toBeVisible();
+  // Only the six benefit cards: no eight-card category grid and no promise to cover every property type.
+  await expect(page.locator("#provides li")).toHaveCount(6);
+  await expect(page.locator("#provides")).not.toContainText(/\bevery\b|any (type|kind)|all (types|kinds)/i);
   await expect(page.locator("#sample-report")).toBeAttached();
-  await expect(page.locator(".deliverables-panel")).toHaveCount(0);
 });
 
 test("service offerings replace the purchase emphasis, keep introductory rates as reference, and state that terms are confirmed first", async ({ page }) => {
@@ -170,17 +250,43 @@ test("the credibility section states the experience and the service boundary, an
   }
 });
 
-test("the detailed assignment form is still on the page as the secondary action", async ({ page }) => {
+test("the homepage has one inquiry form, and the separate assignment form and its intro are gone", async ({ page }) => {
   await page.goto("/");
-  const card = page.locator("#submit-assignment");
-  await expect(card.locator("#contact-form")).toBeAttached();
-  for (const selector of ["#contact-name", "#email", "#assignment-notes", "#attachments", "#output-format", "#turnaround"]) {
-    await expect(card.locator(selector)).toBeAttached();
+  await expect(page.locator("form")).toHaveCount(1);
+  await expect(page.locator("#consultation-form")).toHaveCount(1);
+  for (const selector of ["#contact-form", "#attachments", "#assignment-notes", "#client-reference", ".assignment-lead", "input[type=file]"]) {
+    await expect(page.locator(selector), selector).toHaveCount(0);
   }
-  await expect(page.locator(".assignment-lead h2")).toHaveText("Ready to Submit an Assignment?");
-  // Consultation comes first.
-  const order = await page.evaluate(() => document.getElementById("consultation").compareDocumentPosition(document.getElementById("submit-assignment")));
-  expect(order & 4, "DOCUMENT_POSITION_FOLLOWING").toBeTruthy();
+  await expect(page.getByText("Ready to Submit an Assignment?")).toHaveCount(0);
+  await expect(page.getByText("Submit Contents List")).toHaveCount(0);
+});
+
+test("the unified form shows the specified heading, intro, fields, request types, button and commitment", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#consultation-heading")).toHaveText("Request Research or a Free Consultation");
+  await expect(page.locator(".consult-card .cta-info > p").first()).toHaveText(
+    "Tell us a little about what you need. Whether you’re exploring our services or ready to submit a research assignment, we’ll review your request and follow up about next steps."
+  );
+  const form = page.locator("#consultation-form");
+  for (const id of ["name", "email", "reason", "description"]) {
+    await expect(form.locator("#consult-" + id)).toHaveAttribute("required", "");
+    await expect(form.locator("#consult-" + id)).toHaveAttribute("aria-required", "true");
+  }
+  for (const id of ["company", "phone", "count"]) {
+    await expect(form.locator("#consult-" + id)).not.toHaveAttribute("required", "");
+  }
+  await expect(form.getByLabel("Request type")).toBeVisible();
+  const options = await form.locator("#consult-reason option").evaluateAll((nodes) => nodes.map((n) => [n.value, n.textContent.trim()]));
+  expect(options).toEqual([
+    ["", "Choose one…"],
+    ["consultation", "Free consultation"],
+    ["research_request", "Research request / assignment"],
+    ["exploring", "Exploring options"]
+  ]);
+  await expect(form.locator(".form-submit")).toHaveText("Send My Request →");
+  await expect(form.locator(".form-commitment")).toHaveText("No commitment required. Scope, turnaround, and pricing are confirmed before paid work begins.");
+  // Nothing beyond the inquiry is asked for at this stage.
+  await expect(form.locator("input[type=file], input[name*=claim], input[name*=policy], input[name*=payment], input[name*=card]")).toHaveCount(0);
 });
 
 test("the nav and hero consultation CTAs go to the form", async ({ page }, testInfo) => {
@@ -209,52 +315,28 @@ test("existing nav anchors and the sample-report link still resolve", async ({ p
   await expect(page.locator('.nav-links a[href="https://itemassist.com/#contact"]')).toHaveText("Contact");
 });
 
-test("every deliverable and research category has a decorative line icon, and the sample CTA is a primary button", async ({ page }) => {
-  await page.goto("/");
-  const deliverables = page.locator("#deliverables .deliverable-card:not(.deliverable-card--cta)");
-  await expect(deliverables).toHaveCount(7);
-  for (const card of await deliverables.all()) {
-    await expect(card.locator('.ia-icon svg[aria-hidden="true"]')).toHaveCount(1);
-  }
-  const cta = page.locator("#deliverables .deliverable-card--cta a");
-  await expect(cta).toHaveText("View a Sample Report");
-  await expect(cta).toHaveClass(/btn-primary/);
-
-  const scope = page.locator(".research-scope-section");
-  await expect(scope.locator(".research-scope-title")).toHaveText([
-    "Televisions and Home Electronics",
-    "Computers and Tablets",
-    "Major Household Appliances",
-    "Small Kitchen Appliances",
-    "Furniture and Household Goods",
-    "Power Tools",
-    "Lawn Equipment",
-    "And Much More"
-  ]);
-  for (const item of await scope.locator(".research-scope-grid > li").all()) {
-    await expect(item.locator('.ia-icon svg[aria-hidden="true"]')).toHaveCount(1);
-  }
-  const more = scope.locator(".research-scope-more");
-  await expect(more).toContainText("may also fit the standard report");
-  await expect(more).toContainText("confirmed during scope review");
-  await expect(more).not.toContainText(/\bevery\b|any (type|kind)|all (types|kinds)/i);
-});
-
-test("how it works keeps the four steps as a connected, numbered process", async ({ page }, testInfo) => {
+test("how it works keeps four short, connected, numbered steps", async ({ page }, testInfo) => {
   await page.goto("/");
   const section = page.locator("#how");
   await expect(section.locator(".how-card h3")).toHaveText([
-    "Submit available item information",
-    "Review scope and requirements",
-    "Research and compare items",
-    "Deliver the documented report"
+    "Tell Us What You Need",
+    "We Review the Scope",
+    "Research & Comparison",
+    "Receive Your Findings"
+  ]);
+  await expect(section.locator(".how-card p")).toHaveText([
+    "Send a short description of your items or research needs. Detailed claim information isn’t required to get started.",
+    "We discuss the assignment, available information, turnaround, and pricing before any paid research begins.",
+    "We identify products, evaluate replacement candidates, and document relevant specifications and pricing evidence.",
+    "Receive organized research and supporting comparison notes for review and use in your claims workflow."
   ]);
   await expect(section.locator(".how-num")).toHaveText(["1", "2", "3", "4"]);
   await expect(section.locator(".how-card .ia-icon svg")).toHaveCount(4);
   await expect(section.locator(".how-line")).toHaveCount(3);
   await expect(section).toContainText("Scope, timing, and price are confirmed with you before work begins.");
-  await expect(section.locator(".how-card").nth(1)).toContainText("approve any additional pricing before research begins");
   await expect(section.locator(".turnaround-note")).toContainText("24–48 business hours");
+  // Short enough to scan: no step runs past a couple of sentences.
+  for (const text of await section.locator(".how-card p").allTextContents()) expect(text.length).toBeLessThan(160);
 
   const boxes = await section.locator(".how-step").evaluateAll((nodes) =>
     nodes.map((n) => {
@@ -288,7 +370,7 @@ test("layout holds: no horizontal overflow, form and offers visible", async ({ p
   }
   await page.locator("#pricing .offer-grid").scrollIntoViewIfNeeded();
   await expect(page.locator(".offer-card")).toHaveCount(4);
-  for (const card of await page.locator(".comparable-card, .deliverable-card, .offer-card").all()) {
+  for (const card of await page.locator(".comparable-card, .provides-card, .offer-card").all()) {
     const box = await card.boundingBox();
     expect(box.x, testInfo.project.name).toBeGreaterThanOrEqual(-0.5);
     expect(box.x + box.width, testInfo.project.name).toBeLessThanOrEqual(testInfo.project.use.viewport.width + 0.5);

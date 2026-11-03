@@ -35,7 +35,7 @@ async function stubSite(page, { consultation, contact } = {}) {
 }
 
 async function fillConsultation(page, values = {}) {
-  const v = { name: "Jane Smith", email: "jane@example.com", reason: "contents_research", ...values };
+  const v = { name: "Jane Smith", email: "jane@example.com", reason: "consultation", description: "About thirty items.", ...values };
   await page.locator("#consult-name").fill(v.name);
   await page.locator("#consult-email").fill(v.email);
   if (v.reason) await page.locator("#consult-reason").selectOption(v.reason);

@@ -120,16 +120,27 @@ test("every internal link and anchor on every page resolves", async ({ page, req
   }
 });
 
-test("service pages point back to the full assignment form on the homepage", async ({ page }) => {
+test("service pages point to the unified homepage form, and the old assignment anchor still resolves to it", async ({ page }) => {
   for (const path of ["/services", "/report", "/what-does-lkq-mean-contents-claims"]) {
     await page.goto(path);
-    const link = page.locator('.cta-assignment-link a[href="/#submit-assignment"]').first();
-    await expect(link, path).toHaveText("Go to the assignment form");
+    const link = page.locator('.cta-assignment-link a[href="/?consult=research_request#consultation"]').first();
+    await expect(link, path).toHaveText("Send a research request");
+    await expect(page.getByText("Go to the assignment form"), path).toHaveCount(0);
   }
+  // The static test server cannot serve "/?query", so follow the link's target through the explicit .html route.
+  await page.goto("/index.html?consult=research_request#consultation");
+  await expect(page.locator("#consultation-form")).toBeVisible();
+  await expect(page.locator("#consult-reason")).toHaveValue("research_request");
+
+  // Documented fallback: bookmarks and the services card that still use #submit-assignment land on the same form.
   await page.goto("/services");
   await page.locator('#svc-pricing-tiers a[href="/#submit-assignment"]').click();
   await expect(page).toHaveURL(/\/#submit-assignment$/);
-  await expect(page.locator("#submit-assignment #contact-form")).toBeVisible();
+  await expect(page.locator("#submit-assignment")).toBeAttached();
+  await expect(page.locator("#consultation-form")).toBeVisible();
+  await expect(page.locator("#consult-reason")).toHaveValue("research_request");
+  await page.goto("/index.html#contact");
+  await expect(page.locator("#contact #consultation-form")).toBeAttached();
 });
 
 test("the About page keeps its own working assignment form and links to the consultation", async ({ page }) => {
@@ -182,22 +193,25 @@ test("the age-verification request page uses the new service name and no fixed p
   await expect(page.locator(".avr-pricing-detail-section")).toContainText("scope and price confirmed before paid work begins");
 });
 
-test("links from other pages preselect the reason on the homepage form", async ({ page }) => {
-  await page.goto("/index.html?consult=individual_item");
-  await expect(page.locator("#consult-reason")).toHaveValue("individual_item");
-  await page.goto("/index.html?consult=ongoing_support");
-  await expect(page.locator("#consult-reason")).toHaveValue("ongoing_support");
+test("links from other pages preselect the request type on the homepage form", async ({ page }) => {
+  await page.goto("/index.html?consult=research_request");
+  await expect(page.locator("#consult-reason")).toHaveValue("research_request");
+  await page.goto("/index.html?consult=consultation");
+  await expect(page.locator("#consult-reason")).toHaveValue("consultation");
   await page.goto("/index.html?consult=<script>");
   await expect(page.locator("#consult-reason")).toHaveValue("");
   await page.goto("/index.html?consult=");
   await expect(page.locator("#consult-reason")).toHaveValue("");
-  await expect(page.locator('a[href="/?consult=individual_item#consultation"]').first()).toBeAttached().catch(() => {});
+  await page.goto("/services");
+  await expect(page.locator('a[href="/?consult=research_request#consultation"]').first()).toBeAttached();
+  await expect(page.locator('a[href="/?consult=consultation#consultation"]').first()).toBeAttached();
+  await expect(page.locator('a[href*="individual_item"], a[href*="ongoing_support"]')).toHaveCount(0);
 });
 
 test("the privacy policy discloses consultation details, campaign tags and spam verification, without security or retention promises", async ({ page }) => {
   await page.goto("/privacy");
   const main = page.locator("main");
-  await expect(main.locator("h2")).toContainText(["Consultation Requests", "Campaign Source Tags", "Spam and Abuse Protection", "Website Analytics"]);
+  await expect(main.locator("h2")).toContainText(["Consultation and Research Requests", "Campaign Source Tags", "Spam and Abuse Protection", "Website Analytics"]);
   const analytics = main.locator("div", { has: page.getByRole("heading", { name: "Website Analytics" }) }).last();
   await expect(analytics).toContainText("Google Analytics");
   await expect(analytics).toContainText("website traffic, how visitors interact with pages and links, and how our marketing links perform");
@@ -209,8 +223,10 @@ test("the privacy policy discloses consultation details, campaign tags and spam 
   await expect(main).toContainText("measure website traffic");
   // The consultation disclosures from the earlier round are untouched.
   await expect(main).toContainText("Separately, this website uses Google Analytics");
-  await expect(main).toContainText("name, email address, and reason for inquiry");
-  await expect(main).toContainText("company name, phone number, approximate item count, and short description");
+  await expect(main).toContainText("name, email address, request type (free consultation, research request, or exploring options), and a short description");
+  await expect(main).toContainText("optional company name, phone number, and approximate item count");
+  await expect(main.locator("h2")).toContainText(["Consultation and Research Requests"]);
+  await expect(main).toContainText("we arrange how to send item lists or files after we follow up");
   await expect(main).toContainText("utm_source, utm_medium, utm_campaign, or ref");
   await expect(main).toContainText("Cloudflare Turnstile");
   await expect(main).toContainText("IP address");

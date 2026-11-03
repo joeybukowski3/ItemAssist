@@ -46,7 +46,7 @@ export function validConsultationBody(overrides = {}) {
   return {
     name: "Jane Smith",
     email: "jane@example.com",
-    reason: "contents_research",
+    reason: "consultation",
     company: "Smith Adjusting",
     phone: "(555) 555-5555",
     item_count: "11-50",
@@ -62,5 +62,5 @@ export function validConsultationBody(overrides = {}) {
 }
 
 export function minimalConsultationBody(overrides = {}) {
-  return { name: "Jane Smith", email: "jane@example.com", reason: "question", turnstileToken: "valid-token", ...overrides };
+  return { name: "Jane Smith", email: "jane@example.com", reason: "exploring", description: "Just looking at options.", turnstileToken: "valid-token", ...overrides };
 }
