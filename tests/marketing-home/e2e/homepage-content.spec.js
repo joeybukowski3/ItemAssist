@@ -211,7 +211,7 @@ test("the supporting range section is compact, names no category catalog, and ke
   await expect(page.locator("#sample-report")).toBeAttached();
 });
 
-test("the Ways to Work With Item Assist section is gone, and the homepage moves from How It Works to the inquiry form", async ({ page }) => {
+test("the Ways to Work With Item Assist section is gone, with no service or pricing cards left on the homepage", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Ways to Work With Item Assist" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Why Item Age Matters" })).toHaveCount(0);
@@ -223,17 +223,52 @@ test("the Ways to Work With Item Assist section is gone, and the homepage moves 
   await expect(page.locator("main")).not.toContainText(/\$25|\$75|introductory starting rates/);
   await expect(page.locator("main")).not.toContainText(/Free Initial Consultation|Ongoing Research Support/);
 
-  // How It Works is followed, without a replacement panel, by the credibility section and then the form.
-  const between = await page.evaluate(() => {
-    const children = Array.from(document.querySelector("main").children);
-    const from = children.indexOf(document.getElementById("how"));
-    const to = children.indexOf(document.getElementById("contact"));
-    return { from, to, ids: children.slice(from + 1, to).map((el) => el.id || el.className) };
-  });
-  expect(between.from).toBeGreaterThan(-1);
-  expect(between.to).toBeGreaterThan(between.from);
-  expect(between.ids).toEqual(["experience"]);
   await expect(page.locator("#contact #consultation-form")).toHaveCount(1);
+});
+
+test("the homepage sections run in the approved order, with How It Works leading straight into the inquiry form", async ({ page }) => {
+  await page.goto("/");
+  const order = await page.evaluate(() =>
+    Array.from(document.querySelectorAll("main > section"))
+      .map((section) => section.querySelector("h2")?.textContent.trim())
+      .filter(Boolean)
+  );
+  const wanted = [
+    "Similar Isn\u2019t the Same as Comparable",
+    "A Poor Comparison Can Miss in Either Direction",
+    "What Item Assist Provides",
+    "Built From Hands-On Claims Experience",
+    "How It Works",
+    "Request Research or a Free Consultation"
+  ];
+  // The sample-report hero and anything above it come first; from the comparison examples on, the order is exact.
+  const start = order.indexOf(wanted[0]);
+  expect(start, "comparison section present").toBeGreaterThan(-1);
+  expect(order.slice(start)).toEqual(wanted);
+
+  // The credibility section appears once, and nothing sits between How It Works and the form.
+  await expect(page.locator("#experience")).toHaveCount(1);
+  await expect(page.getByRole("heading", { name: "Built From Hands-On Claims Experience" })).toHaveCount(1);
+  const adjacency = await page.evaluate(() => {
+    const children = Array.from(document.querySelector("main").children);
+    const index = (id) => children.indexOf(document.getElementById(id));
+    return { experience: index("experience"), how: index("how"), contact: index("contact") };
+  });
+  expect(adjacency.how).toBe(adjacency.experience + 1);
+  expect(adjacency.contact).toBe(adjacency.how + 1);
+});
+
+test("section spacing is even: no large gap or overlap between the sections from the benefits to the form", async ({ page }) => {
+  await page.goto("/");
+  const gaps = await page.evaluate(() => {
+    const ids = ["provides", "experience", "how", "contact"];
+    const rects = ids.map((id) => document.getElementById(id).getBoundingClientRect());
+    return rects.slice(1).map((rect, i) => ({ from: ids[i], to: ids[i + 1], gap: rect.top - rects[i].bottom }));
+  });
+  for (const { from, to, gap } of gaps) {
+    expect(gap, from + " to " + to + " does not overlap").toBeGreaterThanOrEqual(0);
+    expect(gap, from + " to " + to + " is not an oversized gap").toBeLessThanOrEqual(140);
+  }
 });
 
 test("the credibility section states the experience and the service boundary, and claims nothing unverified", async ({ page }) => {

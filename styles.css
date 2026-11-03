@@ -8208,10 +8208,6 @@ body.homepage-redesign .home-hero-ctas .btn-secondary {
   white-space: nowrap;
 }
 
-body.homepage-redesign .credibility-section {
-  padding-bottom: 0;
-}
-
 /* On small screens the consultation form follows the intro directly; the longer notes come after it. */
 @media (max-width: 820px) {
   body.homepage-redesign .consult-card { gap: 20px; }
