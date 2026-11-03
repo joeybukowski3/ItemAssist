@@ -360,18 +360,25 @@
     }
   });
 
-  /* Links that start a consultation: pick the matching reason and move focus to the form. */
-  document.querySelectorAll("[data-consult-reason]").forEach((link) => {
-    link.addEventListener("click", () => {
-      const select = field("reason");
-      const wanted = link.getAttribute("data-consult-reason");
+  /* Preselect a reason when a link names one: on this page (data-consult-reason) or from another page (?consult=). */
+  const selectReason = (wanted) => {
+    const select = field("reason");
 
-      if (select && Array.from(select.options).some((option) => option.value === wanted)) {
-        select.value = wanted;
-        clearFieldError("reason");
-      }
-    });
+    if (select && Array.from(select.options).some((option) => option.value && option.value === wanted)) {
+      select.value = wanted;
+      clearFieldError("reason");
+    }
+  };
+
+  document.querySelectorAll("[data-consult-reason]").forEach((link) => {
+    link.addEventListener("click", () => selectReason(link.getAttribute("data-consult-reason")));
   });
+
+  try {
+    selectReason(new URLSearchParams(window.location.search).get("consult"));
+  } catch {
+    /* no query string support: nothing to preselect */
+  }
 
   document.querySelectorAll('a[href="#consultation"]').forEach((link) => {
     link.addEventListener("click", () => {

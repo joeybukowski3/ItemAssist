@@ -619,7 +619,7 @@ test.describe("pricing guidance", () => {
     const detailBox = await page.locator(".avr-pricing-detail-section").boundingBox();
 
     expect(detailBox.y).toBeGreaterThan(formBox.y + formBox.height - 50);
-    await expect(page.locator(".avr-pricing-detail-section")).toContainText("starting at $25");
+    await expect(page.locator(".avr-pricing-detail-section")).toContainText("scope and price confirmed before paid work begins");
   });
 });
 

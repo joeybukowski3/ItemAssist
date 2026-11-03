@@ -109,9 +109,9 @@ test("service offerings replace the purchase emphasis, keep introductory rates a
     "Individual Item Research",
     "Ongoing Research Support"
   ]);
-  await expect(section.locator(".offer-card").nth(0)).toContainText("Discuss your scope and research needs. No commitment.");
+  await expect(section.locator(".offer-card").nth(0)).toContainText("Discuss your scope, research needs, and pricing. No commitment.");
   await expect(section.locator(".offer-card").nth(1)).toContainText("Quoted based on item count, complexity, and deliverable requirements.");
-  await expect(section.locator(".offer-card").nth(2)).toContainText("Available for difficult or disputed product comparisons.");
+  await expect(section.locator(".offer-card").nth(2)).toContainText("available for difficult or disputed product comparisons.");
   await expect(section.locator(".offer-card").nth(3)).toContainText("Available for recurring professional assignments.");
   await expect(section.locator(".pricing-expectations")).toContainText("Scope, turnaround, and price are confirmed before work begins.");
   await expect(section.locator(".pricing-reference")).toContainText("$25");
