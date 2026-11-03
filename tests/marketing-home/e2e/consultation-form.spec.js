@@ -192,16 +192,6 @@ test("a direct visit sends no source, and nothing the visitor types is kept in b
   expect(stored).not.toMatch(/Jane|jane@example|Private note/);
 });
 
-test("service cards that start a request preselect the matching request type", async ({ page }) => {
-  await stubSite(page);
-  await openHome(page);
-  await page.locator('[data-consult-reason="research_request"]').first().click();
-  await expect(page.locator("#consult-reason")).toHaveValue("research_request");
-  await page.locator('[data-consult-reason="consultation"]').click();
-  await expect(page.locator("#consult-reason")).toHaveValue("consultation");
-  await expect(page).toHaveURL(/#consultation$/);
-});
-
 test("every field has a visible label, and the spam trap is hidden from people and assistive technology", async ({ page }) => {
   await stubSite(page);
   await openHome(page);
@@ -263,16 +253,6 @@ test("the old assignment anchor and request-type links land on the unified form 
   await page.locator("#consult-reason").selectOption("exploring");
   await page.evaluate(() => { window.location.hash = "#submit-assignment"; });
   await expect(page.locator("#consult-reason")).toHaveValue("research_request");
-});
-
-test("the assignment and consultation offers choose the matching request type", async ({ page }) => {
-  await stubSite(page);
-  await openHome(page);
-  await page.locator('#pricing a[href="#consultation"][data-consult-reason="research_request"]').first().click();
-  await expect(page.locator("#consult-reason")).toHaveValue("research_request");
-  await page.locator('#pricing a[data-consult-reason="consultation"]').click();
-  await expect(page.locator("#consult-reason")).toHaveValue("consultation");
-  await expect(page).toHaveURL(/#consultation$/);
 });
 
 test("the form stays usable on a narrow screen: single column, no overflow, button reachable", async ({ page }, testInfo) => {

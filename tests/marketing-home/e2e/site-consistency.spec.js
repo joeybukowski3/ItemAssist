@@ -68,15 +68,7 @@ test("introductory rates appear only as a quiet reference note, never in a headi
   }
 });
 
-test("the four offerings are described the same way on the homepage and the services page", async ({ page }) => {
-  await page.goto("/index.html");
-  await expect(page.locator(".offer-kind")).toHaveText([
-    "Conversation · no research deliverable",
-    "Scoped & quoted",
-    "Paid research · with findings",
-    "Recurring work"
-  ]);
-
+test("the four offerings are described on the services page, which now holds the pricing tiers", async ({ page }) => {
   await page.goto("/services");
   const cards = page.locator("#svc-pricing-tiers .card");
   await expect(cards.locator(".card-title")).toHaveText(["Free Initial Consultation", "Individual Item Research", "Contents Research", "Ongoing Research Support"]);
@@ -88,6 +80,17 @@ test("the four offerings are described the same way on the homepage and the serv
   await expect(cards.nth(3)).toContainText("recurring professional assignments");
   await expect(page.locator("#svc-pricing-tiers")).toContainText("Scope, turnaround, and price are confirmed before work begins.");
   await expect(page.locator(".trust-note", { hasText: "introductory starting rates" })).toContainText("not quotes");
+});
+
+test("every Pricing link points to the Services pricing tiers, and none points to the removed homepage section", async ({ page, request, baseURL }) => {
+  for (const path of PAGES) {
+    await page.goto(path);
+    await expect(page.locator('a[href$="/#pricing"], a[href="#pricing"]'), path).toHaveCount(0);
+    const links = page.locator('a[href="https://itemassist.com/services#svc-pricing-tiers"]');
+    expect(await links.count(), path + " keeps a Pricing link").toBeGreaterThan(0);
+  }
+  const services = await (await request.get(baseURL + "/services")).text();
+  expect(services).toContain('id="svc-pricing-tiers"');
 });
 
 test("every internal link and anchor on every page resolves", async ({ page, request, baseURL }) => {

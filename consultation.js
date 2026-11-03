@@ -360,8 +360,8 @@
     }
   });
 
-  /* Preselect a request type when a link names one: on this page (data-consult-reason), from another page (?consult=),
-     or by landing on the retired #submit-assignment anchor, which now leads to this form as a research request. */
+  /* Preselect a request type when a link names one: from another page (?consult=), or by landing on the
+     retired #submit-assignment anchor, which now leads to this form as a research request. */
   const selectReason = (wanted) => {
     const select = field("reason");
 
@@ -370,10 +370,6 @@
       clearFieldError("reason");
     }
   };
-
-  document.querySelectorAll("[data-consult-reason]").forEach((link) => {
-    link.addEventListener("click", () => selectReason(link.getAttribute("data-consult-reason")));
-  });
 
   try {
     selectReason(new URLSearchParams(window.location.search).get("consult"));

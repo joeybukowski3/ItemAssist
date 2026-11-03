@@ -211,25 +211,29 @@ test("the supporting range section is compact, names no category catalog, and ke
   await expect(page.locator("#sample-report")).toBeAttached();
 });
 
-test("service offerings replace the purchase emphasis, keep introductory rates as reference, and state that terms are confirmed first", async ({ page }) => {
+test("the Ways to Work With Item Assist section is gone, and the homepage moves from How It Works to the inquiry form", async ({ page }) => {
   await page.goto("/");
-  const section = page.locator("#pricing");
-  await expect(section.locator(".offer-card h3")).toHaveText([
-    "Free Initial Consultation",
-    "Contents Research & Pricing",
-    "Individual Item Research",
-    "Ongoing Research Support"
-  ]);
-  await expect(section.locator(".offer-card").nth(0)).toContainText("Discuss your scope, research needs, and pricing. No commitment.");
-  await expect(section.locator(".offer-card").nth(1)).toContainText("Quoted based on item count, complexity, and deliverable requirements.");
-  await expect(section.locator(".offer-card").nth(2)).toContainText("available for difficult or disputed product comparisons.");
-  await expect(section.locator(".offer-card").nth(3)).toContainText("Available for recurring professional assignments.");
-  await expect(section.locator(".pricing-expectations")).toContainText("Scope, turnaround, and price are confirmed before work begins.");
-  await expect(section.locator(".pricing-reference")).toContainText("$25");
-  await expect(section.locator(".pricing-reference")).toContainText("$75");
-  await expect(section.locator(".pricing-reference")).toContainText("not quotes");
-  await expect(section.locator(".consultation-pricing-card, .launch-pricing-card")).toHaveCount(0);
-  await expect(section.locator(".scope-boundary")).toContainText("All coverage, depreciation, settlement, and claim-handling decisions remain with the client.");
+  await expect(page.getByRole("heading", { name: "Ways to Work With Item Assist" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Why Item Age Matters" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Clear Service Boundaries" })).toHaveCount(0);
+  for (const selector of ["#pricing", ".pricing-section", ".offer-grid", ".offer-card", ".offer-kind", ".pricing-expectations", ".pricing-reference", ".age-value-callout", ".scope-boundary", ".btn-tier"]) {
+    await expect(page.locator(selector), selector).toHaveCount(0);
+  }
+  // No introductory-rate note, and no service or pricing cards, remain anywhere on the homepage.
+  await expect(page.locator("main")).not.toContainText(/\$25|\$75|introductory starting rates/);
+  await expect(page.locator("main")).not.toContainText(/Free Initial Consultation|Ongoing Research Support/);
+
+  // How It Works is followed, without a replacement panel, by the credibility section and then the form.
+  const between = await page.evaluate(() => {
+    const children = Array.from(document.querySelector("main").children);
+    const from = children.indexOf(document.getElementById("how"));
+    const to = children.indexOf(document.getElementById("contact"));
+    return { from, to, ids: children.slice(from + 1, to).map((el) => el.id || el.className) };
+  });
+  expect(between.from).toBeGreaterThan(-1);
+  expect(between.to).toBeGreaterThan(between.from);
+  expect(between.ids).toEqual(["experience"]);
+  await expect(page.locator("#contact #consultation-form")).toHaveCount(1);
 });
 
 test("the credibility section states the experience and the service boundary, and claims nothing unverified", async ({ page }) => {
@@ -309,10 +313,12 @@ test("the nav and hero consultation CTAs go to the form", async ({ page }, testI
 test("existing nav anchors and the sample-report link still resolve", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("#how")).toBeAttached();
-  await expect(page.locator("#pricing")).toBeAttached();
   await expect(page.locator("#contact")).toBeAttached();
   await expect(page.locator(".nav-cta")).toHaveText(["Request a Free Consultation", "Request a Free Consultation"]);
   await expect(page.locator('.nav-links a[href="https://itemassist.com/#contact"]')).toHaveText("Contact");
+  // "Pricing" no longer has a homepage section; it leads to the pricing tiers on the Services page.
+  await expect(page.locator('.nav-links a[href="https://itemassist.com/services#svc-pricing-tiers"]')).toHaveText("Pricing");
+  await expect(page.locator('a[href$="/#pricing"]')).toHaveCount(0);
 });
 
 test("how it works keeps four short, connected, numbered steps", async ({ page }, testInfo) => {
@@ -358,7 +364,7 @@ test("how it works keeps four short, connected, numbered steps", async ({ page }
   }
 });
 
-test("layout holds: no horizontal overflow, form and offers visible", async ({ page }, testInfo) => {
+test("layout holds: no horizontal overflow, the form follows the process section, nothing spills", async ({ page }, testInfo) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
@@ -368,9 +374,7 @@ test("layout holds: no horizontal overflow, form and offers visible", async ({ p
   for (const field of ["#consult-name", "#consult-email", "#consult-reason", "#consult-count", "#consult-description"]) {
     await expect(page.locator(field)).toBeVisible();
   }
-  await page.locator("#pricing .offer-grid").scrollIntoViewIfNeeded();
-  await expect(page.locator(".offer-card")).toHaveCount(4);
-  for (const card of await page.locator(".comparable-card, .provides-card, .offer-card").all()) {
+  for (const card of await page.locator(".comparable-card, .provides-card").all()) {
     const box = await card.boundingBox();
     expect(box.x, testInfo.project.name).toBeGreaterThanOrEqual(-0.5);
     expect(box.x + box.width, testInfo.project.name).toBeLessThanOrEqual(testInfo.project.use.viewport.width + 0.5);
