@@ -9,7 +9,7 @@ function escapeHtml(value) {
 
 const SERVICE_LABELS = {
   age_verification: "Age Verification",
-  item_pricing_valuation: "Item Consultation",
+  item_pricing_valuation: "Individual Item Research",
   item_list_collection: "Item List Collection",
   unsure: "Unsure — Help Me Determine the Scope"
 };
