@@ -234,7 +234,7 @@ test("the privacy policy discloses consultation details, campaign tags and spam 
   await expect(main).toContainText("Cloudflare Turnstile");
   await expect(main).toContainText("IP address");
   await expect(main).toContainText("does not save the inquiry in a separate database");
-  await expect(main).toContainText("Updated November 3, 2026");
+  await expect(main).toContainText("Updated November 4, 2026");
   const body = await textOf(page);
   for (const pattern of [/\bencrypt/i, /\bsecure(ly|d)?\b/i, /\bSOC ?2\b/i, /\bHIPAA\b/i, /\bGDPR\b/i, /\bCCPA\b/i, /deleted? (after|within)/i, /\bretain(ed)? for \d/i, /\bnever\b/i, /\bguarantee/i, /anonym/i, /pseudonym/i, /de-?identif/i, /\bconsent/i, /do not track/i, /\bopt[- ]?(in|out)\b/i, /not (shared|sold) with google/i]) {
     expect(body, String(pattern)).not.toMatch(pattern);
