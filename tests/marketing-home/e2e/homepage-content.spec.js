@@ -116,235 +116,236 @@ test("legacy deep links still land on the form, which now sits in the hero", asy
   const scripts = await page.locator("script[src]").evaluateAll((nodes) => nodes.map((n) => n.getAttribute("src")));
   expect(new Set(scripts).size).toBe(scripts.length);
   expect(scripts.filter((s) => s === "consultation.js")).toHaveLength(1);
-  expect(scripts.filter((s) => s === "showcase.js")).toHaveLength(1);
+  expect(scripts.filter((s) => s === "sample-preview.js")).toHaveLength(1);
   await expect(page.locator("[data-turnstile-container]")).toHaveCount(1);
 });
 
-test("below the hero, a sample report preview sits beside a two-tab research showcase that defaults to televisions", async ({ page }) => {
+test("below the hero, one report-window sample preview carries the three researched examples, with no tab showcase", async ({ page }) => {
   await page.goto("/");
   const section = page.locator("#comparable");
-  await expect(section.locator("h2")).toHaveText("Similar Isn\u2019t the Same as Comparable");
-  await expect(section.locator(".mini-report")).toHaveCount(1);
-  await expect(section.locator(".showcase")).toHaveCount(1);
-  const tabs = section.locator('[role="tab"]');
-  await expect(section.locator('[role="tablist"]')).toHaveAttribute("aria-label", "Research examples");
-  await expect(tabs).toHaveText(["Televisions", "Refrigerators"]);
-  await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
-  await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "false");
-  for (const tab of await tabs.all()) {
-    const panel = page.locator("#" + (await tab.getAttribute("aria-controls")));
-    await expect(panel).toHaveAttribute("role", "tabpanel");
-    await expect(panel).toHaveAttribute("aria-labelledby", await tab.getAttribute("id"));
+  await expect(section.locator("h2")).toHaveText("Similar Isn’t the Same as Comparable");
+  const preview = section.locator("article.sample-preview#sample");
+  await expect(preview).toHaveCount(1);
+  // The earlier report-window structure: titlebar, branded header, claim bar, overview sidebar, summary tiles, item table.
+  await expect(preview.locator(".titlebar .dot")).toHaveCount(3);
+  await expect(preview.locator(".report-branded-header .rbh-logo")).toHaveAttribute("alt", "Item Assist logo");
+  await expect(preview.locator(".rbh-title")).toHaveText("Sample Research Report");
+  await expect(preview.locator(".rbh-date")).toHaveText("Prices observed November 9, 2026");
+  await expect(preview.locator(".report-claim-bar")).toContainText("Not a claim determination");
+  await expect(preview.locator(".sidebar .sb-item")).toHaveText(["Summary Findings", "Itemized Research", "Supporting Evidence"]);
+  await expect(preview.locator(".stats .stat")).toHaveCount(2);
+  await expect(preview.locator(".tbl thead th")).toHaveText(["Submitted Item", "Selected Research Comparison", "Replacement Price", "Status"]);
+  await expect(preview.locator(".tbl tbody tr:not(.detail-row)")).toHaveCount(3);
+  // The tabbed showcase, the miniature report and the older compact card are gone.
+  await expect(page.locator('[role="tablist"], [role="tab"], .showcase, .mini-report, .sc-toggle, .hero-finding, #research-showcase, #sample-report')).toHaveCount(0);
+  // The retired fictional report does not come back.
+  const text = (await preview.textContent()).replace(/\s+/g, " ");
+  expect(text).not.toMatch(/fictional|IA-DEMO|\b22\b|95%|High Confidence|Average Documented Age|17,022|34,152|Published|KitchenAid|OLED65|\$2,699|receiver/i);
+  expect(text).not.toMatch(/comparable value|\bwas \$|\bsave \$|\bsavings?\b|most supportable|universal/i);
+});
+
+test("the report rows carry the real TV, refrigerator and dryer findings, prices, dates and limits", async ({ page }) => {
+  await page.goto("/");
+  const rows = page.locator("#sample .tbl tbody tr:not(.detail-row)");
+  await expect(rows.nth(0)).toContainText("QN55Q80AAFXZA");
+  await expect(rows.nth(0)).toContainText("QN55QN80H");
+  await expect(rows.nth(0)).toContainText("$899.99");
+  await expect(rows.nth(0)).toContainText("Black Friday Deal");
+  await expect(rows.nth(0)).toContainText("Samsung list price: $1,299.99");
+  await expect(rows.nth(1)).toContainText("RF28R7201SR (identical)");
+  await expect(rows.nth(1)).toContainText("$1,899.99");
+  await expect(rows.nth(1)).toContainText("Still sold new");
+  await expect(rows.nth(2)).toContainText("GFD65ESSNWW");
+  await expect(rows.nth(2)).toContainText("GFD65ESSVWW (successor)");
+  await expect(rows.nth(2)).toContainText("$899.00");
+  await expect(rows.nth(2)).toContainText("Built Dec 2019 – Aug 2023 (GE)");
+  await expect(rows.nth(2)).toContainText("Sale event");
+  await expect(page.locator("#sample .rcv-val")).toHaveText(["$899.99", "$1,899.99", "$899.00"]);
+  await expect(page.locator("#sample .stat-val")).toHaveText(["$899.99", "$1,023.07"]);
+  await expect(page.locator("#sample .stat-note").nth(1)).toContainText("assumed 6.0-year age, 13-year life");
+
+  // The documented detail behind each row (present in the page; shown on request).
+  // Rows read as "label value"; the notes read as written.
+  const detail = (id) =>
+    page.locator(id).evaluate((el) =>
+      Array.from(el.querySelectorAll(".match-row, .detail-note"))
+        .map((node) => (node.matches(".match-row") ? Array.from(node.children).map((c) => c.textContent.trim()).join(" ") : node.textContent))
+        .join(" ")
+        .replace(/\s+/g, " ")
+    );
+  const tv = await detail("#sp-detail-tv");
+  for (const needle of ["120Hz (RTINGS, third-party)", "One HDMI port", "144Hz", "All 4 ports", "FreeSync Premium Pro", "Retail Cost $899.99", "Best Buy, Nov 9, 2026",
+    "The QN55QN70H ($699.99) falls short on native refresh rate, 4K@120Hz input and VRR", "The QN55S90H ($1,199.99) is OLED, a different product tier",
+    "not presented as the lowest-priced suitable Samsung", "a 2025 QN80F at $827.95, seller not named, is unresolved"]) {
+    expect(tv, needle).toContain(needle);
   }
-  await expect(page.locator("#sc-panel-tv")).toBeVisible();
-  await expect(page.locator("#sc-panel-fridge")).toBeHidden();
-  // The retired hypothetical figures, the older August example and the old compact finding card are gone.
-  await expect(section).not.toContainText(/hypothetical|\$249|\$1,499|August 13|RF32CG5100|RF32CG5300|receiver/i);
-  await expect(page.locator(".hero-finding, .comparable-card, .comparable-ladder, #sample-report")).toHaveCount(0);
-});
-
-test("the sample report preview is a miniature report built from the three researched cases", async ({ page }) => {
-  await page.goto("/");
-  const report = page.locator(".mini-report");
-  await expect(report.locator("img")).toHaveAttribute("alt", "Item Assist");
-  await expect(report.locator(".mr-head h3")).toHaveText("Sample Research Report");
-  await expect(report.locator(".mr-date")).toHaveText("Prices observed November 9, 2026");
-  await expect(report.locator(".mr-bar")).toContainText("not a claim determination");
-  await expect(report.locator(".mr-item")).toHaveCount(3);
-  const text = (await report.textContent()).replace(/\s+/g, " ");
-  for (const needle of [
-    "Samsung QN55Q80AAFXZA", "Samsung QN55QN80H", "$899.99", "Black Friday Deal", "Samsung list $1,299.99", "native refresh per RTINGS (third-party)",
-    "Samsung RF28R7201SR", "identical model", "$1,899.99", "Illustrative ACV $1,023.07", "assumed 6.0-year age, 13-year life, no condition adjustment",
-    "GE GFD65ESSNWW", "GE GFD65ESSVWW", "$899.00", "Dec 2019 to Aug 2023", "3.2 to 6.9 years", "$419 to $678", "No serial number was available, so no unit date is stated",
-    "Item Assist does not determine depreciation, final ACV, coverage or settlement"
-  ]) {
-    expect(text, needle).toContain(needle);
+  const fridge = await detail("#sp-detail-fridge");
+  for (const needle of ["3.8 cu ft, 4 zones", "External water and ice", "28 cu ft", "RF32CG5B30SR ($1,799.99) has no FlexZone drawer", "RF29BB8600QL ($2,199.99) has no external dispenser",
+    "Illustrative ACV $1,023.07", "$1,899.99 × (1 − 6.0 ÷ 13)", "an assumed age, a 13-year life (NAHB, 2007) and no condition adjustment"]) {
+    expect(fridge, needle).toContain(needle);
   }
-  await expect(report.locator(".mr-chip")).toHaveText(["Documented", "Third-party", "Observed price", "Assumed"]);
-  await expect(report.locator('a[href="/report"]')).toHaveText("Read the full sample report");
-  await expect(report.locator('a[href="/assets/ItemAssist-Sample-Research-Report.pdf"]')).toHaveText("Download the 2-page PDF");
-  // None of the retired fictional report survives.
-  expect(text).not.toMatch(/fictional|IA-DEMO|22 |95%|High Confidence|Average Documented Age|17,022|34,152|Published/i);
-  await expect(page.locator(".report-published-date")).toHaveCount(0);
-});
-
-test("the television tab summarizes the original, three candidates, the key differences and dated prices", async ({ page }) => {
-  await page.goto("/");
-  const tv = page.locator("#sc-panel-tv");
-  await expect(tv.locator(".sc-orig")).toContainText("Samsung QN55Q80AAFXZA");
-  await expect(tv.locator(".sc-orig")).toContainText("120Hz native panel per RTINGS");
-  await expect(tv.locator(".sc-role")).toHaveText(["Lower-priced", "Selected LKQ", "Higher-priced"]);
-  await expect(tv.locator(".sc-model")).toHaveText(["Samsung QN55QN70H", "Samsung QN55QN80H", "Samsung QN55S90H"]);
-  await expect(tv.locator(".sc-price")).toHaveText(["$699.99", "$899.99", "$1,199.99"]);
-  await expect(tv.locator(".sc-verdict .rc-flag")).toHaveText([/Shortfall/, /Meets/, /Upgrade/]);
-  await expect(tv.locator(".sc-cand.is-selected .sc-model")).toHaveText("Samsung QN55QN80H");
-  await expect(tv.locator(".sc-note")).toContainText("native refresh rate, 4K@120Hz input and VRR");
-  await expect(tv.locator(".sc-note")).toContainText("Nov 9, 2026");
-  await expect(tv.locator(".sc-note")).toContainText("Black Friday and Holiday Deal promotions");
-  await expect(tv.locator(".sc-note")).toContainText("Samsung list prices $899.99, $1,299.99 and $1,999.99");
-  // Not over-claimed: the QN80H is not called the cheapest suitable Samsung, and the QN80F stays unresolved.
-  await expect(tv.locator(".sc-note")).toContainText("not presented as the lowest-priced suitable Samsung");
-  await expect(tv.locator(".sc-note")).toContainText("QN80F");
-  await expect(tv.locator(".sc-note")).toContainText("unresolved");
-  await expect(tv.locator('a[href="/report#case-tv"]')).toHaveText(/See the complete case/);
-  await expect(page.locator("#comparable")).not.toContainText(/comparable value|\bwas \$|\bsave \$|\bsavings?\b|most supportable|universal/i);
-});
-
-test("tabs switch by click and keyboard, show one case at a time, and keep roving focus", async ({ page }) => {
-  await page.goto("/");
-  const tvTab = page.locator("#sc-tab-tv");
-  const fridgeTab = page.locator("#sc-tab-fridge");
-  await expect(tvTab).toHaveAttribute("tabindex", "0");
-  await expect(fridgeTab).toHaveAttribute("tabindex", "-1");
-
-  await fridgeTab.click();
-  await expect(fridgeTab).toHaveAttribute("aria-selected", "true");
-  await expect(tvTab).toHaveAttribute("aria-selected", "false");
-  await expect(page.locator("#sc-panel-fridge")).toBeVisible();
-  await expect(page.locator("#sc-panel-tv")).toBeHidden();
-  await expect(fridgeTab).toHaveAttribute("tabindex", "0");
-  await expect(tvTab).toHaveAttribute("tabindex", "-1");
-
-  await tvTab.click();
-  await tvTab.focus();
-  await page.keyboard.press("ArrowRight");
-  await expect(fridgeTab).toBeFocused();
-  await expect(fridgeTab).toHaveAttribute("aria-selected", "true");
-  await page.keyboard.press("ArrowRight");
-  await expect(tvTab).toBeFocused();
-  await page.keyboard.press("ArrowLeft");
-  await expect(fridgeTab).toBeFocused();
-  await page.keyboard.press("Home");
-  await expect(tvTab).toBeFocused();
-  await expect(page.locator("#sc-panel-tv")).toBeVisible();
-  await page.keyboard.press("End");
-  await expect(fridgeTab).toBeFocused();
-  await expect(page.locator("#sc-panel-fridge")).toBeVisible();
-
-  // Tab from the tab list reaches the active panel, and the panel is a focusable, labelled region.
-  await page.keyboard.press("Tab");
-  await expect(page.locator("#sc-panel-fridge")).toBeFocused();
-});
-
-test("the refrigerator tab summarizes the original model, both look-alikes and the substitution point", async ({ page }) => {
-  await page.goto("/");
-  await page.locator("#sc-tab-fridge").click();
-  const fridge = page.locator("#sc-panel-fridge");
-  await expect(fridge.locator(".sc-orig")).toContainText("Samsung RF28R7201SR");
-  await expect(fridge.locator(".sc-role")).toHaveText(["Lower-priced", "Selected: original model", "Higher-priced"]);
-  await expect(fridge.locator(".sc-model")).toHaveText(["Samsung RF32CG5B30SR", "Samsung RF28R7201SR", "Samsung RF29BB8600QL"]);
-  await expect(fridge.locator(".sc-price")).toHaveText(["$1,799.99", "$1,899.99", "$2,199.99"]);
-  await expect(fridge.locator(".sc-verdict")).toHaveText([/Shortfall\s+3-door; no FlexZone drawer/, /Meets\s+Same model, still sold new/, /Shortfall\s+No external dispenser; smaller FlexZone/]);
-  await expect(fridge.locator(".sc-note")).toContainText("configuration, FlexZone functionality and dispenser placement");
-  await expect(fridge.locator(".sc-note")).toContainText("Nov 9, 2026");
-  await expect(fridge.locator(".sc-note")).toContainText("two Black Friday Deals and one marked-down price");
-  await expect(fridge.locator(".sc-note")).toContainText("removes the substitution question");
-  await expect(fridge.locator('a[href="/report#case-fridge"]')).toHaveText(/See the complete case/);
-});
-
-test("the full comparison tables stay collapsed, open one at a time on request, and keep their documented content", async ({ page }) => {
-  await page.goto("/");
-  const toggleTv = page.locator('.sc-toggle[aria-controls="sc-more-tv"]');
-  await expect(toggleTv).toHaveText("Show full specification comparison");
-  await expect(toggleTv).toHaveAttribute("aria-expanded", "false");
-  // No full technical table is on screen by default, and never both at once.
-  await expect(page.locator("#tv-comparison")).toBeHidden();
-  await expect(page.locator("#fridge-comparison")).toBeHidden();
-
-  await toggleTv.click();
-  await expect(toggleTv).toHaveAttribute("aria-expanded", "true");
-  await expect(toggleTv).toHaveText("Hide full specification comparison");
-  await expect(page.locator("#tv-comparison")).toBeVisible();
-  await expect(page.locator("#fridge-comparison")).toBeHidden();
-
-  const tv = page.locator("#sc-panel-tv");
-  await expect(tv.locator(".rc-orig-model")).toHaveText("Samsung QN55Q80AAFXZA");
-  await expect(tv.locator(".rc-src--mfr")).toHaveCount(4);
-  await expect(tv.locator(".rc-src--third")).toHaveText(/RTINGS/);
-  await expect(tv.locator("thead .rc-model")).toHaveText(["Samsung QN55QN70H", "Samsung QN55QN80H", "Samsung QN55S90H"]);
-  await expect(tv.locator("thead .rc-price")).toHaveText(["$699.99", "$899.99", "$1,199.99"]);
-  await expect(tv.locator("thead .rc-meta")).toHaveText([/Nov 9, 2026 · Black Friday Deal/, /Nov 9, 2026 · Black Friday Deal/, /Nov 9, 2026 · Holiday Deal/]);
-  const rows = page.locator("#tv-comparison tbody tr");
-  const expected = {
-    "Display technology": ["Meets", "Meets", "Upgrade"],
-    Backlight: ["Meets", "Meets", "Upgrade"],
-    "Native refresh rate": ["Shortfall", "Meets", "Upgrade"],
-    "4K@120Hz HDMI input": ["Shortfall", "Meets", "Upgrade"],
-    "Variable refresh rate": ["Shortfall", "Meets", "Meets"],
-    Conclusion: ["Shortfall", "Meets", "Upgrade"]
-  };
-  for (const [name, flags] of Object.entries(expected)) {
-    const row = rows.filter({ has: page.locator("th", { hasText: new RegExp("^" + name) }) });
-    await expect(row, name).toHaveCount(1);
-    expect((await row.locator(".rc-flag").allTextContents()).map((f) => f.replace(/[^A-Za-z]/g, "")), name).toEqual(flags);
+  const dryer = await detail("#sp-detail-dryer");
+  for (const needle of ["Dec 2019 – Aug 2023", "3.2 – 6.9 years", "Not provided", "Not stated", "13 years (NAHB, 2007)", "101 of 108 identical", "None found", "$419 – $678",
+    "not a single value; a nameplate serial would name one month"]) {
+    expect(dryer, needle).toContain(needle);
   }
-  await expect(page.locator("#tv-comparison td.rc-sel .rc-bad")).toHaveCount(0);
-  const cell = (row, col) => rows.nth(row).locator("td").nth(col);
-  await expect(cell(5, 1)).toHaveText("$899.99");
-  await expect(cell(6, 0)).toHaveText("$899.99");
-  await expect(cell(6, 1)).toHaveText("$1,299.99");
-  await expect(cell(6, 2)).toHaveText("$1,999.99");
-  await expect(tv.locator(".rc-disclosure")).toContainText("not regular prices");
-  await expect(tv.locator(".rc-disclosure")).toContainText("native refresh rate, a third-party measurement by RTINGS");
+  await expect(page.locator("#sample .home-hero-report-note")).toContainText("Item Assist does not determine depreciation, final ACV, coverage or settlement.");
+  await expect(page.locator("#sample .home-hero-report-note")).toContainText("not regular prices");
+});
 
-  // Opening the second case is independent of the first, and only its own table shows.
-  await page.locator("#sc-tab-fridge").click();
-  await page.locator('.sc-toggle[aria-controls="sc-more-fridge"]').click();
-  await expect(page.locator("#fridge-comparison")).toBeVisible();
-  await expect(page.locator("#tv-comparison")).toBeHidden();
-  const fridge = page.locator("#sc-panel-fridge");
-  await expect(fridge.locator("thead .rc-model")).toHaveText(["Samsung RF32CG5B30SR", "Samsung RF28R7201SR", "Samsung RF29BB8600QL"]);
-  await expect(fridge.locator("thead .rc-meta")).toHaveText([/Nov 9, 2026 · Sale price/, /Nov 9, 2026 · Black Friday Deal/, /Nov 9, 2026 · Black Friday Deal/]);
-  await expect(fridge.locator("tbody tr.rc-conclusion td.rc-sel")).toContainText("Same model, still available new");
+test("the preview links to the full report cases, the sources and the PDF, and every report anchor exists", async ({ page, request }) => {
+  await page.goto("/");
+  const preview = page.locator("#sample");
+  await expect(preview.locator('a[href="/report"]')).toHaveText("Read the full sample report");
+  await expect(preview.locator('a[href="/assets/ItemAssist-Sample-Research-Report.pdf"]')).toHaveText("Download the 2-page PDF");
+  const anchors = ["/report#case-tv", "/report#case-fridge", "/report#case-dryer", "/report#sources"];
+  for (const href of anchors) await expect(preview.locator(`a[href="${href}"]`), href).toHaveCount(1);
+  await expect(preview.locator('.sb-item[href="#sp-summary"], .sb-item[href="#sp-items"]')).toHaveCount(2);
+  await expect(page.locator("#sp-summary")).toHaveCount(1);
+  await expect(page.locator("#sp-items")).toHaveCount(1);
+  const report = await (await request.get("/report")).text();
+  for (const id of ["case-tv", "case-fridge", "case-dryer", "sources"]) expect(report, id).toContain(`id="${id}"`);
+  // The hero's own link still lands on the preview.
+  await expect(page.locator('.home-hero-text a[href="#sample"]')).toHaveCount(1);
+});
 
-  // Collapsing works by keyboard.
-  const toggleFridge = page.locator('.sc-toggle[aria-controls="sc-more-fridge"]');
-  await toggleFridge.focus();
+test("specification rows stay collapsed, open independently by click and keyboard, and keep their state labelled", async ({ page }) => {
+  await page.goto("/");
+  const ids = ["sp-detail-tv", "sp-detail-fridge", "sp-detail-dryer"];
+  const buttons = page.locator("#sample .item-link-btn");
+  await expect(buttons).toHaveCount(3);
+  for (const [i, id] of ids.entries()) {
+    await expect(page.locator("#" + id), id + " collapsed").toBeHidden();
+    await expect(buttons.nth(i)).toHaveAttribute("aria-controls", id);
+    await expect(buttons.nth(i)).toHaveAttribute("aria-expanded", "false");
+    await expect(buttons.nth(i)).toContainText("View Specs");
+  }
+  await buttons.nth(0).click();
+  await expect(buttons.nth(0)).toHaveAttribute("aria-expanded", "true");
+  await expect(buttons.nth(0)).toContainText("Hide Specs");
+  await expect(page.locator("#sp-detail-tv")).toBeVisible();
+  await expect(page.locator("#sp-detail-fridge")).toBeHidden();
+  await expect(page.locator("#sp-detail-tv .match-panel")).toHaveCount(2);
+
+  // Keyboard: focus the second button and press Enter, then Space on the third.
+  await buttons.nth(1).focus();
   await page.keyboard.press("Enter");
-  await expect(toggleFridge).toHaveAttribute("aria-expanded", "false");
-  await expect(page.locator("#fridge-comparison")).toBeHidden();
+  await expect(page.locator("#sp-detail-fridge")).toBeVisible();
+  await buttons.nth(2).focus();
+  await page.keyboard.press("Space");
+  await expect(page.locator("#sp-detail-dryer")).toBeVisible();
+  expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
+
+  await buttons.nth(0).click();
+  await expect(page.locator("#sp-detail-tv")).toBeHidden();
+  await expect(buttons.nth(0)).toHaveAttribute("aria-expanded", "false");
+  await expect(buttons.nth(0)).toContainText("View Specs");
 });
 
-test("an expanded comparison highlights the selected candidate and stays labelled at every width", async ({ page }, testInfo) => {
+test("the report window keeps its layout: sidebar beside the table on wide screens, stacked on narrow ones, columns steady when a row opens", async ({ page }, testInfo) => {
   await page.goto("/");
-  await page.locator('.sc-toggle[aria-controls="sc-more-tv"]').click();
-  const metrics = await page.locator("#tv-comparison").evaluate((table) => {
-    const px = (node, prop) => parseFloat(getComputedStyle(node)[prop]);
-    const sel = table.querySelector("thead th.rc-sel");
-    const other = table.querySelector("thead th.rc-col:not(.rc-sel)");
-    const selCell = table.querySelector("tbody td.rc-sel");
-    const heads = Array.from(table.querySelectorAll("thead th.rc-col")).map((el) => el.getBoundingClientRect());
-    const cells = Array.from(table.querySelectorAll("tbody tr:first-child td")).map((el) => el.getBoundingClientRect());
+  await page.addStyleTag({ content: "*, *::before, *::after { animation: none !important; transition: none !important; }" });
+  const width = testInfo.project.use.viewport.width;
+  const measure = () => page.evaluate(() => {
+    const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
+    const sidebar = rect("#sample .sidebar");
+    const main = rect("#sample .main");
+    const window_ = rect("#sample .window");
+    const heads = Array.from(document.querySelectorAll("#sample .tbl thead th")).map((th) => Math.round(th.getBoundingClientRect().width));
+    return { sidebar: { right: sidebar.right, bottom: sidebar.bottom }, main: { left: main.left, top: main.top }, window: { left: window_.left, right: window_.right }, heads };
+  });
+  const before = await measure();
+  if (width > 820) {
+    expect(before.sidebar.right).toBeLessThanOrEqual(before.main.left + 1);
+  } else {
+    expect(before.main.top).toBeGreaterThanOrEqual(before.sidebar.bottom - 1);
+  }
+  expect(before.window.left).toBeGreaterThanOrEqual(0);
+  expect(before.window.right).toBeLessThanOrEqual(width + 0.5);
+  await page.locator("#sample .item-link-btn").nth(0).click();
+  const after = await measure();
+  if (width > 640) expect(after.heads).toEqual(before.heads);
+  // On narrow screens the table stacks into labelled blocks.
+  if (width <= 640) {
+    await expect(page.locator("#sample .tbl thead")).toBeHidden();
+    const display = await page.locator("#sample .tbl tbody tr").first().evaluate((tr) => getComputedStyle(tr).display);
+    expect(display).toBe("block");
+  }
+  for (const button of await page.locator("#sample .item-link-btn").all()) {
+    if ((await button.getAttribute("aria-expanded")) !== "true") await button.click();
+  }
+  expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
+  for (const panel of await page.locator("#sample .match-panel").all()) {
+    const box = await panel.boundingBox();
+    expect(box.x).toBeGreaterThanOrEqual(-0.5);
+    expect(box.x + box.width).toBeLessThanOrEqual(width + 0.5);
+  }
+});
+
+test("without JavaScript every specification row stays open and no toggle is offered", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
+  const page = await context.newPage();
+  await stubSite(page);
+  await page.goto("/");
+  for (const id of ["sp-detail-tv", "sp-detail-fridge", "sp-detail-dryer"]) await expect(page.locator("#" + id)).toBeVisible();
+  await expect(page.locator("#sample .item-link-btn").first()).toBeHidden();
+  await context.close();
+});
+
+test("hero copy starts at the top of the form card, left aligned, with no vertical centering", async ({ page }, testInfo) => {
+  await page.goto("/");
+  await page.addStyleTag({ content: "*, *::before, *::after { animation: none !important; transition: none !important; }" });
+  const width = testInfo.project.use.viewport.width;
+  const m = await page.evaluate(() => {
+    const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
+    const text = rect(".home-hero-text");
+    const kicker = rect(".home-hero-text .home-hero-kicker");
+    const card = rect(".hero-consult");
+    const links = rect(".home-hero-text .hero-sample");
     return {
-      selBorder: Math.max(px(sel, "borderTopWidth"), px(sel, "borderLeftWidth")),
-      otherBorder: Math.max(px(other, "borderTopWidth"), px(other, "borderLeftWidth")),
-      selCellBorder: px(selCell, "borderLeftWidth"),
-      selBackground: getComputedStyle(sel).backgroundColor,
-      otherBackground: getComputedStyle(other).backgroundColor,
-      headY: heads.map((r) => Math.round(r.top)),
-      cellY: cells.map((r) => Math.round(r.top)),
-      cellX: cells.map((r) => Math.round(r.left)),
-      labelContent: getComputedStyle(selCell, "::before").content
+      textTop: text.top, textLeft: text.left, kickerTop: kicker.top, cardTop: card.top, cardHeight: card.height, textBottom: text.bottom, linksBottom: links.bottom,
+      align: getComputedStyle(document.querySelector(".home-hero-text")).alignSelf,
+      textAlign: getComputedStyle(document.querySelector(".home-hero-text")).textAlign
     };
   });
-  expect(metrics.selBorder).toBeGreaterThanOrEqual(2);
-  expect(metrics.selBorder).toBeGreaterThan(metrics.otherBorder);
-  expect(metrics.selCellBorder).toBeGreaterThanOrEqual(2);
-  expect(metrics.selBackground).not.toBe(metrics.otherBackground);
-  if (testInfo.project.use.viewport.width <= 820) {
-    expect(metrics.headY[0]).toBeLessThan(metrics.headY[1]);
-    expect(metrics.headY[1]).toBeLessThan(metrics.headY[2]);
-    expect(new Set(metrics.cellX).size).toBe(1);
-    expect(metrics.labelContent).toMatch(/Display technology \(original: QLED, quantum dot\)/);
-  } else {
-    expect(new Set(metrics.headY).size).toBe(1);
-    expect(new Set(metrics.cellY).size).toBe(1);
-    expect(new Set(metrics.cellX).size).toBe(3);
+  expect(m.textAlign).not.toBe("center");
+  if (width >= 1024) {
+    expect(m.align).toBe("start");
+    // The kicker begins level with the top of the form card, not partway down it.
+    expect(Math.abs(m.textTop - m.cardTop)).toBeLessThanOrEqual(8);
+    expect(m.kickerTop - m.cardTop).toBeLessThanOrEqual(24);
+    // The copy sits in the upper part of the form's height, ending well above the card's bottom.
+    expect(m.linksBottom - m.cardTop).toBeLessThan(m.cardHeight * 0.85);
   }
-  expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
-  await page.locator("#sc-tab-fridge").click();
-  await page.locator('.sc-toggle[aria-controls="sc-more-fridge"]').click();
-  expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
+});
+
+test("the experience markers sit in their own gutter and never overlap the item text", async ({ page }) => {
+  await page.goto("/");
+  const items = await page.locator("#experience .credibility-areas li").evaluateAll((nodes) =>
+    nodes.map((li) => {
+      const before = getComputedStyle(li, "::before");
+      const style = getComputedStyle(li);
+      const range = document.createRange();
+      range.selectNodeContents(li);
+      const text = range.getBoundingClientRect();
+      const box = li.getBoundingClientRect();
+      const markerRight = box.left + parseFloat(before.left) + parseFloat(before.width);
+      return { markerRight, textLeft: text.left, padLeft: parseFloat(style.paddingLeft), markerLeft: parseFloat(before.left), height: box.height, markerTop: parseFloat(before.top), liTop: 0 };
+    })
+  );
+  expect(items).toHaveLength(4);
+  for (const item of items) {
+    expect(item.textLeft - item.markerRight, "gap between the marker and the text").toBeGreaterThanOrEqual(8);
+    expect(item.markerLeft).toBeGreaterThanOrEqual(10);
+    expect(item.height).toBeGreaterThanOrEqual(40);
+  }
+  // The four items form a tidy two-by-two block inside the card.
+  const boxes = await page.locator("#experience .credibility-areas li").evaluateAll((nodes) => nodes.map((n) => n.getBoundingClientRect()));
+  const card = await page.locator("#experience .credibility-card").boundingBox();
+  for (const box of boxes) {
+    expect(box.left).toBeGreaterThanOrEqual(card.x);
+    expect(box.right).toBeLessThanOrEqual(card.x + card.width + 0.5);
+  }
 });
 
 test("a financial-impact illustration replaces the two-card pricing explanation, and is plainly hypothetical", async ({ page }) => {
@@ -625,7 +626,7 @@ test("layout holds: no horizontal overflow, the form is usable in place, nothing
   for (const field of ["#consult-name", "#consult-email", "#consult-reason", "#consult-count", "#consult-description"]) {
     await expect(page.locator(field)).toBeVisible();
   }
-  for (const card of await page.locator(".mini-report, .showcase, .impact-card, .provides-card, .hero-consult").all()) {
+  for (const card of await page.locator(".sample-preview, .impact-card, .provides-card, .hero-consult").all()) {
     const box = await card.boundingBox();
     expect(box.x, testInfo.project.name).toBeGreaterThanOrEqual(-0.5);
     expect(box.x + box.width, testInfo.project.name).toBeLessThanOrEqual(testInfo.project.use.viewport.width + 0.5);

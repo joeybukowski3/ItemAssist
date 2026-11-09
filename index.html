@@ -198,269 +198,255 @@
       </div>
     </section>
 
-    <section class="trust-section showcase-section" id="comparable" aria-labelledby="trust-heading">
+    <section class="trust-section sample-section" id="comparable" aria-labelledby="trust-heading">
       <div class="trust-header">
         <h2 id="trust-heading">Similar Isn&rsquo;t the Same as Comparable</h2>
         <p>A search for the same brand, size, or category can return products that differ in features, tier, and specifications. Item Assist researches the original item first, then identifies which differences matter before recommending a supportable replacement.</p>
       </div>
-      <div class="showcase-grid">
-      <article class="mini-report" id="sample" aria-labelledby="mr-title">
-        <div class="mr-titlebar" aria-hidden="true"><span></span><span></span><span></span></div>
-        <div class="mr-head">
-          <div class="mr-brand"><img src="assets/itemassist-logo-header.svg" alt="Item Assist" width="130" height="30"><span class="mr-divider" aria-hidden="true"></span><h3 id="mr-title">Sample Research Report</h3></div>
-          <p class="mr-date">Prices observed November 9, 2026</p>
+
+      <article class="sample-preview" id="sample" aria-labelledby="sp-title">
+        <div class="window">
+          <div class="titlebar" aria-hidden="true">
+            <div class="dots">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+            </div>
+          </div>
+
+          <div class="report-branded-header">
+            <div class="rbh-left">
+              <img src="assets/itemassist-logo-header.svg" alt="Item Assist logo" class="rbh-logo">
+              <div class="rbh-divider" aria-hidden="true"></div>
+              <span class="rbh-title" id="sp-title">Sample Research Report</span>
+            </div>
+            <div class="rbh-right">
+              <div class="rbh-date">Prices observed November 9, 2026</div>
+              <div class="rbh-contact"><a href="mailto:support@itemassist.com">support@itemassist.com</a></div>
+            </div>
+          </div>
+
+          <div class="report-claim-bar">
+            <div class="claim-id">Three research examples &bull; Sale-event prices &bull; Not a claim determination</div>
+          </div>
+
+          <div class="body">
+            <div class="sidebar">
+              <div class="sb-title">Report Overview</div>
+              <a class="sb-item active" href="#sp-summary">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"></path><rect x="9" y="3" width="6" height="4" rx="1"></rect></svg>
+                Summary Findings
+              </a>
+              <a class="sb-item" href="#sp-items">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>
+                Itemized Research
+              </a>
+              <a class="sb-item" href="/report#sources">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                Supporting Evidence
+              </a>
+
+              <div class="sb-metrics">
+                <div class="sb-metric">
+                  <div class="sb-metric-label">Items Researched</div>
+                  <div class="sb-metric-val">3</div>
+                  <div class="sb-metric-break"><span class="v">Television, refrigerator, dryer</span></div>
+                </div>
+                <div class="sb-metric">
+                  <div class="sb-metric-label">Prices Observed</div>
+                  <div class="sb-metric-val">Nov 9 <small>2026</small></div>
+                  <div class="sb-metric-break"><span class="e">Sale-event prices, not regular prices</span></div>
+                </div>
+                <div class="sb-metric">
+                  <div class="sb-metric-label">ACV Examples</div>
+                  <div class="sb-metric-val">Illustrative</div>
+                  <div class="sb-metric-break"><span class="e">Assumed age and 13-year life</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="main">
+              <div class="stats" id="sp-summary">
+                <div class="stat stat-total stat-total-rcv">
+                  <div class="stat-label">Selected Television Replacement</div>
+                  <div class="stat-val">$899.99</div>
+                  <div class="stat-note">Samsung QN55QN80H &middot; Best Buy, Nov 9, 2026</div>
+                </div>
+                <div class="stat stat-total stat-total-acv">
+                  <div class="stat-label">Illustrative ACV Example</div>
+                  <div class="stat-val">$1,023.07</div>
+                  <div class="stat-note">Refrigerator &middot; assumed 6.0-year age, 13-year life</div>
+                </div>
+              </div>
+
+              <div class="section-hdr" id="sp-items">
+                <h3>Itemized Research</h3>
+                <p>Three examples from the full sample report. Each pairs the original item with the replacement Item Assist selected and the evidence behind it.</p>
+              </div>
+
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th scope="col">Submitted Item</th>
+                    <th scope="col">Selected Research Comparison</th>
+                    <th scope="col">Replacement Price</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td data-label="Submitted Item">
+                      <div class="item-name">Samsung 55" Q80A QLED TV</div>
+                      <div class="item-sub">Model: QN55Q80AAFXZA</div>
+                      <div class="item-sub">2021 model &bull; No longer sold new at Best Buy</div>
+                      <button type="button" class="item-link item-link-btn" aria-expanded="false" aria-controls="sp-detail-tv">View Specs <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+                    </td>
+                    <td data-label="Selected Research Comparison">
+                      <div class="item-name">Samsung 55" QN80H Neo QLED TV</div>
+                      <div class="item-sub">Model: QN55QN80H</div>
+                      <div class="item-sub">Best Buy &bull; Nov 9, 2026 &bull; Black Friday Deal</div>
+                      <span class="item-link item-link-static">Samsung list price: $1,299.99</span>
+                    </td>
+                    <td class="rcv-val" data-label="Replacement Price">$899.99</td>
+                    <td data-label="Status"><span class="badge verified"><span class="badge-dot"></span> Meets Checked Specs</span></td>
+                  </tr>
+                  <tr class="detail-row" id="sp-detail-tv">
+                    <td colspan="4" class="detail-cell">
+                      <div class="match-grid">
+                        <div class="match-panel">
+                          <div class="match-panel-hdr">Submitted Item</div>
+                          <div class="match-row"><span class="ml">Description</span><span class="mv">Samsung 55" Q80A QLED TV</span></div>
+                          <div class="match-row"><span class="ml">Model</span><span class="mv">QN55Q80AAFXZA</span></div>
+                          <div class="match-row"><span class="ml">Specification source</span><span class="mv">Samsung sheets</span></div>
+                          <div class="match-row"><span class="ml">Key Specs</span></div>
+                          <div class="match-row"><span class="ml match-indent">Display</span><span class="mv">QLED, quantum dot</span></div>
+                          <div class="match-row"><span class="ml match-indent">Backlight</span><span class="mv">Direct Full Array</span></div>
+                          <div class="match-row"><span class="ml match-indent">Native refresh</span><span class="mv">120Hz (RTINGS, third-party)</span></div>
+                          <div class="match-row"><span class="ml match-indent">4K@120Hz input</span><span class="mv">One HDMI port</span></div>
+                          <div class="match-row"><span class="ml match-indent">Variable refresh</span><span class="mv">Yes</span></div>
+                        </div>
+                        <div class="match-panel">
+                          <div class="match-panel-hdr">Selected Research Comparison</div>
+                          <div class="match-row"><span class="ml">Description</span><span class="mv">Samsung 55" QN80H Neo QLED TV</span></div>
+                          <div class="match-row"><span class="ml">Model</span><span class="mv">QN55QN80H</span></div>
+                          <div class="match-row"><span class="ml">Retail Cost</span><span class="mv">$899.99</span></div>
+                          <div class="match-row"><span class="ml">Retailer</span><span class="mv">Best Buy, Nov 9, 2026</span></div>
+                          <div class="match-row"><span class="ml">Key Specs Comparison</span></div>
+                          <div class="match-row"><span class="ml match-indent">Display</span><span class="mv hi">Quantum dot Mini LED <span class="chk">&#10003;</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Backlight</span><span class="mv hi">Full array Mini LED <span class="chk">&#10003;</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Native refresh</span><span class="mv up">144Hz <span class="star">&#9733;</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">4K@120Hz input</span><span class="mv up">All 4 ports <span class="star">&#9733;</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Variable refresh</span><span class="mv hi">FreeSync Premium Pro <span class="chk">&#10003;</span></span></div>
+                        </div>
+                      </div>
+                      <p class="detail-note"><strong>Why not the lower-priced model?</strong> The QN55QN70H ($699.99) falls short on native refresh rate, 4K@120Hz input and VRR. The QN55S90H ($1,199.99) is OLED, a different product tier. The QN80H is not presented as the lowest-priced suitable Samsung: a 2025 QN80F at $827.95, seller not named, is unresolved.</p>
+                      <p class="detail-links"><a href="/report#case-tv">See the full television comparison &rarr;</a></p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td data-label="Submitted Item">
+                      <div class="item-name">Samsung 28 cu ft 4-Door Refrigerator</div>
+                      <div class="item-sub">Model: RF28R7201SR</div>
+                      <div class="item-sub">French door &bull; FlexZone drawer</div>
+                      <button type="button" class="item-link item-link-btn" aria-expanded="false" aria-controls="sp-detail-fridge">View Specs <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+                    </td>
+                    <td data-label="Selected Research Comparison">
+                      <div class="item-name">Samsung 28 cu ft 4-Door Refrigerator</div>
+                      <div class="item-sub">Model: RF28R7201SR (identical)</div>
+                      <div class="item-sub">Best Buy &bull; Nov 9, 2026 &bull; Black Friday Deal</div>
+                      <span class="item-link item-link-static">Still sold new</span>
+                    </td>
+                    <td class="rcv-val" data-label="Replacement Price">$1,899.99</td>
+                    <td data-label="Status"><span class="badge verified"><span class="badge-dot"></span> Identical Model</span></td>
+                  </tr>
+                  <tr class="detail-row" id="sp-detail-fridge">
+                    <td colspan="4" class="detail-cell">
+                      <div class="match-grid">
+                        <div class="match-panel">
+                          <div class="match-panel-hdr">Submitted Item</div>
+                          <div class="match-row"><span class="ml">Description</span><span class="mv">Samsung 28 cu ft 4-door French door refrigerator</span></div>
+                          <div class="match-row"><span class="ml">Model</span><span class="mv">RF28R7201SR</span></div>
+                          <div class="match-row"><span class="ml">Specification source</span><span class="mv">Samsung sheets</span></div>
+                          <div class="match-row"><span class="ml">Key Specs</span></div>
+                          <div class="match-row"><span class="ml match-indent">Configuration</span><span class="mv">4-door French door</span></div>
+                          <div class="match-row"><span class="ml match-indent">FlexZone drawer</span><span class="mv">3.8 cu ft, 4 zones</span></div>
+                          <div class="match-row"><span class="ml match-indent">Dispenser</span><span class="mv">External water and ice</span></div>
+                          <div class="match-row"><span class="ml match-indent">Capacity</span><span class="mv">28 cu ft</span></div>
+                        </div>
+                        <div class="match-panel">
+                          <div class="match-panel-hdr">Selected Research Comparison</div>
+                          <div class="match-row"><span class="ml">Description</span><span class="mv">Same model, still sold new</span></div>
+                          <div class="match-row"><span class="ml">Model</span><span class="mv">RF28R7201SR</span></div>
+                          <div class="match-row"><span class="ml">Retail Cost</span><span class="mv">$1,899.99</span></div>
+                          <div class="match-row"><span class="ml">Retailer</span><span class="mv">Best Buy, Nov 9, 2026</span></div>
+                          <div class="match-row"><span class="ml">Key Specs Comparison</span></div>
+                          <div class="match-row"><span class="ml match-indent">Configuration</span><span class="mv hi">4-door <span class="chk">&#10003;</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">FlexZone drawer</span><span class="mv hi">3.8 cu ft, 4 zones <span class="chk">&#10003;</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Dispenser</span><span class="mv hi">External <span class="chk">&#10003;</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Capacity</span><span class="mv hi">28 cu ft <span class="chk">&#10003;</span></span></div>
+                        </div>
+                      </div>
+                      <p class="detail-note"><strong>Why the original model?</strong> The look-alikes drop a defining feature: the RF32CG5B30SR ($1,799.99) has no FlexZone drawer, and the RF29BB8600QL ($2,199.99) has no external dispenser and a smaller FlexZone. <strong>Illustrative ACV $1,023.07:</strong> $1,899.99 &times; (1 &minus; 6.0 &divide; 13), with an assumed age, a 13-year life (NAHB, 2007) and no condition adjustment.</p>
+                      <p class="detail-links"><a href="/report#case-fridge">See the full refrigerator comparison &rarr;</a></p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td data-label="Submitted Item">
+                      <div class="item-name">GE 7.8 cu ft Smart Front-Load Dryer</div>
+                      <div class="item-sub">Model: GFD65ESSNWW</div>
+                      <div class="item-sub">Built Dec 2019 &ndash; Aug 2023 (GE)</div>
+                      <button type="button" class="item-link item-link-btn" aria-expanded="false" aria-controls="sp-detail-dryer">View Specs <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+                    </td>
+                    <td data-label="Selected Research Comparison">
+                      <div class="item-name">GE 7.8 cu ft Smart Front-Load Dryer</div>
+                      <div class="item-sub">Model: GFD65ESSVWW (successor)</div>
+                      <div class="item-sub">GE.com, Home Depot &bull; Nov 9, 2026 &bull; Sale event</div>
+                      <span class="item-link item-link-static">GE list price: $1,249.00</span>
+                    </td>
+                    <td class="rcv-val" data-label="Replacement Price">$899.00</td>
+                    <td data-label="Status"><span class="badge estimated"><span class="badge-dot"></span> Age Range Only</span></td>
+                  </tr>
+                  <tr class="detail-row" id="sp-detail-dryer">
+                    <td colspan="4" class="detail-cell">
+                      <div class="match-grid">
+                        <div class="match-panel">
+                          <div class="match-panel-hdr">Submitted Item</div>
+                          <div class="match-row"><span class="ml">Description</span><span class="mv">GE 7.8 cu ft smart front-load electric dryer</span></div>
+                          <div class="match-row"><span class="ml">Model</span><span class="mv">GFD65ESSNWW</span></div>
+                          <div class="match-row"><span class="ml">Manufacture window</span><span class="mv">Dec 2019 &ndash; Aug 2023</span></div>
+                          <div class="match-row"><span class="ml">Age Evidence</span><span class="mv">GE Owner Center; ENERGY STAR (corroborating)</span></div>
+                          <div class="match-row"><span class="ml">Age on Nov 9, 2026</span><span class="mv">3.2 &ndash; 6.9 years</span></div>
+                          <div class="match-row"><span class="ml">Serial number</span><span class="mv">Not provided</span></div>
+                          <div class="match-row"><span class="ml">Unit date</span><span class="mv">Not stated</span></div>
+                          <div class="match-row"><span class="ml">Useful life</span><span class="mv">13 years (NAHB, 2007)</span></div>
+                        </div>
+                        <div class="match-panel">
+                          <div class="match-panel-hdr">Selected Research Comparison</div>
+                          <div class="match-row"><span class="ml">Description</span><span class="mv">Same description</span></div>
+                          <div class="match-row"><span class="ml">Model</span><span class="mv">GFD65ESSVWW</span></div>
+                          <div class="match-row"><span class="ml">Retail Cost</span><span class="mv">$899.00</span></div>
+                          <div class="match-row"><span class="ml">Retailers</span><span class="mv">GE.com, Home Depot</span></div>
+                          <div class="match-row"><span class="ml">Key Specs Comparison</span></div>
+                          <div class="match-row"><span class="ml match-indent">GE spec fields</span><span class="mv hi">101 of 108 identical <span class="chk">&#10003;</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Capacity</span><span class="mv hi">7.8 cu ft <span class="chk">&#10003;</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Functional difference</span><span class="mv hi">None found <span class="chk">&#10003;</span></span></div>
+                          <div class="match-row"><span class="ml match-indent">Illustrative ACV</span><span class="mv">$419 &ndash; $678</span></div>
+                        </div>
+                      </div>
+                      <p class="detail-note"><strong>Why a range?</strong> GE&rsquo;s serial letters repeat every 12 years, so GE&rsquo;s manufacture window for the model does the work. With no serial number, the result is an age range and an illustrative ACV range, not a single value; a nameplate serial would name one month.</p>
+                      <p class="detail-links"><a href="/report#case-dryer">See the dryer age research &rarr;</a></p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <p class="mr-bar">Three research examples &middot; sale-event prices &middot; not a claim determination</p>
-        <ol class="mr-items">
-          <li class="mr-item">
-            <span class="mr-num" aria-hidden="true">1</span>
-            <div class="mr-body">
-              <p class="mr-line"><span class="mr-key">Original</span> <strong>Samsung QN55Q80AAFXZA</strong>, 2021 Q80A 55-inch QLED</p>
-              <p class="mr-line"><span class="mr-key">Selected</span> <strong>Samsung QN55QN80H</strong> <span class="mr-price">$899.99</span> Best Buy, Nov 9, 2026 (Black Friday Deal); Samsung list $1,299.99</p>
-              <p class="mr-evidence">Meets every specification checked. The lower-priced QN70H falls short on native refresh, 4K@120Hz input and VRR. Samsung sheets; native refresh per RTINGS (third-party).</p>
-            </div>
-          </li>
-          <li class="mr-item">
-            <span class="mr-num" aria-hidden="true">2</span>
-            <div class="mr-body">
-              <p class="mr-line"><span class="mr-key">Original</span> <strong>Samsung RF28R7201SR</strong>, 28 cu ft 4-door with FlexZone</p>
-              <p class="mr-line"><span class="mr-key">Selected</span> The <strong>identical model</strong>, still sold new <span class="mr-price">$1,899.99</span> Best Buy, Nov 9, 2026 (Black Friday Deal)</p>
-              <p class="mr-evidence">The look-alikes drop the FlexZone drawer or the external dispenser. Illustrative ACV $1,023.07: assumed 6.0-year age, 13-year life, no condition adjustment.</p>
-            </div>
-          </li>
-          <li class="mr-item">
-            <span class="mr-num" aria-hidden="true">3</span>
-            <div class="mr-body">
-              <p class="mr-line"><span class="mr-key">Original</span> <strong>GE GFD65ESSNWW</strong>, 7.8 cu ft smart front-load dryer</p>
-              <p class="mr-line"><span class="mr-key">Successor</span> <strong>GE GFD65ESSVWW</strong> <span class="mr-price">$899.00</span> GE.com and Home Depot, Nov 9, 2026 (sale event)</p>
-              <p class="mr-evidence">Age research: GE&rsquo;s manufacture window, Dec 2019 to Aug 2023, gives 3.2 to 6.9 years and an illustrative ACV of $419 to $678. No serial number was available, so no unit date is stated.</p>
-            </div>
-          </li>
-        </ol>
-        <div class="mr-legend" aria-label="Evidence labels"><span class="mr-chip mr-chip--doc">Documented</span><span class="mr-chip mr-chip--third">Third-party</span><span class="mr-chip mr-chip--obs">Observed price</span><span class="mr-chip mr-chip--assumed">Assumed</span></div>
-        <p class="mr-fine">Item Assist does not determine depreciation, final ACV, coverage or settlement.</p>
-        <div class="mr-links"><a class="btn-primary" href="/report">Read the full sample report</a><a class="comparable-link" href="/assets/ItemAssist-Sample-Research-Report.pdf" download>Download the 2-page PDF</a></div>
+        <p class="home-hero-report-note"><strong>Research examples, not claim determinations.</strong> Prices are retailer selling prices on November 9, 2026, during sale events, and are not regular prices. Item Assist does not determine depreciation, final ACV, coverage or settlement.</p>
+        <div class="sp-links"><a class="btn-primary" href="/report">Read the full sample report</a><a class="comparable-link" href="/assets/ItemAssist-Sample-Research-Report.pdf" download>Download the 2-page PDF</a></div>
       </article>
-      <div class="showcase" id="research-showcase">
-        <div class="sc-tabs" role="tablist" aria-label="Research examples">
-          <button type="button" role="tab" class="sc-tab" id="sc-tab-tv" aria-selected="true" aria-controls="sc-panel-tv" tabindex="0">Televisions</button>
-          <button type="button" role="tab" class="sc-tab" id="sc-tab-fridge" aria-selected="false" aria-controls="sc-panel-fridge" tabindex="-1">Refrigerators</button>
-        </div>
-          <div class="sc-panel is-active" role="tabpanel" id="sc-panel-tv" aria-labelledby="sc-tab-tv" tabindex="0">
-            <p class="sc-orig"><span class="sc-label">Original</span> <strong>Samsung QN55Q80AAFXZA</strong> (2021 Q80A, 55-inch QLED): quantum dot, full-array backlight, 4K@120Hz input and VRR per Samsung; 120Hz native panel per RTINGS.</p>
-            <ul class="sc-cands">
-            <li class="sc-cand">
-              <span class="sc-role">Lower-priced</span>
-              <span class="sc-model">Samsung QN55QN70H</span>
-              <span class="sc-price">$699.99</span>
-              <span class="sc-verdict"><span class="rc-flag rc-bad"><span aria-hidden="true">&#10007;</span> Shortfall</span> 60Hz, no VRR, 4K@60Hz maximum</span>
-            </li>
-            <li class="sc-cand is-selected">
-              <span class="sc-role">Selected LKQ</span>
-              <span class="sc-model">Samsung QN55QN80H</span>
-              <span class="sc-price">$899.99</span>
-              <span class="sc-verdict"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span> Meets every specification checked</span>
-            </li>
-            <li class="sc-cand">
-              <span class="sc-role">Higher-priced</span>
-              <span class="sc-model">Samsung QN55S90H</span>
-              <span class="sc-price">$1,199.99</span>
-              <span class="sc-verdict"><span class="rc-flag rc-up"><span aria-hidden="true">&#9650;</span> Upgrade</span> OLED, a different product tier</span>
-            </li>
-            </ul>
-            <p class="sc-note"><strong>What differs:</strong> native refresh rate, 4K@120Hz input and VRR. <strong>Prices:</strong> Best Buy, Nov 9, 2026, during Black Friday and Holiday Deal promotions; Samsung list prices $899.99, $1,299.99 and $1,999.99. The QN80H is not presented as the lowest-priced suitable Samsung: a 2025 QN80F at $827.95, seller not named, is unresolved.</p>
-            <div class="sc-actions">
-              <button type="button" class="sc-toggle" aria-expanded="false" aria-controls="sc-more-tv">Show full specification comparison</button>
-              <a class="comparable-link" href="/report#case-tv">See the complete case &rarr;</a>
-            </div>
-            <div class="sc-more" id="sc-more-tv" role="region" aria-label="Full television specification comparison">
-              <div class="rc-original">
-        <div class="rc-original-head">
-          <span class="rc-orig-label">Original item</span>
-          <p class="rc-orig-model">Samsung QN55Q80AAFXZA</p>
-          <span class="rc-orig-desc">2021 Q80A, 55-inch QLED &middot; No longer sold new at Best Buy</span>
-        </div>
-        <dl class="rc-orig-specs">
-          <div class="rc-orig-spec">
-            <dt>Display</dt>
-            <dd>QLED with quantum dot color<span class="rc-src rc-src--mfr">Samsung</span></dd>
-          </div>
-          <div class="rc-orig-spec">
-            <dt>Backlight</dt>
-            <dd>Direct Full Array<span class="rc-src rc-src--mfr">Samsung</span></dd>
-          </div>
-          <div class="rc-orig-spec">
-            <dt>Native refresh rate</dt>
-            <dd>120Hz (55-inch size)<span class="rc-src rc-src--third">Third-party: RTINGS</span><span class="rc-orig-note">Samsung&rsquo;s sheet does not state a native rate</span></dd>
-          </div>
-          <div class="rc-orig-spec">
-            <dt>4K@120Hz HDMI input</dt>
-            <dd>One port (HDMI 4)<span class="rc-src rc-src--mfr">Samsung</span></dd>
-          </div>
-          <div class="rc-orig-spec">
-            <dt>Variable refresh rate</dt>
-            <dd>Yes, all ports (FreeSync Premium Pro)<span class="rc-src rc-src--mfr">Samsung</span></dd>
-          </div>
-        </dl>
-      </div>
-              <table class="rc-table" role="table" id="tv-comparison">
-        <caption class="rc-sr">Samsung 55-inch television candidates compared against the original Samsung QN55Q80AAFXZA</caption>
-        <thead role="rowgroup"><tr role="row">
-          <th scope="col" role="columnheader" class="rc-corner">Specification</th>
-          <th scope="col" role="columnheader" class="rc-col">
-            <span class="rc-role">Lower-priced candidate</span>
-            <span class="rc-model">Samsung QN55QN70H</span>
-            <span class="rc-price">$699.99</span>
-            <span class="rc-meta"><a href="https://www.bestbuy.com/product/samsung-55-class-qn70h-series-neo-qled-mini-led-4k-uhd-samsungvision-ai-smart-tizen-tv-2026/JJGRF3Q6J5" rel="noopener noreferrer">Best Buy</a> &middot; Nov 9, 2026 &middot; <span class="rc-event">Black Friday Deal</span></span>
-          </th>
-          <th scope="col" role="columnheader" class="rc-col rc-sel">
-            <span class="rc-role">Selected LKQ candidate</span>
-            <span class="rc-model">Samsung QN55QN80H</span>
-            <span class="rc-price">$899.99</span>
-            <span class="rc-meta"><a href="https://www.bestbuy.com/product/samsung-55-class-qn80h-series-neo-qled-mini-led-4k-uhd-samsungvision-ai-smart-tizen-tv-2026/JJGRF3QXW6" rel="noopener noreferrer">Best Buy</a> &middot; Nov 9, 2026 &middot; <span class="rc-event">Black Friday Deal</span></span>
-          </th>
-          <th scope="col" role="columnheader" class="rc-col">
-            <span class="rc-role">Higher-priced candidate</span>
-            <span class="rc-model">Samsung QN55S90H</span>
-            <span class="rc-price">$1,199.99</span>
-            <span class="rc-meta"><a href="https://www.bestbuy.com/product/samsung-55-class-s90h-oled-4k-glare-free-tv-with-samsungvisionai-2026/JJGRF3QG5T" rel="noopener noreferrer">Best Buy</a> &middot; Nov 9, 2026 &middot; <span class="rc-event">Holiday Deal</span></span>
-          </th>
-        </tr></thead>
-        <tbody role="rowgroup">
-        <tr role="row" style="--r:1">
-          <th scope="row" role="rowheader">Display technology<span class="rc-row-orig">Original: QLED, quantum dot</span></th><td role="cell" class="rc-cell" data-label="Display technology (original: QLED, quantum dot)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">Quantum dot Mini LED LCD (Neo QLED)</span></td><td role="cell" class="rc-cell rc-sel" data-label="Display technology (original: QLED, quantum dot)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">Quantum dot Mini LED LCD (Neo QLED)</span></td><td role="cell" class="rc-cell" data-label="Display technology (original: QLED, quantum dot)"><span class="rc-flag rc-up"><span aria-hidden="true">&#9650;</span> Upgrade</span><span class="rc-val">OLED, a different display technology</span></td>
-        </tr>
-        <tr role="row" style="--r:2">
-          <th scope="row" role="rowheader">Backlight<span class="rc-row-orig">Original: Direct Full Array</span></th><td role="cell" class="rc-cell" data-label="Backlight (original: Direct Full Array)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">Mini LED backlight with Supreme Mini LED Dimming</span></td><td role="cell" class="rc-cell rc-sel" data-label="Backlight (original: Direct Full Array)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">Quantum Mini LED, full array, with Supreme Mini LED Dimming</span></td><td role="cell" class="rc-cell" data-label="Backlight (original: Direct Full Array)"><span class="rc-flag rc-up"><span aria-hidden="true">&#9650;</span> Upgrade</span><span class="rc-val">No backlight; self-lit pixels</span></td>
-        </tr>
-        <tr role="row" style="--r:3">
-          <th scope="row" role="rowheader">Native refresh rate<span class="rc-row-orig">Original: 120Hz, per RTINGS</span></th><td role="cell" class="rc-cell" data-label="Native refresh rate (original: 120Hz, per RTINGS)"><span class="rc-flag rc-bad"><span aria-hidden="true">&#10007;</span> Shortfall</span><span class="rc-val">60Hz. Samsung also lists a 120Hz "DLG" mode that reduces image sharpness</span></td><td role="cell" class="rc-cell rc-sel" data-label="Native refresh rate (original: 120Hz, per RTINGS)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">144Hz (Samsung: VRR support)</span></td><td role="cell" class="rc-cell" data-label="Native refresh rate (original: 120Hz, per RTINGS)"><span class="rc-flag rc-up"><span aria-hidden="true">&#9650;</span> Upgrade</span><span class="rc-val">165Hz (Samsung: VRR support)</span></td>
-        </tr>
-        <tr role="row" style="--r:4">
-          <th scope="row" role="rowheader">4K@120Hz HDMI input<span class="rc-row-orig">Original: one port</span></th><td role="cell" class="rc-cell" data-label="4K@120Hz HDMI input (original: one port)"><span class="rc-flag rc-bad"><span aria-hidden="true">&#10007;</span> Shortfall</span><span class="rc-val">None. Maximum 4K@60Hz, on 3 HDMI ports</span></td><td role="cell" class="rc-cell rc-sel" data-label="4K@120Hz HDMI input (original: one port)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">All 4 HDMI ports, maximum input 4K@144Hz</span></td><td role="cell" class="rc-cell" data-label="4K@120Hz HDMI input (original: one port)"><span class="rc-flag rc-up"><span aria-hidden="true">&#9650;</span> Upgrade</span><span class="rc-val">All 4 HDMI ports, maximum input 4K@165Hz</span></td>
-        </tr>
-        <tr role="row" style="--r:5">
-          <th scope="row" role="rowheader">Variable refresh rate<span class="rc-row-orig">Original: yes</span></th><td role="cell" class="rc-cell" data-label="Variable refresh rate (original: yes)"><span class="rc-flag rc-bad"><span aria-hidden="true">&#10007;</span> Shortfall</span><span class="rc-val">Not supported (Samsung lists VRR and FreeSync as N/A)</span></td><td role="cell" class="rc-cell rc-sel" data-label="Variable refresh rate (original: yes)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">Yes, AMD FreeSync Premium Pro</span></td><td role="cell" class="rc-cell" data-label="Variable refresh rate (original: yes)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">Yes, AMD FreeSync Premium Pro</span></td>
-        </tr>
-        <tr role="row" style="--r:6">
-          <th scope="row" role="rowheader">Samsung.com price, same day</th><td role="cell" class="rc-cell" data-label="Samsung.com price, same day"><span class="rc-val">$699.99</span></td><td role="cell" class="rc-cell rc-sel" data-label="Samsung.com price, same day"><span class="rc-val">$899.99</span></td><td role="cell" class="rc-cell" data-label="Samsung.com price, same day"><span class="rc-val">$1,199.99</span></td>
-        </tr>
-        <tr role="row" style="--r:7">
-          <th scope="row" role="rowheader">Samsung U.S. list price</th><td role="cell" class="rc-cell" data-label="Samsung U.S. list price"><span class="rc-val">$899.99</span></td><td role="cell" class="rc-cell rc-sel" data-label="Samsung U.S. list price"><span class="rc-val">$1,299.99</span></td><td role="cell" class="rc-cell" data-label="Samsung U.S. list price"><span class="rc-val">$1,999.99</span></td>
-        </tr>
-        <tr role="row" style="--r:8">
-          <th scope="row" role="rowheader">How it differs from the original</th><td role="cell" class="rc-cell" data-label="How it differs from the original"><span class="rc-val">Branded Neo QLED and priced lower, but short of the original on three documented capabilities: native refresh rate, 4K@120Hz input and VRR.</span></td><td role="cell" class="rc-cell rc-sel" data-label="How it differs from the original"><span class="rc-val">No documented shortfall on the specifications checked. Adds a higher refresh ceiling and 4K-capable input on all four ports.</span></td><td role="cell" class="rc-cell" data-label="How it differs from the original"><span class="rc-val">Adds OLED, a glare-free screen and a 165Hz ceiling. A different product tier, not a like-kind match.</span></td>
-        </tr>
-        <tr role="row" style="--r:9" class="rc-conclusion">
-          <th scope="row" role="rowheader">Conclusion</th><td role="cell" class="rc-cell rc-last" data-label="Conclusion"><span class="rc-flag rc-bad"><span aria-hidden="true">&#10007;</span> Shortfall</span><span class="rc-val">Does not meet the original&rsquo;s documented specifications</span></td><td role="cell" class="rc-cell rc-sel rc-last" data-label="Conclusion"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">Meets every specification checked</span></td><td role="cell" class="rc-cell rc-last" data-label="Conclusion"><span class="rc-flag rc-up"><span aria-hidden="true">&#9650;</span> Upgrade</span><span class="rc-val">Exceeds the original; a different tier</span></td>
-        </tr>
-        </tbody>
-      </table>
-              <p class="rc-disclosure"><strong>Prices.</strong> Best Buy selling prices on November 9, 2026, during Black Friday and Holiday Deal promotions; not regular prices. Samsung.com prices were read later the same day. List prices are Samsung&rsquo;s published U.S. launch prices. Original specifications are Samsung&rsquo;s except the native refresh rate, a third-party measurement by RTINGS. A research example, not a claim determination.</p>
-            </div>
-          </div>
-          <div class="sc-panel" role="tabpanel" id="sc-panel-fridge" aria-labelledby="sc-tab-fridge" tabindex="0">
-            <p class="sc-orig"><span class="sc-label">Original</span> <strong>Samsung RF28R7201SR</strong> (28 cu ft 4-door French door): FlexZone drawer (3.8 cu ft) and an external water and ice dispenser, per Samsung.</p>
-            <ul class="sc-cands">
-            <li class="sc-cand">
-              <span class="sc-role">Lower-priced</span>
-              <span class="sc-model">Samsung RF32CG5B30SR</span>
-              <span class="sc-price">$1,799.99</span>
-              <span class="sc-verdict"><span class="rc-flag rc-bad"><span aria-hidden="true">&#10007;</span> Shortfall</span> 3-door; no FlexZone drawer</span>
-            </li>
-            <li class="sc-cand is-selected">
-              <span class="sc-role">Selected: original model</span>
-              <span class="sc-model">Samsung RF28R7201SR</span>
-              <span class="sc-price">$1,899.99</span>
-              <span class="sc-verdict"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span> Same model, still sold new</span>
-            </li>
-            <li class="sc-cand">
-              <span class="sc-role">Higher-priced</span>
-              <span class="sc-model">Samsung RF29BB8600QL</span>
-              <span class="sc-price">$2,199.99</span>
-              <span class="sc-verdict"><span class="rc-flag rc-bad"><span aria-hidden="true">&#10007;</span> Shortfall</span> No external dispenser; smaller FlexZone</span>
-            </li>
-            </ul>
-            <p class="sc-note"><strong>What differs:</strong> configuration, FlexZone functionality and dispenser placement. <strong>Prices:</strong> Best Buy, Nov 9, 2026, during sale events (two Black Friday Deals and one marked-down price). Finding that the original model is still sold new removes the substitution question.</p>
-            <div class="sc-actions">
-              <button type="button" class="sc-toggle" aria-expanded="false" aria-controls="sc-more-fridge">Show full specification comparison</button>
-              <a class="comparable-link" href="/report#case-fridge">See the complete case, with a worked ACV example &rarr;</a>
-            </div>
-            <div class="sc-more" id="sc-more-fridge" role="region" aria-label="Full refrigerator specification comparison">
-              <div class="rc-original">
-        <div class="rc-original-head">
-          <span class="rc-orig-label">Original item</span>
-          <p class="rc-orig-model">Samsung RF28R7201SR</p>
-          <span class="rc-orig-desc">28 cu ft 4-door French door refrigerator, stainless steel &middot; Still sold new at Best Buy</span>
-        </div>
-        <dl class="rc-orig-specs">
-          <div class="rc-orig-spec">
-            <dt>Configuration</dt>
-            <dd>4-door French door<span class="rc-src rc-src--mfr">Samsung</span></dd>
-          </div>
-          <div class="rc-orig-spec">
-            <dt>FlexZone drawer</dt>
-            <dd>3.8 cu ft, 4 temperature zones<span class="rc-src rc-src--mfr">Samsung</span></dd>
-          </div>
-          <div class="rc-orig-spec">
-            <dt>Dispenser</dt>
-            <dd>External filtered water and ice (crushed or cubed)<span class="rc-src rc-src--mfr">Samsung</span></dd>
-          </div>
-          <div class="rc-orig-spec">
-            <dt>Total capacity</dt>
-            <dd>28 cu ft<span class="rc-src rc-src--mfr">Samsung</span></dd>
-          </div>
-        </dl>
-      </div>
-              <table class="rc-table" role="table" id="fridge-comparison">
-        <caption class="rc-sr">Samsung refrigerator candidates compared against the original Samsung RF28R7201SR</caption>
-        <thead role="rowgroup"><tr role="row">
-          <th scope="col" role="columnheader" class="rc-corner">Specification</th>
-          <th scope="col" role="columnheader" class="rc-col">
-            <span class="rc-role">Lower-priced candidate</span>
-            <span class="rc-model">Samsung RF32CG5B30SR</span>
-            <span class="rc-price">$1,799.99</span>
-            <span class="rc-meta"><a href="https://www.bestbuy.com/product/samsung-36-in-wide-bespoke-ai-31-cu-ft-mega-capacity-3-door-french-door-refrigerator-with-external-water-ice-dispenser-stainless-steel/JJGRF3Q634" rel="noopener noreferrer">Best Buy</a> &middot; Nov 9, 2026 &middot; <span class="rc-event">Sale price</span></span>
-          </th>
-          <th scope="col" role="columnheader" class="rc-col rc-sel">
-            <span class="rc-role">Selected: the original model</span>
-            <span class="rc-model">Samsung RF28R7201SR</span>
-            <span class="rc-price">$1,899.99</span>
-            <span class="rc-meta"><a href="https://www.bestbuy.com/product/samsung-36-in-wide-28-cu-ft-4-door-french-door-smart-refrigerator-with-flexzone-drawer-stainless-steel/J3ZYGCL945" rel="noopener noreferrer">Best Buy</a> &middot; Nov 9, 2026 &middot; <span class="rc-event">Black Friday Deal</span></span>
-          </th>
-          <th scope="col" role="columnheader" class="rc-col">
-            <span class="rc-role">Higher-priced candidate</span>
-            <span class="rc-model">Samsung RF29BB8600QL</span>
-            <span class="rc-price">$2,199.99</span>
-            <span class="rc-meta"><a href="https://www.bestbuy.com/product/samsung-36-in-wide-bespoke-29-cu-ft-4-door-french-door-smart-refrigerator-with-beverage-center-stainless-steel/J3ZYG22FFY" rel="noopener noreferrer">Best Buy</a> &middot; Nov 9, 2026 &middot; <span class="rc-event">Black Friday Deal</span></span>
-          </th>
-        </tr></thead>
-        <tbody role="rowgroup">
-        <tr role="row" style="--r:1">
-          <th scope="row" role="rowheader">Configuration<span class="rc-row-orig">Original: 4-door</span></th><td role="cell" class="rc-cell" data-label="Configuration (original: 4-door)"><span class="rc-flag rc-bad"><span aria-hidden="true">&#10007;</span> Shortfall</span><span class="rc-val">3-door (Bespoke AI)</span></td><td role="cell" class="rc-cell rc-sel" data-label="Configuration (original: 4-door)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">4-door</span></td><td role="cell" class="rc-cell" data-label="Configuration (original: 4-door)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">4-door (Bespoke)</span></td>
-        </tr>
-        <tr role="row" style="--r:2">
-          <th scope="row" role="rowheader">FlexZone drawer<span class="rc-row-orig">Original: 3.8 cu ft, 4 zones</span></th><td role="cell" class="rc-cell" data-label="FlexZone drawer (original: 3.8 cu ft, 4 zones)"><span class="rc-flag rc-bad"><span aria-hidden="true">&#10007;</span> Shortfall</span><span class="rc-val">None. A full-width drawer instead</span></td><td role="cell" class="rc-cell rc-sel" data-label="FlexZone drawer (original: 3.8 cu ft, 4 zones)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">3.8 cu ft, 4 temperature zones</span></td><td role="cell" class="rc-cell" data-label="FlexZone drawer (original: 3.8 cu ft, 4 zones)"><span class="rc-flag rc-mix"><span aria-hidden="true">&#9670;</span> Mixed</span><span class="rc-val">3.1 cu ft (smaller), 5 temperature zones</span></td>
-        </tr>
-        <tr role="row" style="--r:3">
-          <th scope="row" role="rowheader">External water and ice dispenser<span class="rc-row-orig">Original: yes</span></th><td role="cell" class="rc-cell" data-label="External water and ice dispenser (original: yes)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">Yes (curved and crushed ice)</span></td><td role="cell" class="rc-cell rc-sel" data-label="External water and ice dispenser (original: yes)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">Yes (crushed or cubed ice)</span></td><td role="cell" class="rc-cell" data-label="External water and ice dispenser (original: yes)"><span class="rc-flag rc-bad"><span aria-hidden="true">&#10007;</span> Shortfall</span><span class="rc-val">None listed. Internal water dispenser or built-in pitcher</span></td>
-        </tr>
-        <tr role="row" style="--r:4">
-          <th scope="row" role="rowheader">Total capacity<span class="rc-row-orig">Original: 28 cu ft</span></th><td role="cell" class="rc-cell" data-label="Total capacity (original: 28 cu ft)"><span class="rc-flag rc-up"><span aria-hidden="true">&#9650;</span> Upgrade</span><span class="rc-val">30.5 cu ft</span></td><td role="cell" class="rc-cell rc-sel" data-label="Total capacity (original: 28 cu ft)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">28 cu ft</span></td><td role="cell" class="rc-cell" data-label="Total capacity (original: 28 cu ft)"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">28.8 cu ft</span></td>
-        </tr>
-        <tr role="row" style="--r:5">
-          <th scope="row" role="rowheader">How it differs from the original</th><td role="cell" class="rc-cell" data-label="How it differs from the original"><span class="rc-val">Newer, larger and branded Bespoke AI, but it drops the FlexZone drawer, a defining feature of the original.</span></td><td role="cell" class="rc-cell rc-sel" data-label="How it differs from the original"><span class="rc-val">The identical model, so no substitution judgment is needed.</span></td><td role="cell" class="rc-cell" data-label="How it differs from the original"><span class="rc-val">Adds a Beverage Center and dual ice maker, but moves water to an internal dispenser and shrinks the FlexZone.</span></td>
-        </tr>
-        <tr role="row" style="--r:6" class="rc-conclusion">
-          <th scope="row" role="rowheader">Conclusion</th><td role="cell" class="rc-cell rc-last" data-label="Conclusion"><span class="rc-flag rc-bad"><span aria-hidden="true">&#10007;</span> Shortfall</span><span class="rc-val">Changes the configuration the policyholder had</span></td><td role="cell" class="rc-cell rc-sel rc-last" data-label="Conclusion"><span class="rc-flag rc-ok"><span aria-hidden="true">&#10003;</span> Meets</span><span class="rc-val">Same model, still available new</span></td><td role="cell" class="rc-cell rc-last" data-label="Conclusion"><span class="rc-flag rc-bad"><span aria-hidden="true">&#10007;</span> Shortfall</span><span class="rc-val">Changes the dispenser and FlexZone</span></td>
-        </tr>
-        </tbody>
-      </table>
-              <p class="rc-disclosure"><strong>Prices.</strong> Best Buy selling prices on November 9, 2026, during sale events; not regular prices. Specifications are from Samsung&rsquo;s sheets. A research example, not a claim determination.</p>
-            </div>
-          </div>
-      </div>
-      </div>
     </section>
 
     <section class="trust-section impact-section" id="impact" aria-labelledby="impact-heading">
@@ -555,6 +541,6 @@
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
   <script src="script.js"></script>
   <script src="consultation.js" defer></script>
-  <script src="showcase.js" defer></script>
+  <script src="sample-preview.js" defer></script>
 </body>
 </html>
