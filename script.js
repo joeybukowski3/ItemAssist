@@ -28,44 +28,6 @@ if (navToggle && siteNav) {
   });
 }
 
-/* Mobile Sample Report accordion */
-const sampleReportToggle = document.querySelector(".sample-report-toggle");
-const sampleReportContent = document.getElementById("sample-report-content");
-
-if (sampleReportToggle && sampleReportContent) {
-  const mobileReportQuery = window.matchMedia("(max-width: 768px)");
-
-  const setSampleReportState = (isExpanded) => {
-    sampleReportToggle.setAttribute("aria-expanded", String(isExpanded));
-    sampleReportContent.classList.toggle("is-expanded", isExpanded);
-
-    if (mobileReportQuery.matches && !isExpanded) {
-      sampleReportContent.setAttribute("aria-hidden", "true");
-      sampleReportContent.inert = true;
-    } else {
-      sampleReportContent.removeAttribute("aria-hidden");
-      sampleReportContent.inert = false;
-    }
-  };
-
-  const syncSampleReportForViewport = () => {
-    setSampleReportState(!mobileReportQuery.matches);
-  };
-
-  sampleReportToggle.addEventListener("click", () => {
-    const isExpanded = sampleReportToggle.getAttribute("aria-expanded") === "true";
-    setSampleReportState(!isExpanded);
-  });
-
-  if (typeof mobileReportQuery.addEventListener === "function") {
-    mobileReportQuery.addEventListener("change", syncSampleReportForViewport);
-  } else {
-    mobileReportQuery.addListener(syncSampleReportForViewport);
-  }
-
-  syncSampleReportForViewport();
-}
-
 /* Active nav link on scroll */
 const sections = document.querySelectorAll("section[id], div[id]");
 const navLinks = Array.from(document.querySelectorAll(".nav-links a")).filter((link) => {
@@ -335,40 +297,5 @@ if (contactForm) {
     } finally {
       setSubmittingState(false);
     }
-  });
-}
-
-/* Report preview detail rows */
-function toggleReportDetail(id, el) {
-  const row = document.getElementById(id);
-
-  if (!row || !el) {
-    return;
-  }
-
-  const isOpen = row.classList.toggle("open");
-  el.classList.toggle("open", isOpen);
-  el.setAttribute("aria-expanded", String(isOpen));
-
-  const labelNode = Array.from(el.childNodes).find(
-    (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0
-  );
-
-  if (labelNode) {
-    labelNode.textContent = isOpen ? "Hide Specs " : "View Specs ";
-  }
-}
-
-window.toggleReportDetail = toggleReportDetail;
-
-const publishedDateEls = document.querySelectorAll(".report-published-date");
-
-if (publishedDateEls.length) {
-  const today = new Date();
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  const formatted = `Published ${today.toLocaleDateString("en-US", options)}`;
-
-  publishedDateEls.forEach((el) => {
-    el.textContent = formatted;
   });
 }

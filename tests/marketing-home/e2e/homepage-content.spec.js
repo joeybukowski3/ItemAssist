@@ -50,97 +50,189 @@ test("title, description and social descriptions describe the service and carry 
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://itemassist.com/");
 });
 
-test("the similar-versus-comparable section shows exactly two examples, refrigerators and televisions", async ({ page }) => {
+test("the comparison section leads with the verified Samsung television comparison and keeps the refrigerator second", async ({ page }) => {
   await page.goto("/");
   const section = page.locator("#comparable");
-  await expect(section.locator(".comparable-card")).toHaveCount(2);
-  await expect(section.locator(".comparable-card h3")).toHaveText(["Refrigerators", "Televisions"]);
-  await expect(section.locator(".comparable-tag")).toHaveCount(2);
-  for (const tag of await section.locator(".comparable-tag").allTextContents()) expect(tag).toMatch(/illustrative example/i);
-  // The AV receiver comparison is gone from this section.
-  await expect(section).not.toContainText(/receiver/i);
-  await expect(section.locator('a[href="/discontinued-av-receiver-replacement-research"]')).toHaveCount(0);
-  for (const card of await section.locator(".comparable-card").all()) {
-    await expect(card.locator(".comparable-ladder > li")).toHaveCount(3);
-    await expect(card.locator(".comparable-ladder-mid")).toHaveCount(1);
-    await expect(card.locator(".comparable-alt")).toHaveCount(2);
-    await expect(card.locator(".comparable-differences")).toContainText("What separates them");
-    await expect(card.locator(".comparable-evidence")).toHaveCount(1);
-    await expect(card.locator(".comparable-disclosure")).toHaveCount(1);
-  }
-  await expect(section).not.toContainText(/%|\bsav(e|ed|ings?)\b/i);
-  await expect(section.locator(".comparable-note")).toContainText("not determinations about any actual claim");
-});
-
-test("the refrigerator example keeps its dated retail evidence and names the original it assumes", async ({ page }) => {
-  await page.goto("/");
-  const fridge = page.locator("#comparable .comparable-card").nth(0);
-  await expect(fridge.locator(".comparable-tag")).toContainText("retail prices referenced August 13, 2026");
-  await expect(fridge.locator(".comparable-role")).toHaveText(["Lower-priced alternative", "Selected comparison example", "Higher-priced alternative"]);
-  await expect(fridge.locator(".comparable-model")).toHaveText(["Samsung RF32CG5100SR/AA", "Samsung RF32CG5300SR", "Samsung Bespoke RF29BB8600QL"]);
-  await expect(fridge.locator(".comparable-price")).toHaveText(["$1,699.99", "$1,799.99", "$2,299.99"]);
-  await expect(fridge.locator(".comparable-spec")).toHaveText([
-    "3-door, dual ice, smart · Best Buy",
-    "Adds a beverage center · Lowe’s",
-    "4-door, FlexZone, Bespoke tier · Lowe’s"
+  await expect(section.locator(".rc-stack > .rc")).toHaveCount(2);
+  await expect(section.locator(".rc .rc-title")).toHaveText([
+    "The newer model isn\u2019t always the comparable one.",
+    "Refrigerator: when the original is still sold new"
   ]);
-  await expect(fridge.locator(".comparable-ladder-mid .comparable-model")).toHaveText("Samsung RF32CG5300SR");
-  await expect(fridge.locator(".comparable-ladder-mid .comparable-price")).toHaveText("$1,799.99");
-  await expect(fridge.locator(".comparable-disclosure")).toContainText("Documented prices from the retailers shown, referenced August 13, 2026");
-  await expect(fridge.locator(".comparable-link")).toHaveAttribute("href", "/what-does-lkq-mean-contents-claims");
-  // It is not presented as universally correct: the original it assumes is stated, and the pick is tied to it.
-  await expect(fridge.locator(".comparable-lede")).toContainText("assumes an original French-door refrigerator with dual ice and a beverage center");
-  await expect(fridge.locator(".comparable-evidence")).toContainText("supportable only against the original item described above");
-  await expect(fridge).not.toContainText(/universal|always the right|best choice/i);
+  for (const tags of await section.locator(".rc-tags").all()) {
+    await expect(tags).toContainText("prices observed November 9, 2026");
+    await expect(tags).toContainText("Sale-event prices");
+  }
+  // The retired hypothetical figures and the older August example are gone.
+  await expect(section).not.toContainText(/hypothetical|illustrative|\$249|\$1,499|August 13|RF32CG5100|RF32CG5300|receiver/i);
+  await expect(section.locator(".comparable-card, .comparable-ladder")).toHaveCount(0);
+  const hrefs = await section.locator(".comparable-link").evaluateAll((nodes) => nodes.map((a) => a.getAttribute("href")));
+  expect(hrefs).toEqual(["/report#case-tv", "/report#case-fridge"]);
 });
 
-test("the television example is labelled hypothetical, invents nothing, and does not call the midrange tier correct", async ({ page }) => {
+test("the television table names the original, its sources, three candidates and exact model codes", async ({ page }) => {
   await page.goto("/");
-  const tv = page.locator("#comparable .comparable-card").nth(1);
-  await expect(tv.locator(".comparable-tag")).toContainText("hypothetical prices, not verified");
-  await expect(tv.locator(".comparable-role")).toHaveText(["Lower alternative", "Selected midrange comparison example", "Higher alternative"]);
-  await expect(tv.locator(".comparable-model")).toHaveText(["55-inch entry LED/LCD", "55-inch QLED / Mini-LED", "55-inch premium OLED"]);
-  const prices = await tv.locator(".comparable-price").evaluateAll((nodes) => nodes.map((n) => n.firstChild.textContent.trim()));
-  expect(prices).toEqual(["$249", "$699", "$1,499"]);
-  await expect(tv.locator(".comparable-price-flag")).toHaveText(["illustrative", "illustrative", "illustrative"]);
-  await expect(tv.locator(".comparable-ladder-mid .comparable-model")).toHaveText("55-inch QLED / Mini-LED");
-  await expect(tv.locator(".comparable-disclosure")).toContainText("Hypothetical educational figures, not observed retailer prices");
-  await expect(tv.locator(".comparable-disclosure")).toContainText("name no product, SKU, seller, date, or link");
-  await expect(tv.locator(".comparable-differences")).toContainText("panel technology, brightness, processing, refresh rate, original tier");
-  await expect(tv.locator(".comparable-evidence")).toContainText("not presumed correct");
-  await expect(tv.locator(".comparable-evidence")).toContainText("original TV’s specifications and product tier");
-  // No retailer, SKU, date or link on the television card, and it never claims "most supportable".
-  await expect(tv).not.toContainText(/most supportable|best buy|lowe’s|amazon|walmart|costco|home depot|20\d\d/i);
-  await expect(tv.locator("a")).toHaveCount(0);
-  await expect(page.locator("#comparable .comparable-note")).toContainText("television figures are hypothetical");
-  await expect(page.locator("#comparable .comparable-note")).toContainText("not verified retail observations");
+  const tv = page.locator("#cmp-tv");
+  await expect(tv.locator(".rc-orig-model")).toHaveText("Samsung QN55Q80AAFXZA");
+  await expect(tv.locator(".rc-orig-specs dt")).toHaveText(["Display", "Backlight", "Native refresh rate", "4K@120Hz HDMI input", "Variable refresh rate"]);
+  // Samsung supports four of the original's specifications; the native refresh rate rests on RTINGS and says so.
+  await expect(tv.locator(".rc-src--mfr")).toHaveCount(4);
+  await expect(tv.locator(".rc-src--third")).toHaveCount(1);
+  await expect(tv.locator(".rc-src--third")).toHaveText(/RTINGS/);
+  await expect(tv.locator(".rc-orig-note")).toContainText("Samsung's sheet does not state a native rate".replace("'", "\u2019"));
+
+  await expect(tv.locator("thead .rc-role")).toHaveText(["Lower-priced candidate", "Selected LKQ candidate", "Higher-priced candidate"]);
+  await expect(tv.locator("thead .rc-model")).toHaveText(["Samsung QN55QN70H", "Samsung QN55QN80H", "Samsung QN55S90H"]);
+  await expect(tv.locator("thead .rc-price")).toHaveText(["$699.99", "$899.99", "$1,199.99"]);
+  await expect(tv.locator("thead .rc-meta")).toHaveText([
+    /Best Buy · Nov 9, 2026 · Black Friday Deal/,
+    /Best Buy · Nov 9, 2026 · Black Friday Deal/,
+    /Best Buy · Nov 9, 2026 · Holiday Deal/
+  ]);
+  await expect(tv.locator("thead .rc-meta a")).toHaveCount(3);
+  await expect(tv.locator("thead th.rc-sel")).toHaveCount(1);
+  await expect(tv.locator("thead th.rc-sel .rc-model")).toHaveText("Samsung QN55QN80H");
 });
 
-test("the selected comparison dominates: larger and higher in the hierarchy than the lower and higher alternatives", async ({ page }) => {
+test("every specification cell carries a text label, and the television verdicts match the documented specifications", async ({ page }) => {
   await page.goto("/");
-  for (const index of [0, 1]) {
-    const card = page.locator("#comparable .comparable-card").nth(index);
-    const metrics = await card.evaluate((el) => {
-      const px = (node, prop) => parseFloat(getComputedStyle(node)[prop]);
-      const box = (node) => node.getBoundingClientRect();
-      const focus = el.querySelector(".comparable-ladder-mid");
-      const alts = Array.from(el.querySelectorAll(".comparable-alt"));
-      return {
-        focusPrice: px(focus.querySelector(".comparable-price"), "fontSize"),
-        altPrices: alts.map((alt) => px(alt.querySelector(".comparable-price"), "fontSize")),
-        focusHeight: box(focus).height,
-        altHeights: alts.map((alt) => box(alt).height),
-        order: [box(alts[0]).top, box(focus).top, box(alts[1]).top],
-        focusBorder: px(focus, "borderTopWidth")
-      };
+  const rows = page.locator("#tv-comparison tbody tr");
+  const labelled = ["Display technology", "Backlight", "Native refresh rate", "4K@120Hz HDMI input", "Variable refresh rate", "Conclusion"];
+  const expected = {
+    "Display technology": ["Meets", "Meets", "Upgrade"],
+    Backlight: ["Meets", "Meets", "Upgrade"],
+    "Native refresh rate": ["Shortfall", "Meets", "Upgrade"],
+    "4K@120Hz HDMI input": ["Shortfall", "Meets", "Upgrade"],
+    "Variable refresh rate": ["Shortfall", "Meets", "Meets"],
+    Conclusion: ["Shortfall", "Meets", "Upgrade"]
+  };
+  for (const name of labelled) {
+    const row = rows.filter({ has: page.locator("th", { hasText: new RegExp("^" + name) }) });
+    await expect(row, name).toHaveCount(1);
+    const flags = await row.locator(".rc-flag").allTextContents();
+    expect(flags.map((f) => f.replace(/[^A-Za-z]/g, "")), name).toEqual(expected[name]);
+  }
+  // The selected candidate never falls short, and the lower-priced one falls short exactly three times on specifications.
+  const lowerShortfalls = await page.locator("#tv-comparison tbody tr:not(.rc-conclusion) td:nth-child(2) .rc-bad").count();
+  expect(lowerShortfalls).toBe(3);
+  await expect(page.locator("#tv-comparison td.rc-sel .rc-bad")).toHaveCount(0);
+
+  const cell = (row, col) => page.locator("#tv-comparison tbody tr").nth(row).locator("td").nth(col);
+  await expect(cell(2, 0)).toContainText("60Hz");
+  await expect(cell(2, 1)).toContainText("144Hz");
+  await expect(cell(2, 2)).toContainText("165Hz");
+  await expect(cell(3, 0)).toContainText("Maximum 4K@60Hz");
+  await expect(cell(4, 0)).toContainText("Not supported");
+  // Same-day Samsung.com prices and Samsung's published list prices are shown separately from the observed Best Buy price.
+  await expect(cell(5, 0)).toHaveText("$699.99");
+  await expect(cell(5, 1)).toHaveText("$899.99");
+  await expect(cell(5, 2)).toHaveText("$1,199.99");
+  await expect(cell(6, 0)).toHaveText("$899.99");
+  await expect(cell(6, 1)).toHaveText("$1,299.99");
+  await expect(cell(6, 2)).toHaveText("$1,999.99");
+});
+
+test("the television reasoning is specific, avoids over-claiming and keeps sale-event disclosure visible", async ({ page }) => {
+  await page.goto("/");
+  const tv = page.locator("#cmp-tv");
+  await expect(tv.locator(".rc-points li").nth(0)).toContainText("Why not the QN70H.");
+  await expect(tv.locator(".rc-points li").nth(0)).toContainText("60Hz, no VRR and a 4K@60Hz maximum");
+  await expect(tv.locator(".rc-points li").nth(1)).toContainText("not because it is the middle price");
+  await expect(tv.locator(".rc-points li").nth(2)).toContainText("not presented as the lowest-priced suitable Samsung");
+  await expect(tv.locator(".rc-points li").nth(2)).toContainText("QN80F");
+  await expect(tv.locator(".rc-points li").nth(2)).toContainText("unresolved");
+  await expect(tv.locator(".rc-disclosure")).toContainText("Black Friday and Holiday Deal promotions");
+  await expect(tv.locator(".rc-disclosure")).toContainText("not regular prices");
+  await expect(tv.locator(".rc-disclosure")).toContainText("native refresh rate, a third-party measurement by RTINGS");
+  await expect(tv.locator(".rc-disclosure")).toContainText("not a claim determination");
+  await expect(tv.locator(".rc-disclosure")).toBeVisible();
+  // Crossed-out retailer prices are never presented as regular prices, and no savings claims appear.
+  await expect(page.locator("#comparable")).not.toContainText(/comparable value|\bwas \$|\bsave \$|\bsavings?\b|most supportable|universal/i);
+});
+
+test("the refrigerator table compares the original model with the two look-alikes and keeps dated Best Buy prices", async ({ page }) => {
+  await page.goto("/");
+  const fridge = page.locator("#cmp-fridge");
+  await expect(fridge.locator(".rc-orig-model")).toHaveText("Samsung RF28R7201SR");
+  await expect(fridge.locator("thead .rc-model")).toHaveText(["Samsung RF32CG5B30SR", "Samsung RF28R7201SR", "Samsung RF29BB8600QL"]);
+  await expect(fridge.locator("thead .rc-price")).toHaveText(["$1,799.99", "$1,899.99", "$2,199.99"]);
+  await expect(fridge.locator("thead .rc-role")).toHaveText(["Lower-priced candidate", "Selected: the original model", "Higher-priced candidate"]);
+  await expect(fridge.locator("thead .rc-meta")).toHaveText([/Nov 9, 2026 · Sale price/, /Nov 9, 2026 · Black Friday Deal/, /Nov 9, 2026 · Black Friday Deal/]);
+  await expect(fridge.locator("tbody tr").nth(0)).toContainText("3-door (Bespoke AI)");
+  await expect(fridge.locator("tbody tr").nth(1)).toContainText("None. A full-width drawer instead");
+  await expect(fridge.locator("tbody tr").nth(1)).toContainText("3.1 cu ft (smaller), 5 temperature zones");
+  await expect(fridge.locator("tbody tr").nth(2)).toContainText("None listed. Internal water dispenser or built-in pitcher");
+  await expect(fridge.locator("tbody tr.rc-conclusion td.rc-sel")).toContainText("Same model, still available new");
+  await expect(fridge.locator(".rc-lede")).toContainText("removes the substitution question");
+  await expect(fridge.locator(".rc-disclosure")).toContainText("not regular prices");
+});
+
+test("the selected candidate is visibly emphasized, and the table is a labelled comparison at every width", async ({ page }, testInfo) => {
+  await page.goto("/");
+  const metrics = await page.locator("#tv-comparison").evaluate((table) => {
+    const px = (node, prop) => parseFloat(getComputedStyle(node)[prop]);
+    const sel = table.querySelector("thead th.rc-sel");
+    const other = table.querySelector("thead th.rc-col:not(.rc-sel)");
+    const selCell = table.querySelector("tbody td.rc-sel");
+    const otherCell = table.querySelector("tbody td:not(.rc-sel)");
+    const heads = Array.from(table.querySelectorAll("thead th.rc-col")).map((el) => el.getBoundingClientRect());
+    const cells = Array.from(table.querySelectorAll("tbody tr:first-child td")).map((el) => el.getBoundingClientRect());
+    return {
+      selBorder: Math.max(px(sel, "borderTopWidth"), px(sel, "borderLeftWidth")),
+      otherBorder: Math.max(px(other, "borderTopWidth"), px(other, "borderLeftWidth")),
+      selCellBorder: px(selCell, "borderLeftWidth"),
+      otherCellBorder: px(otherCell, "borderLeftWidth"),
+      selBackground: getComputedStyle(sel).backgroundColor,
+      otherBackground: getComputedStyle(other).backgroundColor,
+      headY: heads.map((r) => Math.round(r.top)),
+      cellY: cells.map((r) => Math.round(r.top)),
+      cellX: cells.map((r) => Math.round(r.left)),
+      labelContent: getComputedStyle(selCell, "::before").content
+    };
+  });
+  expect(metrics.selBorder).toBeGreaterThanOrEqual(2);
+  expect(metrics.selBorder).toBeGreaterThan(metrics.otherBorder);
+  expect(metrics.selCellBorder).toBeGreaterThanOrEqual(2);
+  expect(metrics.selBackground).not.toBe(metrics.otherBackground);
+
+  if (testInfo.project.use.viewport.width <= 820) {
+    // Stacked: each candidate is its own block, in price order, and every value is labelled with its specification.
+    expect(metrics.headY[0]).toBeLessThan(metrics.headY[1]);
+    expect(metrics.headY[1]).toBeLessThan(metrics.headY[2]);
+    expect(new Set(metrics.cellX).size).toBe(1);
+    expect(metrics.labelContent).toMatch(/Display technology \(original: QLED, quantum dot\)/);
+    const order = await page.locator("#tv-comparison").evaluate((table) => {
+      const top = (el) => el.getBoundingClientRect().top;
+      const heads = Array.from(table.querySelectorAll("thead th.rc-col"));
+      const cells = Array.from(table.querySelectorAll("tbody td.rc-cell"));
+      return cells.map((cell) => {
+        const col = Array.from(cell.parentElement.children).indexOf(cell) - 1;
+        const next = heads[col + 1];
+        return top(cell) > top(heads[col]) && (!next || top(cell) < top(next));
+      });
     });
-    for (const altPrice of metrics.altPrices) expect(metrics.focusPrice, "central price is at least twice the alternatives'").toBeGreaterThanOrEqual(altPrice * 2);
-    // On narrow screens the alternatives wrap, so only require the selected block to be the tallest.
-    for (const altHeight of metrics.altHeights) expect(metrics.focusHeight).toBeGreaterThan(altHeight);
-    // Lower alternative above, selected comparison in the middle, higher alternative below.
-    expect(metrics.order[0]).toBeLessThan(metrics.order[1]);
-    expect(metrics.order[1]).toBeLessThan(metrics.order[2]);
-    expect(metrics.focusBorder).toBeGreaterThanOrEqual(2);
+    expect(order.every(Boolean), "each cell sits inside its own candidate block").toBe(true);
+  } else {
+    // Side by side: the three candidates share one header row and each specification row.
+    expect(new Set(metrics.headY).size).toBe(1);
+    expect(new Set(metrics.cellY).size).toBe(1);
+    expect(new Set(metrics.cellX).size).toBe(3);
+  }
+});
+
+test("the hero shows the real sample finding instead of the retired fictional report", async ({ page }) => {
+  await page.goto("/");
+  const hero = page.locator("#sample-report");
+  await expect(hero).toBeVisible();
+  await expect(hero.locator(".hero-finding-kicker")).toContainText("prices observed November 9, 2026");
+  await expect(hero.locator(".hero-finding-model")).toHaveText(["Samsung QN55QN70H", "Samsung QN55QN80H · selected", "Samsung QN55S90H"]);
+  await expect(hero.locator(".hero-finding-price")).toHaveText(["$699.99", "$899.99", "$1,199.99"]);
+  await expect(hero.locator(".rc-flag")).toHaveText([/Shortfall/, /Meets/, /Upgrade/]);
+  await expect(hero.locator('a[href="#comparable"]')).toBeVisible();
+  await expect(hero.locator('a[href="/report"]')).toBeVisible();
+  await expect(hero.locator('a[href="/assets/ItemAssist-Sample-Research-Report.pdf"]')).toHaveAttribute("download", "");
+  await expect(hero).not.toContainText(/fictional|IA-DEMO|demonstration|22 |95%|High Confidence/i);
+  for (const selector of [".window", ".titlebar", ".sb-metrics", ".tbl", ".sample-report-toggle", ".report-published-date"]) {
+    await expect(page.locator(selector), selector).toHaveCount(0);
   }
 });
 
@@ -278,7 +370,7 @@ test("the credibility section states the experience and the service boundary, an
   await expect(section).toContainText("specialized, independent research service");
   await expect(section).toContainText("Coverage, depreciation, settlement, and claim-handling decisions remain with the client.");
 
-  // Outside the clearly fictional sample report, the page makes no credential, endorsement or outcome claims.
+  // Outside the hero finding card, the page makes no credential, endorsement or outcome claims.
   const bodyText = await page.evaluate(() => {
     const clone = document.querySelector("main").cloneNode(true);
     clone.querySelector("#sample-report")?.remove();
@@ -409,7 +501,7 @@ test("layout holds: no horizontal overflow, the form follows the process section
   for (const field of ["#consult-name", "#consult-email", "#consult-reason", "#consult-count", "#consult-description"]) {
     await expect(page.locator(field)).toBeVisible();
   }
-  for (const card of await page.locator(".comparable-card, .provides-card").all()) {
+  for (const card of await page.locator(".rc, .provides-card").all()) {
     const box = await card.boundingBox();
     expect(box.x, testInfo.project.name).toBeGreaterThanOrEqual(-0.5);
     expect(box.x + box.width, testInfo.project.name).toBeLessThanOrEqual(testInfo.project.use.viewport.width + 0.5);
