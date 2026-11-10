@@ -8355,9 +8355,9 @@ body.homepage-redesign .credibility-card--compact .credibility-areas li::before 
     table-layout: fixed;
   }
 
-  body.homepage-redesign .sample-preview .tbl thead th:nth-child(1) { width: 30%; }
-  body.homepage-redesign .sample-preview .tbl thead th:nth-child(2) { width: 31%; }
-  body.homepage-redesign .sample-preview .tbl thead th:nth-child(3) { width: 15%; }
+  body.homepage-redesign .sample-preview .tbl thead th:nth-child(1) { width: 27%; }
+  body.homepage-redesign .sample-preview .tbl thead th:nth-child(2) { width: 24%; }
+  body.homepage-redesign .sample-preview .tbl thead th:nth-child(3) { width: 29%; }
 }
 
 /* Stacked rows: keep the specification rows collapsed until opened (the stacking rule above would show them) */
@@ -8384,3 +8384,119 @@ body.homepage-redesign .sample-preview .sp-links > a {
   margin: 0;
 }
 /* === Homepage V5 END === */
+
+/* === Homepage V6 START === */
+/* Reported and researched age sit side by side in the itemized table, visually distinct */
+body.homepage-redesign .sample-preview .age-pair {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 8px;
+}
+
+body.homepage-redesign .sample-preview .age-item {
+  padding: 5px 9px;
+  border-left: 3px solid #cbd5e1;
+  border-radius: 6px;
+  background: #f8fafc;
+}
+
+body.homepage-redesign .sample-preview .age-item--res {
+  border-left-color: var(--navy);
+  background: #eef3fb;
+}
+
+body.homepage-redesign .sample-preview .age-item dt {
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+body.homepage-redesign .sample-preview .age-item dd {
+  margin: 1px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+body.homepage-redesign .sample-preview .age-item--res dt {
+  color: var(--navy);
+}
+
+body.homepage-redesign .sample-preview .age-item--res dd {
+  color: #111827;
+  font-weight: 600;
+}
+
+body.homepage-redesign .sample-preview .age-item small {
+  display: block;
+  color: #6b7280;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+body.homepage-redesign .sample-preview .badge.neutral {
+  background: #eef2f7;
+  color: #475569;
+}
+
+body.homepage-redesign .sample-preview .tbl td .item-sub + .item-sub {
+  margin-top: 1px;
+}
+
+body.homepage-redesign .sample-preview .tbl td .badge + .item-sub {
+  margin-top: 5px;
+}
+
+/* How the partial ACV is built, directly under the summary tiles */
+body.homepage-redesign .sample-preview .acv-basis {
+  margin: -8px 0 22px;
+  padding: 2px 0 2px 12px;
+  border-left: 3px solid #0f4a3a;
+  color: var(--slate);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+body.homepage-redesign .sample-preview .acv-basis strong {
+  color: #111827;
+}
+
+/* The expanded age evidence runs the full width under the two comparison panels */
+body.homepage-redesign .sample-preview .age-panel {
+  margin-top: 14px;
+  background: #fff;
+}
+
+body.homepage-redesign .sample-preview .age-panel .match-row {
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 14px;
+}
+
+body.homepage-redesign .sample-preview .age-panel .ml {
+  flex: 0 0 150px;
+}
+
+body.homepage-redesign .sample-preview .age-panel .mv {
+  flex: 1;
+  line-height: 1.45;
+}
+
+body.homepage-redesign .sample-preview .match-grid .ml {
+  flex: none;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  body.homepage-redesign .sample-preview .age-panel .ml {
+    flex: none;
+  }
+}
+
+/* Report: a status that asks for more evidence, in the amber used on the homepage badges */
+.report-page .rp-status--review { background: var(--amber-bg); color: #92400e; }
+.report-page .rp-status--evidence { background: #eef2f7; color: #475569; }
+/* === Homepage V6 END === */

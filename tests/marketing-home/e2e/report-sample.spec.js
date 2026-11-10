@@ -36,6 +36,7 @@ test("the report is a fixed-date three-case document, free of the retired fictio
   for (const id of ["case-tv", "case-fridge", "case-dryer", "sources"]) await expect(page.locator("#" + id), id).toHaveCount(1);
   await expect(page.locator("main h2.rp-h2")).toHaveText([
     "How to read this report",
+    "Summary findings",
     "Case 1: Samsung 55-inch television",
     "Case 2: Samsung refrigerator",
     "Case 3: GE dryer age research",
@@ -52,7 +53,7 @@ test("the television case separates documented, third-party and unresolved evide
   await expect(tv.locator(".rc-src--third")).toHaveText(/RTINGS/);
   const card = page.locator("#case-tv").locator("xpath=ancestor::div[contains(@class,'rp-wrap')]");
   await expect(card).toContainText("Third-party measurement");
-  await expect(card).toContainText("Not determined");
+  await expect(card).toContainText("Not established");
   await expect(card).toContainText("Unresolved");
   await expect(card).toContainText("$827.95");
   await expect(card).toContainText("$509.99");
@@ -116,7 +117,7 @@ test("the dryer age table follows from GE's manufacture window and date-code cha
 
   // Age, depreciation and ACV per possible year letter, recomputed here.
   const windows = { M: [2019, 12, 12], R: [2020, 1, 12], S: [2021, 1, 12], T: [2022, 1, 12], V: [2023, 1, 8] };
-  const ageRows = section.locator("table", { hasText: "Illustrative ACV" }).first().locator("tbody tr");
+  const ageRows = section.locator("table", { hasText: "Whole window, no serial" }).locator("tbody tr");
   let index = 0;
   for (const [letter, [year, firstMonth, lastMonth]] of Object.entries(windows)) {
     const oldest = ageAt(year, firstMonth, false);
@@ -163,6 +164,86 @@ test("successor and price claims in the dryer case are bounded by what was verif
   // The ACV disclaimer appears under each ACV example.
   const disclaimers = page.locator("main").getByText("Item Assist does not determine depreciation, final ACV, coverage or settlement");
   expect(await disclaimers.count()).toBeGreaterThanOrEqual(3);
+});
+
+test("the summary shows reported against researched age, a verified total and an ACV that states what is missing", async ({ page }) => {
+  await page.goto("/report");
+  const summary = page.locator("#summary");
+  const ages = summary.locator("table").nth(0);
+  await expect(ages.locator("thead th")).toHaveText(["Item", "Reported age", "Researched age", "Age status", "Documented market price"]);
+  const cells = async (row) => ages.locator("tbody tr").nth(row).locator("th, td").allTextContents();
+  const tv = await cells(0);
+  expect(tv.slice(1, 4)).toEqual(["2021", "2021, model year", "Model Year Confirmed"]);
+  const fridge = await cells(1);
+  expect(fridge.slice(1, 4)).toEqual(["Not provided", "Not established", "Age Evidence Needed"]);
+  const dryer = await cells(2);
+  expect(dryer.slice(1, 4)).toEqual(["2025", "December 2019 to August 2023, model production window", "Reported Age Requires Review"]);
+  // The total is the sum of the three documented prices.
+  const prices = [tv, fridge, dryer].map((row) => Number(row[4].match(/^\$([\d,]+\.\d\d)/)[1].replace(/,/g, "")));
+  expect(prices).toEqual([899.99, 1899.99, 899]);
+  const total = Math.round(prices.reduce((a, b) => a + b, 0) * 100) / 100;
+  expect(total).toBe(3698.98);
+  await expect(ages.locator("tbody tr").nth(3)).toContainText("$3,698.98, three items");
+  await expect(summary).not.toContainText(/Age Verified/);
+
+  // ACV by item: television unresolved, refrigerator and dryer illustrative, sum matches the stated partial range.
+  const acvTable = summary.locator("table").nth(1);
+  await expect(acvTable.locator("tbody tr").last().locator("td")).toHaveText(["Unresolved", "$1,023.07, illustrative", "$419 to $678, illustrative range"]);
+  await expect(acvTable.locator("tbody th", { hasText: "Useful life" }).locator("xpath=..").locator("td").first()).toContainText("None supported");
+  const observed = Date.UTC(2026, 10, 9);
+  const ageAt = (year, month, endOfMonth) => (observed - (endOfMonth ? Date.UTC(year, month, 0) : Date.UTC(year, month - 1, 1))) / 86400000 / 365.25;
+  const low = 1023.07 + acv(899, ageAt(2019, 12, false));
+  const high = 1023.07 + acv(899, ageAt(2023, 8, true));
+  await expect(summary).toContainText(`$1,023.07 + $419 to $678 = ${money(low)} to ${money(high)}`);
+  await expect(summary).toContainText("The television is excluded because no supported television useful life exists");
+  await expect(summary).toContainText("the refrigerator’s age is assumed");
+  await expect(summary).not.toContainText(/verified aggregate|Verification Needed|Discrepancy/);
+  await expect(summary).toContainText("not a verified claim valuation");
+});
+
+test("the dryer's reported 2025 is shown as a discrepancy against GE's window, with its effect on the ACV", async ({ page }) => {
+  await page.goto("/report");
+  const section = page.locator("#case-dryer");
+  const table = section.locator("table", { hasText: "Reported age against the research" });
+  await expect(table.locator("tbody tr").nth(0)).toContainText("2025, in the sample submission");
+  await expect(table.locator("tbody tr").nth(1)).toContainText("December 2019 to August 2023");
+  await expect(table.locator("tbody tr").nth(2)).toContainText("GE lists no production of this model after August 2023");
+  await expect(table.locator("tbody tr").nth(2)).toContainText("the letter A");
+  await expect(table.locator("tbody tr").nth(3)).toContainText("A dryer built in the window could have been bought or installed in 2025");
+  await expect(table.locator("tbody tr").nth(5)).toContainText("Reported Age Requires Review");
+  await expect(table.locator("tbody tr").nth(2)).toContainText("No conclusion is drawn about the accuracy of the report");
+  await expect(table.locator("tbody tr").nth(5)).toContainText("a serial number or other appropriate documentation is needed to resolve the original unit’s age");
+  // The documented window is kept, not rewritten to fit the reported age.
+  await expect(section).not.toContainText(/2019 to 2021|2019[–-]2021/);
+  // 2025 as a build year, from the same inputs and day count as the rest of the report.
+  const old = ageAt(2025, 1, false);
+  const young = ageAt(2025, 12, true);
+  const effect = (await table.locator("tbody tr").nth(6).textContent()).replace(/\s+/g, " ");
+  expect(effect).toContain(`${range(young, old, 1)} years`);
+  expect(effect).toContain(`${money(acv(RCV_DRYER, old))} to ${money(acv(RCV_DRYER, young))}`);
+  expect(acv(RCV_DRYER, young)).toBeGreaterThan(acv(RCV_DRYER, ageAt(2023, 8, true)));
+  expect(effect).toContain("GE’s window supports $419 to $678");
+});
+
+test("the refrigerator is not marked age-verified and its ACV is labelled as an assumed age; price wording follows the policy", async ({ page }) => {
+  await page.goto("/report");
+  const fridge = page.locator("#case-fridge").locator("xpath=ancestor::div[contains(@class,'rp-wrap')]");
+  await expect(fridge).toContainText("Not provided in the sample submission");
+  await expect(fridge).toContainText("No serial analysis is shown or implied, and none is invented");
+  await expect(fridge).toContainText("Age Evidence Needed. The original model was identified and researched, but no serial number or other sufficient unit-specific evidence was available");
+  await expect(fridge).toContainText("No age verification is claimed");
+  await expect(fridge).toContainText("Illustrative ACV (assumed age)");
+  await expect(fridge).not.toContainText("age-supported");
+  const main = await page.locator("main").innerText();
+  expect(main).toContain("Documented market price");
+  expect(main).not.toMatch(/Average Market Price/i);
+  // No promotional label sits on the comparison headings or tags; the qualification stays in the notes.
+  await expect(page.locator(".rc-event, .rc-tag--sale")).toHaveCount(0);
+  await expect(page.locator("#case-tv thead .rc-meta").nth(1)).toHaveText("Documented at Best Buy · Nov 9, 2026");
+  await expect(page.locator("main")).toContainText("during Black Friday and Holiday Deal promotions");
+  await expect(page.locator("main")).toContainText("have not been re-verified since");
+  await expect(page.locator("main")).toContainText("list prices and retailer crossed-out prices are not substituted", { ignoreCase: true });
+  await expect(page.locator("#sources")).toContainText("none is marked Age Verified");
 });
 
 test("sources are external, resolvable-looking links, and the report makes no testimonial or outcome claims", async ({ page }) => {

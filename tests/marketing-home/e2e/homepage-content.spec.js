@@ -134,8 +134,14 @@ test("below the hero, one report-window sample preview carries the three researc
   await expect(preview.locator(".report-claim-bar")).toContainText("Not a claim determination");
   await expect(preview.locator(".sidebar .sb-item")).toHaveText(["Summary Findings", "Itemized Research", "Supporting Evidence"]);
   await expect(preview.locator(".stats .stat")).toHaveCount(2);
-  await expect(preview.locator(".tbl thead th")).toHaveText(["Submitted Item", "Selected Research Comparison", "Replacement Price", "Status"]);
+  await expect(preview.locator(".tbl thead th")).toHaveText(["Submitted Item", "Selected Research Comparison", "Age Research", "Documented Market Price"]);
   await expect(preview.locator(".tbl tbody tr:not(.detail-row)")).toHaveCount(3);
+  // The sidebar stays concise: no ACV box, nothing that repeats the summary figures.
+  await expect(preview.locator(".sb-metric-label")).toHaveText(["Items Researched", "Prices Observed"]);
+  await expect(preview.locator(".sidebar")).not.toContainText(/ACV|\$\d/);
+  // The default report carries no promotional labels; the qualification lives in the expanded notes and the source note.
+  const visible = (await preview.locator(".report-claim-bar, .stats, .tbl tbody tr:not(.detail-row)").allTextContents()).join(" ");
+  expect(visible).not.toMatch(/Black Friday|Holiday Deal|Sale[- ]event|list price|Average Market Price/i);
   // The tabbed showcase, the miniature report and the older compact card are gone.
   await expect(page.locator('[role="tablist"], [role="tab"], .showcase, .mini-report, .sc-toggle, .hero-finding, #research-showcase, #sample-report')).toHaveCount(0);
   // The retired fictional report does not come back.
@@ -150,19 +156,56 @@ test("the report rows carry the real TV, refrigerator and dryer findings, prices
   await expect(rows.nth(0)).toContainText("QN55Q80AAFXZA");
   await expect(rows.nth(0)).toContainText("QN55QN80H");
   await expect(rows.nth(0)).toContainText("$899.99");
-  await expect(rows.nth(0)).toContainText("Black Friday Deal");
-  await expect(rows.nth(0)).toContainText("Samsung list price: $1,299.99");
+  await expect(rows.nth(0)).toContainText("Best Buy");
+  await expect(rows.nth(0)).toContainText("Nov 9, 2026");
   await expect(rows.nth(1)).toContainText("RF28R7201SR (identical)");
   await expect(rows.nth(1)).toContainText("$1,899.99");
   await expect(rows.nth(1)).toContainText("Still sold new");
   await expect(rows.nth(2)).toContainText("GFD65ESSNWW");
   await expect(rows.nth(2)).toContainText("GFD65ESSVWW (successor)");
   await expect(rows.nth(2)).toContainText("$899.00");
-  await expect(rows.nth(2)).toContainText("Built Dec 2019 – Aug 2023 (GE)");
-  await expect(rows.nth(2)).toContainText("Sale event");
+  await expect(rows.nth(2)).toContainText("GE.com, Home Depot");
   await expect(page.locator("#sample .rcv-val")).toHaveText(["$899.99", "$1,899.99", "$899.00"]);
-  await expect(page.locator("#sample .stat-val")).toHaveText(["$899.99", "$1,023.07"]);
-  await expect(page.locator("#sample .stat-note").nth(1)).toContainText("assumed 6.0-year age, 13-year life");
+
+  // Aggregate summary: recomputed here from the row prices and the stated ACV inputs.
+  const money = (n) => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const whole = (n) => "$" + Math.round(n).toLocaleString("en-US");
+  const prices = (await page.locator("#sample .rcv-val").allTextContents()).map((t) => Number(t.replace(/[$,]/g, "")));
+  const total = Math.round(prices.reduce((a, b) => a + b, 0) * 100) / 100;
+  expect(total).toBe(3698.98);
+  const observed = Date.UTC(2026, 10, 9);
+  const ageAt = (year, month, endOfMonth) => (observed - (endOfMonth ? Date.UTC(year, month, 0) : Date.UTC(year, month - 1, 1))) / 86400000 / 365.25;
+  const acv = (rcv, age) => rcv * (1 - age / 13);
+  const fridgeAcv = Math.round((prices[1] - Math.round(prices[1] * (6 / 13) * 100) / 100) * 100) / 100;
+  expect(fridgeAcv).toBe(1023.07);
+  const dryerLow = acv(prices[2], ageAt(2019, 12, false));
+  const dryerHigh = acv(prices[2], ageAt(2023, 8, true));
+  const tiles = page.locator("#sample .stat");
+  await expect(tiles.nth(0).locator(".stat-label")).toHaveText("Total Documented Replacement Value");
+  await expect(tiles.nth(0).locator(".stat-val")).toHaveText(money(total));
+  await expect(tiles.nth(0).locator(".stat-note")).toContainText("3 researched items");
+  await expect(tiles.nth(1).locator(".stat-label")).toHaveText("Illustrative Partial ACV");
+  await expect(tiles.nth(1).locator(".stat-val")).toHaveText(`${whole(fridgeAcv + dryerLow)} – ${whole(fridgeAcv + dryerHigh)}`);
+  await expect(tiles.nth(1).locator(".stat-note")).toContainText("2 of 3 items");
+  for (const needle of ["assumed refrigerator age", "illustrative straight-line depreciation", "no television ACV"]) await expect(tiles.nth(1).locator(".stat-note")).toContainText(needle);
+  // The basis states every covered item, the method and the missing input.
+  const basis = (await page.locator("#sample .acv-basis").textContent()).replace(/\s+/g, " ");
+  for (const needle of ["Refrigerator $1,023.07 at an assumed 6.0-year age", `dryer ${whole(dryerLow)} – ${whole(dryerHigh)}`, "3.2 – 6.9 years", "13-year life (NAHB, 2007)", "no condition adjustment",
+    "no supported television useful life exists", "not a verified claim valuation"]) {
+    expect(basis, needle).toContain(needle);
+  }
+
+  // Reported and researched age are separate, labelled fields with a status the evidence supports.
+  const ages = page.locator("#sample .tbl tbody tr:not(.detail-row) .age-pair");
+  await expect(ages).toHaveCount(3);
+  const pair = async (i) => ages.nth(i).evaluate((el) => Array.from(el.querySelectorAll(".age-item")).map((item) => Array.from(item.children).map((c) => c.textContent.replace(/\s+/g, " ").trim()).join(" ")));
+  expect(await pair(0)).toEqual(["Reported 2021", "Researched 2021 model year"]);
+  expect(await pair(1)).toEqual(["Reported Not provided", "Researched Not established"]);
+  expect(await pair(2)).toEqual(["Reported 2025", "Researched Dec 2019 – Aug 2023 model production window"]);
+  await expect(page.locator("#sample .tbl tbody tr:not(.detail-row) td[data-label='Age Research'] .badge")).toHaveText(["Model Year Confirmed", "Age Evidence Needed", "Reported Age Requires Review"]);
+  await expect(page.locator("#sample .badge")).toHaveCount(3);
+  await expect(page.locator("#sample")).not.toContainText(/Age Verified|Discrepancy|Verification Needed|false|misstat|inaccura/i);
+  await expect(page.locator("#sample .age-item--res")).toHaveCount(3);
 
   // The documented detail behind each row (present in the page; shown on request).
   // Rows read as "label value"; the notes read as written.
@@ -174,23 +217,40 @@ test("the report rows carry the real TV, refrigerator and dryer findings, prices
         .replace(/\s+/g, " ")
     );
   const tv = await detail("#sp-detail-tv");
-  for (const needle of ["120Hz (RTINGS, third-party)", "One HDMI port", "144Hz", "All 4 ports", "FreeSync Premium Pro", "Retail Cost $899.99", "Best Buy, Nov 9, 2026",
+  for (const needle of ["120Hz (RTINGS, third-party)", "One HDMI port", "144Hz", "All 4 ports", "FreeSync Premium Pro", "Documented Market Price $899.99", "Best Buy, Nov 9, 2026",
+    "Price note Promotional price (Black Friday Deal). Samsung’s $1,299.99 list price is not used.",
+    "Reported age 2021 (sample submission)", "Researched age 2021 model year", "Model year confirmed. The individual unit’s manufacture date has not been established.",
+    "Samsung Q80A specification sheet (2021 edition)", "A model year is not a unit’s manufacture date", "ACV Not calculated: no supported television useful life",
     "The QN55QN70H ($699.99) falls short on native refresh rate, 4K@120Hz input and VRR", "The QN55S90H ($1,199.99) is OLED, a different product tier",
     "not presented as the lowest-priced suitable Samsung", "a 2025 QN80F at $827.95, seller not named, is unresolved"]) {
     expect(tv, needle).toContain(needle);
   }
   const fridge = await detail("#sp-detail-fridge");
   for (const needle of ["3.8 cu ft, 4 zones", "External water and ice", "28 cu ft", "RF32CG5B30SR ($1,799.99) has no FlexZone drawer", "RF29BB8600QL ($2,199.99) has no external dispenser",
-    "Illustrative ACV $1,023.07", "$1,899.99 × (1 − 6.0 ÷ 13)", "an assumed age, a 13-year life (NAHB, 2007) and no condition adjustment"]) {
+    "Illustrative ACV $1,023.07", "$1,899.99 × (1 − 6.0 ÷ 13)", "an assumed age, a 13-year life (NAHB, 2007) and no condition adjustment",
+    "Reported age Not provided", "Researched age Not established", "Status Age evidence needed. The original model was identified and researched, but no serial number or other sufficient unit-specific evidence was available to determine its manufacture date.", "Serial / date code Not provided. No serial analysis is shown or implied.",
+    "Age used in the ACV 6.0 years, assumed for illustration only. It is not a research finding.", "Documented Market Price $1,899.99"]) {
     expect(fridge, needle).toContain(needle);
   }
   const dryer = await detail("#sp-detail-dryer");
-  for (const needle of ["Dec 2019 – Aug 2023", "3.2 – 6.9 years", "Not provided", "Not stated", "13 years (NAHB, 2007)", "101 of 108 identical", "None found", "$419 – $678",
-    "not a single value; a nameplate serial would name one month"]) {
+  const age2025 = (await page.locator("#sp-detail-dryer .age-panel .mv").last().textContent()).replace(/\s+/g, " ");
+  for (const needle of ["Reported age 2025 (sample submission)", "Researched age Dec 2019 – Aug 2023, the model’s production window", "Status Reported age requires review. GE’s production window closed before 2025, but 2025 could be a purchase or installation date rather than a manufacture date. No conclusion is drawn about the accuracy of the report.",
+    "GE Owner Center: GFD65ESSNWW built December 2019 – August 2023", "2025 is the letter A", "Manufacturer evidence establishes the model’s production period", "other appropriate documentation such as a dated purchase or delivery record", "Serial number Not provided", "13 years (NAHB, 2007)",
+    "101 of 108 identical", "None found", "$419 – $678", "Documented Market Price $899.00",
+    "Price note Promotional price at both retailers. GE’s $1,249.00 list price is not used.", "not a single value; a nameplate serial would name one month"]) {
     expect(dryer, needle).toContain(needle);
   }
+  // Treating the reported 2025 as a build year changes the illustrative ACV; the figures follow from the same inputs.
+  const rOld = ageAt(2025, 1, false);
+  const rYoung = ageAt(2025, 12, true);
+  expect(age2025).toContain(`${rYoung.toFixed(1)} – ${rOld.toFixed(1)} years`);
+  expect(age2025).toContain(`${whole(acv(prices[2], rOld))} – ${whole(acv(prices[2], rYoung))}`);
+  expect(age2025).toContain("GE’s window supports $419 – $678");
+  expect(age2025).toContain("Both are illustrative: $899.00, 13-year straight line, no condition adjustment.");
   await expect(page.locator("#sample .home-hero-report-note")).toContainText("Item Assist does not determine depreciation, final ACV, coverage or settlement.");
   await expect(page.locator("#sample .home-hero-report-note")).toContainText("not regular prices");
+  await expect(page.locator("#sample .home-hero-report-note")).toContainText("Reported ages are sample submissions");
+  await expect(page.locator("#sample .home-hero-report-note")).toContainText("have not been re-verified since");
 });
 
 test("the preview links to the full report cases, the sources and the PDF, and every report anchor exists", async ({ page, request }) => {
@@ -225,7 +285,8 @@ test("specification rows stay collapsed, open independently by click and keyboar
   await expect(buttons.nth(0)).toContainText("Hide Specs");
   await expect(page.locator("#sp-detail-tv")).toBeVisible();
   await expect(page.locator("#sp-detail-fridge")).toBeHidden();
-  await expect(page.locator("#sp-detail-tv .match-panel")).toHaveCount(2);
+  await expect(page.locator("#sp-detail-tv .match-grid .match-panel")).toHaveCount(2);
+  await expect(page.locator("#sp-detail-tv .age-panel .match-panel-hdr")).toHaveText("Age Research");
 
   // Keyboard: focus the second button and press Enter, then Space on the third.
   await buttons.nth(1).focus();
@@ -491,7 +552,7 @@ test("the page is much shorter than before and has no large unused blank areas",
   await page.goto("/");
   const { height, width } = await page.evaluate(() => ({ height: document.documentElement.scrollHeight, width: window.innerWidth }));
   // The previous homepage ran well past 7,000px at desktop width.
-  if (width >= 1024) expect(height).toBeLessThan(4600);
+  if (width >= 1024) expect(height).toBeLessThan(4800);
   const blank = await page.evaluate(() => {
     const secs = Array.from(document.querySelectorAll("main > section"));
     return secs.map((s) => ({ id: s.id, h: s.getBoundingClientRect().height, visible: s.innerText.trim().length }));

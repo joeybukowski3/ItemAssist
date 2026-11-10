@@ -227,7 +227,7 @@
           </div>
 
           <div class="report-claim-bar">
-            <div class="claim-id">Three research examples &bull; Sale-event prices &bull; Not a claim determination</div>
+            <div class="claim-id">Three research examples &bull; Dated price evidence &bull; Not a claim determination</div>
           </div>
 
           <div class="body">
@@ -255,12 +255,7 @@
                 <div class="sb-metric">
                   <div class="sb-metric-label">Prices Observed</div>
                   <div class="sb-metric-val">Nov 9 <small>2026</small></div>
-                  <div class="sb-metric-break"><span class="e">Sale-event prices, not regular prices</span></div>
-                </div>
-                <div class="sb-metric">
-                  <div class="sb-metric-label">ACV Examples</div>
-                  <div class="sb-metric-val">Illustrative</div>
-                  <div class="sb-metric-break"><span class="e">Assumed age and 13-year life</span></div>
+                  <div class="sb-metric-break"><span class="v">Retailer selling prices</span></div>
                 </div>
               </div>
             </div>
@@ -268,20 +263,21 @@
             <div class="main">
               <div class="stats" id="sp-summary">
                 <div class="stat stat-total stat-total-rcv">
-                  <div class="stat-label">Selected Television Replacement</div>
-                  <div class="stat-val">$899.99</div>
-                  <div class="stat-note">Samsung QN55QN80H &middot; Best Buy, Nov 9, 2026</div>
+                  <div class="stat-label">Total Documented Replacement Value</div>
+                  <div class="stat-val">$3,698.98</div>
+                  <div class="stat-note">3 researched items &middot; dated price evidence</div>
                 </div>
                 <div class="stat stat-total stat-total-acv">
-                  <div class="stat-label">Illustrative ACV Example</div>
-                  <div class="stat-val">$1,023.07</div>
-                  <div class="stat-note">Refrigerator &middot; assumed 6.0-year age, 13-year life</div>
+                  <div class="stat-label">Illustrative Partial ACV</div>
+                  <div class="stat-val">$1,442 &ndash; $1,701</div>
+                  <div class="stat-note">2 of 3 items &middot; assumed refrigerator age &middot; illustrative straight-line depreciation &middot; no television ACV</div>
                 </div>
               </div>
+              <p class="acv-basis"><strong>How the partial ACV is built.</strong> Refrigerator $1,023.07 at an assumed 6.0-year age, plus dryer $419 &ndash; $678 across GE&rsquo;s production window (3.2 &ndash; 6.9 years). Straight line over a 13-year life (NAHB, 2007), no condition adjustment. The television is not calculated because no supported television useful life exists. Illustrative only, not a verified claim valuation.</p>
 
               <div class="section-hdr" id="sp-items">
                 <h3>Itemized Research</h3>
-                <p>Three examples from the full sample report. Each pairs the original item with the replacement Item Assist selected and the evidence behind it.</p>
+                <p>Each item shows the age reported, the age Item Assist researched, the selected replacement and its documented market price.</p>
               </div>
 
               <table class="tbl">
@@ -289,8 +285,8 @@
                   <tr>
                     <th scope="col">Submitted Item</th>
                     <th scope="col">Selected Research Comparison</th>
-                    <th scope="col">Replacement Price</th>
-                    <th scope="col">Status</th>
+                    <th scope="col">Age Research</th>
+                    <th scope="col">Documented Market Price</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -298,17 +294,23 @@
                     <td data-label="Submitted Item">
                       <div class="item-name">Samsung 55" Q80A QLED TV</div>
                       <div class="item-sub">Model: QN55Q80AAFXZA</div>
-                      <div class="item-sub">2021 model &bull; No longer sold new at Best Buy</div>
+                      <div class="item-sub">No longer sold new at Best Buy</div>
                       <button type="button" class="item-link item-link-btn" aria-expanded="false" aria-controls="sp-detail-tv">View Specs <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
                     </td>
                     <td data-label="Selected Research Comparison">
                       <div class="item-name">Samsung 55" QN80H Neo QLED TV</div>
                       <div class="item-sub">Model: QN55QN80H</div>
-                      <div class="item-sub">Best Buy &bull; Nov 9, 2026 &bull; Black Friday Deal</div>
-                      <span class="item-link item-link-static">Samsung list price: $1,299.99</span>
+                      <div class="item-sub">Meets every checked specification</div>
                     </td>
-                    <td class="rcv-val" data-label="Replacement Price">$899.99</td>
-                    <td data-label="Status"><span class="badge verified"><span class="badge-dot"></span> Meets Checked Specs</span></td>
+                    <td data-label="Age Research">
+                      <dl class="age-pair">
+                        <div class="age-item"><dt>Reported</dt><dd>2021</dd></div>
+                        <div class="age-item age-item--res"><dt>Researched</dt><dd>2021 <small>model year</small></dd></div>
+                      </dl>
+                      <span class="badge verified"><span class="badge-dot"></span> Model Year Confirmed</span>
+                      <div class="item-sub">Individual unit&rsquo;s manufacture date not established</div>
+                    </td>
+                    <td data-label="Documented Market Price"><span class="rcv-val">$899.99</span><div class="item-sub">Best Buy</div><div class="item-sub">Nov 9, 2026</div></td>
                   </tr>
                   <tr class="detail-row" id="sp-detail-tv">
                     <td colspan="4" class="detail-cell">
@@ -329,8 +331,9 @@
                           <div class="match-panel-hdr">Selected Research Comparison</div>
                           <div class="match-row"><span class="ml">Description</span><span class="mv">Samsung 55" QN80H Neo QLED TV</span></div>
                           <div class="match-row"><span class="ml">Model</span><span class="mv">QN55QN80H</span></div>
-                          <div class="match-row"><span class="ml">Retail Cost</span><span class="mv">$899.99</span></div>
+                          <div class="match-row"><span class="ml">Documented Market Price</span><span class="mv">$899.99</span></div>
                           <div class="match-row"><span class="ml">Retailer</span><span class="mv">Best Buy, Nov 9, 2026</span></div>
+                          <div class="match-row"><span class="ml">Price note</span><span class="mv">Promotional price (Black Friday Deal). Samsung&rsquo;s $1,299.99 list price is not used.</span></div>
                           <div class="match-row"><span class="ml">Key Specs Comparison</span></div>
                           <div class="match-row"><span class="ml match-indent">Display</span><span class="mv hi">Quantum dot Mini LED <span class="chk">&#10003;</span></span></div>
                           <div class="match-row"><span class="ml match-indent">Backlight</span><span class="mv hi">Full array Mini LED <span class="chk">&#10003;</span></span></div>
@@ -338,6 +341,16 @@
                           <div class="match-row"><span class="ml match-indent">4K@120Hz input</span><span class="mv up">All 4 ports <span class="star">&#9733;</span></span></div>
                           <div class="match-row"><span class="ml match-indent">Variable refresh</span><span class="mv hi">FreeSync Premium Pro <span class="chk">&#10003;</span></span></div>
                         </div>
+                      </div>
+                      <div class="match-panel age-panel">
+                        <div class="match-panel-hdr">Age Research</div>
+                        <div class="match-row"><span class="ml">Reported age</span><span class="mv">2021 (sample submission)</span></div>
+                        <div class="match-row"><span class="ml">Researched age</span><span class="mv">2021 model year</span></div>
+                        <div class="match-row"><span class="ml">Status</span><span class="mv">Model year confirmed. The individual unit&rsquo;s manufacture date has not been established.</span></div>
+                        <div class="match-row"><span class="ml">Manufacturer reference</span><span class="mv">Samsung Q80A specification sheet (2021 edition); Best Buy listing for the 2021 model</span></div>
+                        <div class="match-row"><span class="ml">Serial / date code</span><span class="mv">Not provided, so no unit-level analysis</span></div>
+                        <div class="match-row"><span class="ml">Limit</span><span class="mv">A model year is not a unit&rsquo;s manufacture date; the label or serial number would establish it</span></div>
+                        <div class="match-row"><span class="ml">ACV</span><span class="mv">Not calculated: no supported television useful life</span></div>
                       </div>
                       <p class="detail-note"><strong>Why not the lower-priced model?</strong> The QN55QN70H ($699.99) falls short on native refresh rate, 4K@120Hz input and VRR. The QN55S90H ($1,199.99) is OLED, a different product tier. The QN80H is not presented as the lowest-priced suitable Samsung: a 2025 QN80F at $827.95, seller not named, is unresolved.</p>
                       <p class="detail-links"><a href="/report#case-tv">See the full television comparison &rarr;</a></p>
@@ -354,11 +367,17 @@
                     <td data-label="Selected Research Comparison">
                       <div class="item-name">Samsung 28 cu ft 4-Door Refrigerator</div>
                       <div class="item-sub">Model: RF28R7201SR (identical)</div>
-                      <div class="item-sub">Best Buy &bull; Nov 9, 2026 &bull; Black Friday Deal</div>
-                      <span class="item-link item-link-static">Still sold new</span>
+                      <div class="item-sub">Still sold new</div>
                     </td>
-                    <td class="rcv-val" data-label="Replacement Price">$1,899.99</td>
-                    <td data-label="Status"><span class="badge verified"><span class="badge-dot"></span> Identical Model</span></td>
+                    <td data-label="Age Research">
+                      <dl class="age-pair">
+                        <div class="age-item"><dt>Reported</dt><dd>Not provided</dd></div>
+                        <div class="age-item age-item--res"><dt>Researched</dt><dd>Not established</dd></div>
+                      </dl>
+                      <span class="badge neutral"><span class="badge-dot"></span> Age Evidence Needed</span>
+                      <div class="item-sub">No serial number or unit-specific evidence</div>
+                    </td>
+                    <td data-label="Documented Market Price"><span class="rcv-val">$1,899.99</span><div class="item-sub">Best Buy</div><div class="item-sub">Nov 9, 2026</div></td>
                   </tr>
                   <tr class="detail-row" id="sp-detail-fridge">
                     <td colspan="4" class="detail-cell">
@@ -378,14 +397,24 @@
                           <div class="match-panel-hdr">Selected Research Comparison</div>
                           <div class="match-row"><span class="ml">Description</span><span class="mv">Same model, still sold new</span></div>
                           <div class="match-row"><span class="ml">Model</span><span class="mv">RF28R7201SR</span></div>
-                          <div class="match-row"><span class="ml">Retail Cost</span><span class="mv">$1,899.99</span></div>
+                          <div class="match-row"><span class="ml">Documented Market Price</span><span class="mv">$1,899.99</span></div>
                           <div class="match-row"><span class="ml">Retailer</span><span class="mv">Best Buy, Nov 9, 2026</span></div>
+                          <div class="match-row"><span class="ml">Price note</span><span class="mv">Promotional price (Black Friday Deal). The retailer&rsquo;s comparison figure is not used.</span></div>
                           <div class="match-row"><span class="ml">Key Specs Comparison</span></div>
                           <div class="match-row"><span class="ml match-indent">Configuration</span><span class="mv hi">4-door <span class="chk">&#10003;</span></span></div>
                           <div class="match-row"><span class="ml match-indent">FlexZone drawer</span><span class="mv hi">3.8 cu ft, 4 zones <span class="chk">&#10003;</span></span></div>
                           <div class="match-row"><span class="ml match-indent">Dispenser</span><span class="mv hi">External <span class="chk">&#10003;</span></span></div>
                           <div class="match-row"><span class="ml match-indent">Capacity</span><span class="mv hi">28 cu ft <span class="chk">&#10003;</span></span></div>
                         </div>
+                      </div>
+                      <div class="match-panel age-panel">
+                        <div class="match-panel-hdr">Age Research</div>
+                        <div class="match-row"><span class="ml">Reported age</span><span class="mv">Not provided</span></div>
+                        <div class="match-row"><span class="ml">Researched age</span><span class="mv">Not established. Samsung&rsquo;s sheet carries a 2019 copyright, so the model era is 2019 or later.</span></div>
+                        <div class="match-row"><span class="ml">Status</span><span class="mv">Age evidence needed. The original model was identified and researched, but no serial number or other sufficient unit-specific evidence was available to determine its manufacture date.</span></div>
+                        <div class="match-row"><span class="ml">Serial / date code</span><span class="mv">Not provided. No serial analysis is shown or implied.</span></div>
+                        <div class="match-row"><span class="ml">Age used in the ACV</span><span class="mv">6.0 years, assumed for illustration only. It is not a research finding.</span></div>
+                        <div class="match-row"><span class="ml">To resolve</span><span class="mv">The nameplate serial number, read against the manufacturer&rsquo;s date-code scheme</span></div>
                       </div>
                       <p class="detail-note"><strong>Why the original model?</strong> The look-alikes drop a defining feature: the RF32CG5B30SR ($1,799.99) has no FlexZone drawer, and the RF29BB8600QL ($2,199.99) has no external dispenser and a smaller FlexZone. <strong>Illustrative ACV $1,023.07:</strong> $1,899.99 &times; (1 &minus; 6.0 &divide; 13), with an assumed age, a 13-year life (NAHB, 2007) and no condition adjustment.</p>
                       <p class="detail-links"><a href="/report#case-fridge">See the full refrigerator comparison &rarr;</a></p>
@@ -396,17 +425,23 @@
                     <td data-label="Submitted Item">
                       <div class="item-name">GE 7.8 cu ft Smart Front-Load Dryer</div>
                       <div class="item-sub">Model: GFD65ESSNWW</div>
-                      <div class="item-sub">Built Dec 2019 &ndash; Aug 2023 (GE)</div>
+                      <div class="item-sub">Serial number not provided</div>
                       <button type="button" class="item-link item-link-btn" aria-expanded="false" aria-controls="sp-detail-dryer">View Specs <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
                     </td>
                     <td data-label="Selected Research Comparison">
                       <div class="item-name">GE 7.8 cu ft Smart Front-Load Dryer</div>
                       <div class="item-sub">Model: GFD65ESSVWW (successor)</div>
-                      <div class="item-sub">GE.com, Home Depot &bull; Nov 9, 2026 &bull; Sale event</div>
-                      <span class="item-link item-link-static">GE list price: $1,249.00</span>
+                      <div class="item-sub">No functional difference found</div>
                     </td>
-                    <td class="rcv-val" data-label="Replacement Price">$899.00</td>
-                    <td data-label="Status"><span class="badge estimated"><span class="badge-dot"></span> Age Range Only</span></td>
+                    <td data-label="Age Research">
+                      <dl class="age-pair">
+                        <div class="age-item"><dt>Reported</dt><dd>2025</dd></div>
+                        <div class="age-item age-item--res"><dt>Researched</dt><dd>Dec 2019 &ndash; Aug 2023 <small>model production window</small></dd></div>
+                      </dl>
+                      <span class="badge estimated"><span class="badge-dot"></span> Reported Age Requires Review</span>
+                      <div class="item-sub">2025 may be a purchase or installation date</div>
+                    </td>
+                    <td data-label="Documented Market Price"><span class="rcv-val">$899.00</span><div class="item-sub">GE.com, Home Depot</div><div class="item-sub">Nov 9, 2026</div></td>
                   </tr>
                   <tr class="detail-row" id="sp-detail-dryer">
                     <td colspan="4" class="detail-cell">
@@ -415,27 +450,33 @@
                           <div class="match-panel-hdr">Submitted Item</div>
                           <div class="match-row"><span class="ml">Description</span><span class="mv">GE 7.8 cu ft smart front-load electric dryer</span></div>
                           <div class="match-row"><span class="ml">Model</span><span class="mv">GFD65ESSNWW</span></div>
-                          <div class="match-row"><span class="ml">Manufacture window</span><span class="mv">Dec 2019 &ndash; Aug 2023</span></div>
-                          <div class="match-row"><span class="ml">Age Evidence</span><span class="mv">GE Owner Center; ENERGY STAR (corroborating)</span></div>
-                          <div class="match-row"><span class="ml">Age on Nov 9, 2026</span><span class="mv">3.2 &ndash; 6.9 years</span></div>
                           <div class="match-row"><span class="ml">Serial number</span><span class="mv">Not provided</span></div>
-                          <div class="match-row"><span class="ml">Unit date</span><span class="mv">Not stated</span></div>
                           <div class="match-row"><span class="ml">Useful life</span><span class="mv">13 years (NAHB, 2007)</span></div>
                         </div>
                         <div class="match-panel">
                           <div class="match-panel-hdr">Selected Research Comparison</div>
                           <div class="match-row"><span class="ml">Description</span><span class="mv">Same description</span></div>
                           <div class="match-row"><span class="ml">Model</span><span class="mv">GFD65ESSVWW</span></div>
-                          <div class="match-row"><span class="ml">Retail Cost</span><span class="mv">$899.00</span></div>
-                          <div class="match-row"><span class="ml">Retailers</span><span class="mv">GE.com, Home Depot</span></div>
+                          <div class="match-row"><span class="ml">Documented Market Price</span><span class="mv">$899.00</span></div>
+                          <div class="match-row"><span class="ml">Retailers</span><span class="mv">GE.com, Home Depot, Nov 9, 2026</span></div>
+                          <div class="match-row"><span class="ml">Price note</span><span class="mv">Promotional price at both retailers. GE&rsquo;s $1,249.00 list price is not used.</span></div>
                           <div class="match-row"><span class="ml">Key Specs Comparison</span></div>
                           <div class="match-row"><span class="ml match-indent">GE spec fields</span><span class="mv hi">101 of 108 identical <span class="chk">&#10003;</span></span></div>
                           <div class="match-row"><span class="ml match-indent">Capacity</span><span class="mv hi">7.8 cu ft <span class="chk">&#10003;</span></span></div>
                           <div class="match-row"><span class="ml match-indent">Functional difference</span><span class="mv hi">None found <span class="chk">&#10003;</span></span></div>
-                          <div class="match-row"><span class="ml match-indent">Illustrative ACV</span><span class="mv">$419 &ndash; $678</span></div>
                         </div>
                       </div>
-                      <p class="detail-note"><strong>Why a range?</strong> GE&rsquo;s serial letters repeat every 12 years, so GE&rsquo;s manufacture window for the model does the work. With no serial number, the result is an age range and an illustrative ACV range, not a single value; a nameplate serial would name one month.</p>
+                      <div class="match-panel age-panel">
+                        <div class="match-panel-hdr">Age Research</div>
+                        <div class="match-row"><span class="ml">Reported age</span><span class="mv">2025 (sample submission)</span></div>
+                        <div class="match-row"><span class="ml">Researched age</span><span class="mv">Dec 2019 &ndash; Aug 2023, the model&rsquo;s production window</span></div>
+                        <div class="match-row"><span class="ml">Status</span><span class="mv">Reported age requires review. GE&rsquo;s production window closed before 2025, but 2025 could be a purchase or installation date rather than a manufacture date. No conclusion is drawn about the accuracy of the report.</span></div>
+                        <div class="match-row"><span class="ml">Manufacturer reference</span><span class="mv">GE Owner Center: GFD65ESSNWW built December 2019 &ndash; August 2023; successor GFD65ESSVWW from September 2023. ENERGY STAR records corroborate.</span></div>
+                        <div class="match-row"><span class="ml">Serial / date code</span><span class="mv">Not provided. GE&rsquo;s year letters repeat every 12 years; inside this window only M, R, S, T and V are possible, and 2025 is the letter A.</span></div>
+                        <div class="match-row"><span class="ml">To resolve</span><span class="mv">Manufacturer evidence establishes the model&rsquo;s production period. The nameplate serial number, or other appropriate documentation such as a dated purchase or delivery record, is needed to resolve the original unit&rsquo;s age</span></div>
+                        <div class="match-row"><span class="ml">Effect on ACV</span><span class="mv">Taken as a build year, 2025 would mean 0.9 &ndash; 1.9 years and an illustrative ACV of $771 &ndash; $840. GE&rsquo;s window supports $419 &ndash; $678. Both are illustrative: $899.00, 13-year straight line, no condition adjustment.</span></div>
+                      </div>
+                      <p class="detail-note"><strong>Why a range?</strong> GE&rsquo;s serial letters repeat every 12 years, so GE&rsquo;s manufacture window for the model does the work. With no serial number, the result is an age range (3.2 &ndash; 6.9 years) and an illustrative ACV range of $419 &ndash; $678, not a single value; a nameplate serial would name one month.</p>
                       <p class="detail-links"><a href="/report#case-dryer">See the dryer age research &rarr;</a></p>
                     </td>
                   </tr>
@@ -444,7 +485,7 @@
             </div>
           </div>
         </div>
-        <p class="home-hero-report-note"><strong>Research examples, not claim determinations.</strong> Prices are retailer selling prices on November 9, 2026, during sale events, and are not regular prices. Item Assist does not determine depreciation, final ACV, coverage or settlement.</p>
+        <p class="home-hero-report-note"><strong>Research examples, not claim determinations.</strong> Reported ages are sample submissions. Documented market prices are retailer selling prices observed on November 9, 2026 during promotional events; they are not regular prices and have not been re-verified since. Item Assist does not determine depreciation, final ACV, coverage or settlement.</p>
         <div class="sp-links"><a class="btn-primary" href="/report">Read the full sample report</a><a class="comparable-link" href="/assets/ItemAssist-Sample-Research-Report.pdf" download>Download the 2-page PDF</a></div>
       </article>
     </section>
