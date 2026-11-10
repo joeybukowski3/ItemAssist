@@ -18,8 +18,11 @@ test("the hero leads with the positioning, a short value proposition, credibilit
     "Professionally reviewed product identification, comparable replacement research, and documented retail pricing for independent adjusters, public adjusters, and claims professionals."
   );
   await expect(text.locator(".hero-points strong")).toHaveText(["Human-reviewed research.", "Documented retail sources.", "Clear replacement reasoning."]);
-  await expect(text.locator(".hero-sample .hero-sample-link").nth(0)).toHaveAttribute("href", "#sample");
-  await expect(text.locator(".hero-sample .hero-sample-link").nth(1)).toHaveAttribute("href", "/assets/ItemAssist-Sample-Research-Report.pdf");
+  // One sample-report action in the hero, and the PDF is not promoted on the homepage.
+  await expect(text.locator(".hero-sample a")).toHaveCount(1);
+  await expect(text.locator(".hero-sample a")).toHaveText(/View Sample Report/);
+  await expect(text.locator(".hero-sample a")).toHaveAttribute("href", "/report");
+  await expect(page.locator('main a[href$=".pdf"]')).toHaveCount(0);
   // No pricing offer or badge, and no second set of CTAs competing with the form.
   await expect(text.locator(".btn-primary, .home-hero-price, .intro-offer-badge")).toHaveCount(0);
   await expect(text).not.toContainText("$");
@@ -184,16 +187,15 @@ test("the report rows carry the real TV, refrigerator and dryer findings, prices
   await expect(tiles.nth(0).locator(".stat-label")).toHaveText("Total Documented Replacement Value");
   await expect(tiles.nth(0).locator(".stat-val")).toHaveText(money(total));
   await expect(tiles.nth(0).locator(".stat-note")).toContainText("3 researched items");
-  await expect(tiles.nth(1).locator(".stat-label")).toHaveText("Illustrative Partial ACV");
+  await expect(tiles.nth(1).locator(".stat-label")).toHaveText("Estimated ACV (2 of 3 items)");
   await expect(tiles.nth(1).locator(".stat-val")).toHaveText(`${whole(fridgeAcv + dryerLow)} – ${whole(fridgeAcv + dryerHigh)}`);
-  await expect(tiles.nth(1).locator(".stat-note")).toContainText("2 of 3 items");
-  for (const needle of ["assumed refrigerator age", "illustrative straight-line depreciation", "no television ACV"]) await expect(tiles.nth(1).locator(".stat-note")).toContainText(needle);
-  // The basis states every covered item, the method and the missing input.
-  const basis = (await page.locator("#sample .acv-basis").textContent()).replace(/\s+/g, " ");
-  for (const needle of ["Refrigerator $1,023.07 at an assumed 6.0-year age", `dryer ${whole(dryerLow)} – ${whole(dryerHigh)}`, "3.2 – 6.9 years", "13-year life (NAHB, 2007)", "no condition adjustment",
-    "no supported television useful life exists", "not a verified claim valuation"]) {
-    expect(basis, needle).toContain(needle);
-  }
+  // The tile stays short; the stated inputs, the illustrative depreciation, the one assumed input and the exclusion are all named in it.
+  for (const needle of ["Stated age inputs", "illustrative depreciation", "assumed refrigerator age", "television excluded"]) await expect(tiles.nth(1).locator(".stat-note")).toContainText(needle);
+  await expect(tiles.nth(1)).not.toContainText(/verified/i);
+  // The explanatory block under the tiles is gone, and nothing on the homepage labels the figure partial or illustrative.
+  await expect(page.locator("#sample .acv-basis")).toHaveCount(0);
+  await expect(page.locator("#sample .stats + p")).toHaveCount(0);
+  await expect(page.locator("#sample .stat-label")).toHaveText(["Total Documented Replacement Value", "Estimated ACV (2 of 3 items)"]);
 
   // Reported and researched age are separate, labelled fields with a status the evidence supports.
   const ages = page.locator("#sample .tbl tbody tr:not(.detail-row) .age-pair");
@@ -248,16 +250,20 @@ test("the report rows carry the real TV, refrigerator and dryer findings, prices
   expect(age2025).toContain("GE’s window supports $419 – $678");
   expect(age2025).toContain("Both are illustrative: $899.00, 13-year straight line, no condition adjustment.");
   await expect(page.locator("#sample .home-hero-report-note")).toContainText("Item Assist does not determine depreciation, final ACV, coverage or settlement.");
-  await expect(page.locator("#sample .home-hero-report-note")).toContainText("not regular prices");
-  await expect(page.locator("#sample .home-hero-report-note")).toContainText("Reported ages are sample submissions");
-  await expect(page.locator("#sample .home-hero-report-note")).toContainText("have not been re-verified since");
+  await expect(page.locator("#sample .home-hero-report-note")).toContainText("Research examples, not claim determinations.");
+  await expect(page.locator("#sample .home-hero-report-note")).toContainText("retailer selling prices observed on November 9, 2026");
+  // The fuller price qualification lives in the expanded evidence and on the report, not in a block on the homepage.
+  await expect(page.locator("#sample .home-hero-report-note")).not.toContainText(/not regular prices|re-verified/);
 });
 
 test("the preview links to the full report cases, the sources and the PDF, and every report anchor exists", async ({ page, request }) => {
   await page.goto("/");
   const preview = page.locator("#sample");
-  await expect(preview.locator('a[href="/report"]')).toHaveText("Read the full sample report");
-  await expect(preview.locator('a[href="/assets/ItemAssist-Sample-Research-Report.pdf"]')).toHaveText("Download the 2-page PDF");
+  // One sample-report action in the section; the PDF is offered from inside the report instead.
+  await expect(preview.locator(".sp-links a")).toHaveCount(1);
+  await expect(preview.locator(".sp-links a")).toHaveText("View Sample Report");
+  await expect(preview.locator('.sp-links a[href="/report"]')).toHaveCount(1);
+  await expect(preview.locator('a[href$=".pdf"]')).toHaveCount(0);
   const anchors = ["/report#case-tv", "/report#case-fridge", "/report#case-dryer", "/report#sources"];
   for (const href of anchors) await expect(preview.locator(`a[href="${href}"]`), href).toHaveCount(1);
   await expect(preview.locator('.sb-item[href="#sp-summary"], .sb-item[href="#sp-items"]')).toHaveCount(2);
@@ -265,8 +271,8 @@ test("the preview links to the full report cases, the sources and the PDF, and e
   await expect(page.locator("#sp-items")).toHaveCount(1);
   const report = await (await request.get("/report")).text();
   for (const id of ["case-tv", "case-fridge", "case-dryer", "sources"]) expect(report, id).toContain(`id="${id}"`);
-  // The hero's own link still lands on the preview.
-  await expect(page.locator('.home-hero-text a[href="#sample"]')).toHaveCount(1);
+  // The hero's single sample-report action opens the report.
+  await expect(page.locator('.home-hero-text .hero-sample a[href="/report"]')).toHaveCount(1);
 });
 
 test("specification rows stay collapsed, open independently by click and keyboard, and keep their state labelled", async ({ page }) => {
@@ -375,8 +381,8 @@ test("hero copy starts at the top of the form card, left aligned, with no vertic
     // The kicker begins level with the top of the form card, not partway down it.
     expect(Math.abs(m.textTop - m.cardTop)).toBeLessThanOrEqual(8);
     expect(m.kickerTop - m.cardTop).toBeLessThanOrEqual(24);
-    // The copy sits in the upper part of the form's height, ending well above the card's bottom.
-    expect(m.linksBottom - m.cardTop).toBeLessThan(m.cardHeight * 0.85);
+    // The copy starts at the top and may now run most of the form's height, but never past the card's bottom.
+    expect(m.linksBottom - m.cardTop).toBeLessThanOrEqual(m.cardHeight);
   }
 });
 
@@ -409,23 +415,66 @@ test("the experience markers sit in their own gutter and never overlap the item 
   }
 });
 
-test("a financial-impact illustration replaces the two-card pricing explanation, and is plainly hypothetical", async ({ page }) => {
+test("desktop hero is balanced: a compact form, a copy column that fills the width beside it, and no overflow", async ({ page }, testInfo) => {
+  const width = testInfo.project.use.viewport.width;
+  await page.goto("/");
+  await page.addStyleTag({ content: "*, *::before, *::after { animation: none !important; transition: none !important; }" });
+  const m = await page.evaluate(() => {
+    const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
+    const text = rect(".home-hero-text");
+    const card = rect(".hero-consult");
+    const title = rect(".home-hero-title");
+    const lastCopy = rect(".hero-sample");
+    return { textRight: text.right, textLeft: text.left, titleRight: title.right, cardLeft: card.left, cardWidth: card.width, cardHeight: card.height, copyBottom: lastCopy.bottom, cardBottom: card.bottom,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+  });
+  expect(m.overflow).toBeLessThanOrEqual(0);
+  if (width >= 1280) {
+    expect(m.cardWidth).toBeLessThanOrEqual(460);
+    expect(m.cardHeight).toBeLessThan(800);
+    // The copy column is wide enough that the headline and the form are not separated by a large empty band.
+    expect(m.cardLeft - m.titleRight).toBeLessThan(260);
+    // The left column reaches most of the way down the form card.
+    expect(m.cardBottom - m.copyBottom).toBeLessThan(180);
+  }
+});
+
+test("a financial-impact section replaces the two-card pricing explanation with an illustrative $120 across 10 items calculation", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "A Poor Comparison Can Miss in Either Direction" })).toHaveCount(0);
   await expect(page.locator(".pricing-risk-section, .outcome-card")).toHaveCount(0);
   const section = page.locator("#impact");
-  await expect(section.locator("h2")).toHaveText("Small Pricing Differences Can Add Up Across an Entire Claim");
-  await expect(section.locator(".rc-tag")).toHaveText("Hypothetical example");
-  await expect(section.locator(".impact-visual")).toHaveAttribute("aria-label", /50 items times a \$100 pricing difference per item equals a \$5,000 cumulative difference/);
-  await expect(section.locator(".impact-eq b")).toHaveText(["50", "$100", "$5,000"]);
-  await expect(section.locator(".impact-grid i")).toHaveCount(50);
-  await expect(section).toContainText("Differences can run in either direction");
-  await expect(section).toContainText("overstatements and understatements can partly offset one another");
-  await expect(section).toContainText("Hypothetical arithmetic for illustration only. It is not an observed error rate and not a result for any client.");
-  await expect(section).not.toContainText(/\bsaved?\b|\bsavings?\b|\bclients? (have|has)\b|industry (error|average)|studies show/i);
+  await expect(section.locator("h2")).toHaveText("A $120 Pricing Difference Across 10 Items Adds Up to $1,200");
+  // No badge or eyebrow, and none of the earlier round-number example.
+  await expect(section.locator(".rc-tag")).toHaveCount(0);
+  await expect(section).not.toContainText(/hypothetical|\$5,000|\b50 items\b|\$100\b/i);
+  await expect(section.locator(".impact-lead")).toHaveText(
+    "Even a modest difference in replacement pricing can become significant across a contents inventory. Selecting appropriate comparable products helps keep item-level valuations consistent and supportable."
+  );
+  // The calculation is not presented as a measured or typical figure.
+  const asserted = (await section.locator("h2, .impact-lead, .impact-eq").allTextContents()).join(" ");
+  expect(asserted).not.toMatch(/average|typical|often|common|mispriced/i);
+  await expect(section.locator(".impact-visual")).toHaveAttribute("aria-label", /Illustrative calculation: a \$120 pricing difference per item across 10 items is a \$1,200 cumulative difference/);
+  await expect(section.locator(".impact-eq b")).toHaveText(["$120", "10", "$1,200"]);
+  await expect(section.locator(".impact-grid i")).toHaveCount(10);
+  expect(120 * 10).toBe(1200);
+  await expect(section.locator(".impact-fine")).toHaveText("Illustrative calculation, not a measured average or typical claims result.");
+  await expect(section.locator(".impact-copy p")).toHaveCount(2);
+  await expect(section).not.toContainText(/\bsaved?\b|\bsavings?\b|\bclients? (have|has)\b|studies show/i);
   // Minimal copy: a short explanation, not another set of long cards.
   const words = (await section.locator(".impact-copy").textContent()).split(/\s+/).filter(Boolean).length;
   expect(words).toBeLessThan(90);
+});
+
+test("the figures panel is a contrast block against a tinted band, not a plain white card", async ({ page }) => {
+  await page.goto("/");
+  const colours = await page.evaluate(() => {
+    const bg = (selector) => getComputedStyle(document.querySelector(selector)).backgroundColor;
+    return { band: bg("#impact"), panel: bg("#impact .impact-visual"), card: bg("#impact .impact-card") };
+  });
+  expect(colours.panel).not.toBe(colours.card);
+  expect(colours.band).not.toBe("rgba(0, 0, 0, 0)");
+  expect(colours.band).not.toBe("rgb(255, 255, 255)");
 });
 
 test("title, description and social descriptions describe the service and carry no price", async ({ page }) => {
@@ -521,7 +570,7 @@ test("the homepage sections run in the new order, and the form is part of the he
   expect(order).toEqual([
     "Request Research or a Free Consultation",
     "Similar Isn\u2019t the Same as Comparable",
-    "Small Pricing Differences Can Add Up Across an Entire Claim",
+    "A $120 Pricing Difference Across 10 Items Adds Up to $1,200",
     "What Item Assist Provides",
     "Built From Hands-On Claims Experience",
     "How It Works"

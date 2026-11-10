@@ -198,7 +198,16 @@ test("the summary shows reported against researched age, a verified total and an
   await expect(summary).toContainText("The television is excluded because no supported television useful life exists");
   await expect(summary).toContainText("the refrigerator’s age is assumed");
   await expect(summary).not.toContainText(/verified aggregate|Verification Needed|Discrepancy/);
-  await expect(summary).toContainText("not a verified claim valuation");
+  await expect(summary).toContainText("not a verified full-claim ACV or claim valuation");
+  // The same label and the same range as the homepage tile; the detailed method, condition limits and sources stay here.
+  await expect(summary.getByRole("heading", { name: "Estimated ACV (2 of 3 items)" })).toHaveCount(1);
+  await expect(summary).toContainText("Estimated ACV (2 of 3 items), refrigerator plus dryer:");
+  await expect(summary).not.toContainText(/partial ACV|Illustrative partial/i);
+  await expect(summary).toContainText("None provided; no adjustment");
+  await page.goto("/");
+  const tile = page.locator("#sample .stat-total-acv");
+  await expect(tile.locator(".stat-label")).toHaveText("Estimated ACV (2 of 3 items)");
+  await expect(tile.locator(".stat-val")).toHaveText(`${money(low)} – ${money(high)}`);
 });
 
 test("the dryer's reported 2025 is shown as a discrepancy against GE's window, with its effect on the ACV", async ({ page }) => {

@@ -8450,20 +8450,6 @@ body.homepage-redesign .sample-preview .tbl td .badge + .item-sub {
   margin-top: 5px;
 }
 
-/* How the partial ACV is built, directly under the summary tiles */
-body.homepage-redesign .sample-preview .acv-basis {
-  margin: -8px 0 22px;
-  padding: 2px 0 2px 12px;
-  border-left: 3px solid #0f4a3a;
-  color: var(--slate);
-  font-size: 12.5px;
-  line-height: 1.55;
-}
-
-body.homepage-redesign .sample-preview .acv-basis strong {
-  color: #111827;
-}
-
 /* The expanded age evidence runs the full width under the two comparison panels */
 body.homepage-redesign .sample-preview .age-panel {
   margin-top: 14px;
@@ -8500,3 +8486,298 @@ body.homepage-redesign .sample-preview .match-grid .ml {
 .report-page .rp-status--review { background: var(--amber-bg); color: #92400e; }
 .report-page .rp-status--evidence { background: #eef2f7; color: #475569; }
 /* === Homepage V6 END === */
+
+/* === Homepage V7 START === */
+/* Hero: wider copy column and a narrower, tighter form so the two halves read as one composition */
+body.homepage-redesign .home-hero.hero-v4 {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 452px);
+  gap: 64px;
+  padding-top: 40px;
+  padding-bottom: 12px;
+}
+
+body.homepage-redesign .hero-v4 .home-hero-text {
+  max-width: 720px;
+  padding-top: 8px;
+}
+
+body.homepage-redesign .hero-v4 .home-hero-kicker {
+  margin-bottom: 16px;
+  font-size: 12.5px;
+}
+
+body.homepage-redesign .hero-v4 .home-hero-title {
+  max-width: 700px;
+  margin-bottom: 18px;
+  font-size: clamp(34px, 3.9vw, 54px);
+  line-height: 1.1;
+}
+
+body.homepage-redesign .hero-v4 .home-hero-sub {
+  max-width: 620px;
+  margin-bottom: 24px;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+/* The three proof points sit on one rule so the left column carries the same weight as the form */
+body.homepage-redesign .hero-points {
+  gap: 0;
+  max-width: 620px;
+  margin: 0 0 26px;
+  border-top: 1px solid var(--border);
+}
+
+body.homepage-redesign .hero-points li {
+  padding: 13px 0 13px 32px;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+}
+
+body.homepage-redesign .hero-points li::before {
+  top: 14px;
+  width: 20px;
+  height: 20px;
+}
+
+/* One sample-report action */
+body.homepage-redesign .hero-sample-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border: 1.5px solid var(--navy);
+  border-radius: var(--r);
+  background: var(--white);
+  color: var(--navy);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+body.homepage-redesign .hero-sample-btn:hover,
+body.homepage-redesign .hero-sample-btn:focus-visible {
+  background: var(--navy);
+  color: var(--white);
+}
+
+/* Form: the same fields and copy at a calmer size */
+body.homepage-redesign .hero-consult {
+  padding: 18px 22px 12px;
+}
+
+body.homepage-redesign .hero-consult h2 {
+  margin-bottom: 4px;
+  font-size: 20px;
+}
+
+body.homepage-redesign .hero-consult-intro {
+  margin-bottom: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+body.homepage-redesign .hero-consult .form-group {
+  gap: 3px;
+  margin-bottom: 7px;
+}
+
+body.homepage-redesign .hero-consult .form-group label {
+  font-size: 12.5px;
+}
+
+body.homepage-redesign .hero-consult .form-group input,
+body.homepage-redesign .hero-consult .form-group select,
+body.homepage-redesign .hero-consult .form-group textarea {
+  padding: 7px 11px;
+  font-size: 14px;
+}
+
+body.homepage-redesign .hero-consult .form-group select {
+  padding-right: 32px;
+}
+
+body.homepage-redesign .hero-consult .form-group textarea {
+  min-height: 48px;
+}
+
+body.homepage-redesign .hero-consult .form-submit {
+  padding: 10px 1.25rem;
+}
+
+body.homepage-redesign .hero-consult .form-commitment,
+body.homepage-redesign .hero-consult .form-disclaimer {
+  margin-top: 6px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  font-size: 11px;
+}
+
+body.homepage-redesign .hero-consult-foot {
+  margin-top: 8px;
+  padding-top: 8px;
+  font-size: 11px;
+}
+
+/* When a label wraps, the paired fields still share a baseline */
+body.homepage-redesign .hero-consult .form-row .form-group input,
+body.homepage-redesign .hero-consult .form-row .form-group select {
+  margin-top: auto;
+}
+
+/* Sample preview: one centred action under the report window */
+body.homepage-redesign .sample-preview .sp-links {
+  margin-top: 18px;
+}
+
+/* Pricing-difference insight: tinted band, white copy panel, navy figures panel */
+body.homepage-redesign .impact-section {
+  margin-top: 28px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background: #e6edf7;
+  border-top: 1px solid #d5e0ef;
+  border-bottom: 1px solid #d5e0ef;
+}
+
+body.homepage-redesign .impact-card {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 0;
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  box-shadow: var(--shadow-lg);
+}
+
+body.homepage-redesign .impact-copy {
+  justify-content: center;
+  padding: 34px 38px;
+  gap: 14px;
+}
+
+body.homepage-redesign .impact-copy .impact-lead {
+  color: var(--text-head);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+body.homepage-redesign .impact-copy .impact-lead strong {
+  color: var(--navy);
+  font-weight: 700;
+}
+
+body.homepage-redesign .impact-visual {
+  justify-content: center;
+  gap: 24px;
+  padding: 34px 32px;
+  background: var(--navy);
+  color: var(--white);
+}
+
+body.homepage-redesign .impact-eq {
+  gap: 10px 16px;
+}
+
+body.homepage-redesign .impact-eq b {
+  color: var(--white);
+  font-size: 40px;
+}
+
+body.homepage-redesign .impact-eq span {
+  max-width: 110px;
+  color: #b9c8dc;
+}
+
+body.homepage-redesign .impact-eq > i {
+  color: #7f95b3;
+}
+
+body.homepage-redesign .impact-eq .impact-total b {
+  color: #93c5fd;
+  font-size: 48px;
+}
+
+body.homepage-redesign .impact-grid {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  width: min(100%, 340px);
+}
+
+body.homepage-redesign .impact-grid i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--r-xs);
+  background: rgba(255, 255, 255, 0.08);
+  color: #dbe6f4;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1;
+  opacity: 1;
+  aspect-ratio: auto;
+}
+
+@media (max-width: 1100px) {
+  body.homepage-redesign .home-hero.hero-v4 {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+    gap: 36px;
+  }
+
+  body.homepage-redesign .hero-v4 .home-hero-sub {
+    font-size: 16.5px;
+  }
+
+  body.homepage-redesign .impact-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  body.homepage-redesign .home-hero.hero-v4 {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  body.homepage-redesign .hero-v4 .home-hero-title {
+    font-size: 30px;
+  }
+
+  body.homepage-redesign .hero-v4 .home-hero-sub {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  body.homepage-redesign .impact-copy {
+    padding: 24px 20px;
+  }
+
+  body.homepage-redesign .impact-visual {
+    padding: 26px 18px;
+  }
+
+  body.homepage-redesign .impact-eq b {
+    font-size: 30px;
+  }
+
+  body.homepage-redesign .impact-eq .impact-total b {
+    font-size: 38px;
+  }
+
+  /* Two lines: the factors, then the total under a rule, with no stray equals sign */
+  body.homepage-redesign .impact-eq > i:last-of-type {
+    display: none;
+  }
+
+  body.homepage-redesign .impact-eq .impact-total {
+    flex-basis: 100%;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+  }
+}
+/* === Homepage V7 END === */
