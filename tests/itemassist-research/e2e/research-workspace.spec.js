@@ -47,7 +47,7 @@ test("when enabled, research is the default: research greeting and chips in the 
   await expect(page.getByLabel("Message ItemAssist")).toHaveAttribute("placeholder", /Describe the item/);
   await expect(page.locator('[data-action="find"]')).toHaveText("Classic lookup");
   await expect(page.locator("#rf-composer")).toHaveCount(1);
-  await expect(page.locator("textarea")).toHaveCount(1);
+  await expect(page.locator("#rf-shell textarea")).toHaveCount(1); // the contact form below the workspace has its own, optional description
   await expect(page.locator("#rf-product-root")).toHaveCount(1);
   await expect(page.locator("#rf-assistant, #rf-product")).toHaveCount(2);
   settle(seen);

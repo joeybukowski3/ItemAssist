@@ -1,17 +1,17 @@
-const { test, expect, stubSite, fillConsultation, openHome } = require("./helpers.js");
+const { test, expect, stubSite, fillConsultation, openHome, horizontalOverflow } = require("./helpers.js");
 
 const submit = (page) => page.locator("#consultation-form .form-submit");
 
 test("a valid inquiry posts JSON once to the consultation endpoint and shows an accessible confirmation", async ({ page }) => {
   const calls = await stubSite(page);
   await openHome(page);
-  await fillConsultation(page, { company: "Smith Adjusting", phone: "(555) 555-5555", count: "11-50", description: "About thirty items." });
+  await fillConsultation(page, { company: "Smith & Co", phone: "(555) 555-5555", description: "A dishwasher that is no longer sold." });
   await submit(page).click();
 
   await expect(page.locator("#consult-success")).toBeVisible();
   await expect(page.locator("#consult-success")).toBeFocused();
   await expect(page.locator("#consult-success")).toHaveAttribute("role", "status");
-  await expect(page.locator("#consult-success h3")).toContainText("your request was received");
+  await expect(page.locator("#consult-success h3")).toContainText("your message was received");
   await expect(page.locator("#consultation-form")).toBeHidden();
 
   expect(calls.consultation).toHaveLength(1);
@@ -21,35 +21,34 @@ test("a valid inquiry posts JSON once to the consultation endpoint and shows an 
   expect(body).toMatchObject({
     name: "Jane Smith",
     email: "jane@example.com",
-    reason: "consultation",
-    company: "Smith Adjusting",
+    reason: "human_research",
+    company: "Smith & Co",
     phone: "(555) 555-5555",
-    item_count: "11-50",
-    description: "About thirty items.",
+    description: "A dishwasher that is no longer sold.",
     website: "",
     turnstileToken: "fake-turnstile-token"
   });
   expect(body.submission_id).toMatch(/^sub_[A-Za-z0-9-]{16,}$/);
-  // Only the documented fields are sent: no files, claim information or payment details.
-  expect(Object.keys(body).sort()).toEqual(
-    ["company", "description", "email", "item_count", "name", "phone", "reason", "submission_id", "turnstileToken", "website"].sort()
-  );
+  // Only the documented fields are sent: no files, no research text and no payment details.
+  expect(Object.keys(body).sort()).toEqual(["company", "description", "email", "name", "phone", "reason", "submission_id", "turnstileToken", "website"].sort());
 });
 
-test("only name, email, request type and description are required", async ({ page }) => {
+test("only name, email and the reason for the inquiry are required", async ({ page }) => {
   const calls = await stubSite(page);
   await openHome(page);
   await fillConsultation(page);
   await submit(page).click();
   await expect(page.locator("#consult-success")).toBeVisible();
   expect(calls.consultation).toHaveLength(1);
-  expect(calls.consultation[0].body).toMatchObject({ company: "", phone: "", item_count: "", description: "About thirty items." });
-  for (const id of ["#consult-company", "#consult-phone", "#consult-count"]) {
+  expect(calls.consultation[0].body).toMatchObject({ company: "", phone: "", description: "" });
+  for (const id of ["#consult-company", "#consult-phone", "#consult-description"]) {
     await expect(page.locator(id)).not.toHaveAttribute("required", "");
+    await expect(page.locator(id)).not.toHaveAttribute("aria-required", "true");
   }
+  for (const id of ["#consult-name", "#consult-email", "#consult-reason"]) await expect(page.locator(id)).toHaveAttribute("aria-required", "true");
 });
 
-test("submitting an empty form explains each missing field, focuses the first, and sends nothing", async ({ page }) => {
+test("submitting an empty form explains each missing required field, focuses the first, and sends nothing", async ({ page }) => {
   const calls = await stubSite(page);
   await openHome(page);
   await submit(page).click();
@@ -57,8 +56,7 @@ test("submitting an empty form explains each missing field, focuses the first, a
   const messages = {
     name: "Please enter your name.",
     email: "Please enter your email address.",
-    reason: "Please choose a request type.",
-    description: "Please add a short description of what you need."
+    reason: "Please choose a request type."
   };
   for (const [id, message] of Object.entries(messages)) {
     await expect(page.locator(`#consult-${id}`)).toHaveAttribute("aria-invalid", "true");
@@ -70,7 +68,8 @@ test("submitting an empty form explains each missing field, focuses the first, a
   await expect(page.locator("#consult-name")).toBeFocused();
   await expect(page.locator("#consult-status")).toHaveAttribute("role", "alert");
   await expect(page.locator("#consult-status")).toHaveText("Please fix the highlighted fields and try again.");
-  await expect(page.locator("#consult-company-error")).toBeHidden();
+  // The optional fields are never flagged, not even the description before a request type is chosen.
+  for (const id of ["company", "phone", "description"]) await expect(page.locator(`#consult-${id}-error`)).toBeHidden();
   expect(calls.consultation).toHaveLength(0);
 });
 
@@ -169,6 +168,16 @@ test("a network failure is reported without losing the form", async ({ page }) =
   await expect(page.locator("#consult-name")).toHaveValue("Jane Smith");
 });
 
+test("a missing spam-protection token stops the submission before it is sent", async ({ page }) => {
+  const calls = await stubSite(page);
+  await page.addInitScript(() => { window.turnstile.getResponse = () => ""; });
+  await openHome(page);
+  await fillConsultation(page);
+  await submit(page).click();
+  await expect(page.locator("#consult-status")).toHaveText("Please complete the spam protection check before submitting.");
+  expect(calls.consultation).toHaveLength(0);
+});
+
 test("a campaign tag in the URL travels with the inquiry, including after browsing on", async ({ page }) => {
   const calls = await stubSite(page);
   await openHome(page, "/index.html?utm_source=linkedin&utm_medium=social&utm_campaign=launch-nov");
@@ -196,7 +205,7 @@ test("every field has a visible label, and the spam trap is hidden from people a
   await stubSite(page);
   await openHome(page);
   const form = page.locator("#consultation-form");
-  for (const label of ["Name", "Email", "Request type", "Company", "Phone", "Approximate item count", "Short description"]) {
+  for (const label of ["Name", "Email", "Reason for inquiry", "Company", "Phone", "Brief description"]) {
     await expect(form.getByLabel(label)).toBeVisible();
   }
   await expect(form.locator(".form-honeypot")).toHaveAttribute("aria-hidden", "true");
@@ -206,8 +215,29 @@ test("every field has a visible label, and the spam trap is hidden from people a
   await expect(page.locator("#consult-status")).toHaveAttribute("aria-live", "polite");
 });
 
-test("each request type is sent as chosen, so the server can label the notification", async ({ page }) => {
-  for (const reason of ["consultation", "research_request", "exploring"]) {
+test("the research composer's send button and the contact form's submit button have distinct accessible names, and no two visible buttons share one", async ({ page }) => {
+  await stubSite(page);
+  await page.goto("/");
+  await expect(page.getByRole("button", { name: "Send message", exact: true })).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "Submit Inquiry" })).toHaveCount(1);
+  await expect(page.getByRole("button", { name: /send message/i })).toHaveCount(1); // nothing else is a near-match for the composer's button
+  const names = await page.evaluate(() => [...document.querySelectorAll("button")]
+    .filter((button) => !button.closest("[hidden]") && !button.hidden)
+    .map((button) => (button.getAttribute("aria-label") || button.textContent).replace(/\s+/g, " ").trim().toLowerCase()));
+  const repeated = names.filter((name, index) => names.indexOf(name) !== index);
+  expect(repeated, "accessible names repeated across buttons").toEqual([]);
+});
+
+test("the reason for the inquiry offers exactly the three research-site inquiry types", async ({ page }) => {
+  await stubSite(page);
+  await openHome(page);
+  const options = page.locator("#consult-reason option");
+  await expect(options).toHaveText(["Choose one…", "Request Human-Reviewed Research", "Ask About Additional or Paid Access", "General Question"]);
+  await expect(options.evaluateAll((nodes) => nodes.map((node) => node.value))).resolves.toEqual(["", "human_research", "paid_access", "general_question"]);
+});
+
+test("each inquiry type is sent as chosen, so the server can label the notification", async ({ page }) => {
+  for (const reason of ["human_research", "paid_access", "general_question"]) {
     const calls = await stubSite(page);
     await openHome(page);
     await fillConsultation(page, { reason });
@@ -220,49 +250,68 @@ test("each request type is sent as chosen, so the server can label the notificat
   }
 });
 
-test("the description is required and its message appears with the other missing fields", async ({ page }) => {
+test("the description is optional: a blank or spaces-only description is sent as empty and accepted", async ({ page }) => {
   const calls = await stubSite(page);
   await openHome(page);
-  await fillConsultation(page, { description: "" });
+  await fillConsultation(page);
   await page.locator("#consult-description").fill("   ");
   await submit(page).click();
-  await expect(page.locator("#consult-description")).toHaveAttribute("aria-invalid", "true");
-  await expect(page.locator("#consult-description-error")).toHaveText("Please add a short description of what you need.");
-  await expect(page.locator("#consult-description")).toBeFocused();
-  expect(calls.consultation).toHaveLength(0);
-  await page.locator("#consult-description").fill("Twenty items.");
-  await expect(page.locator("#consult-description-error")).toBeHidden();
+  await expect(page.locator("#consult-success")).toBeVisible();
+  expect(calls.consultation[0].body.description).toBe("");
 });
 
-test("the old assignment anchor and request-type links land on the unified form with the right type selected", async ({ page }) => {
+test("links can preselect an inquiry type; unknown and retired values are ignored, not guessed at", async ({ page }) => {
   await stubSite(page);
+  await page.goto("/index.html?consult=human_research");
+  await expect(page.locator("#consult-reason")).toHaveValue("human_research");
+  await page.goto("/index.html?consult=paid_access");
+  await expect(page.locator("#consult-reason")).toHaveValue("paid_access");
+  await page.goto("/index.html?consult=general_question");
+  await expect(page.locator("#consult-reason")).toHaveValue("general_question");
+  for (const retired of ["consultation", "research_request", "exploring", "individual_item"]) {
+    await page.goto(`/index.html?consult=${retired}`);
+    await expect(page.locator("#consult-reason")).toHaveValue("");
+  }
+  // The retired assignment anchor no longer selects anything on this form.
   await page.goto("/index.html#submit-assignment");
-  await expect(page.locator("#consult-reason")).toHaveValue("research_request");
-  await expect(page.locator("#consultation-form")).toBeInViewport();
-
-  await page.goto("/index.html?consult=consultation");
-  await expect(page.locator("#consult-reason")).toHaveValue("consultation");
-  await page.goto("/index.html?consult=exploring");
-  await expect(page.locator("#consult-reason")).toHaveValue("exploring");
-  // The retired reason values from the earlier form are ignored, not guessed at.
-  await page.goto("/index.html?consult=individual_item");
   await expect(page.locator("#consult-reason")).toHaveValue("");
-
-  // Same-page link to the old anchor after the visitor chose something else.
-  await page.goto("/index.html");
-  await page.locator("#consult-reason").selectOption("exploring");
-  await page.evaluate(() => { window.location.hash = "#submit-assignment"; });
-  await expect(page.locator("#consult-reason")).toHaveValue("research_request");
 });
 
-test("the form stays usable on a narrow screen: single column, no overflow, button reachable", async ({ page }, testInfo) => {
+test("the header Contact link and the footer lead to the contact section and the privacy policy", async ({ page }) => {
+  await stubSite(page);
+  await page.goto("/");
+  await page.locator('header a[href="#contact"]').click();
+  await expect(page).toHaveURL(/#contact$/);
+  await expect(page.locator("#contact")).toBeInViewport();
+  await expect(page.locator("#consultation-heading")).toHaveText("Ask a question or request human-reviewed research");
+  await expect(page.locator('#consult-privacy a[href="/privacy"]')).toBeVisible();
+  await expect(page.locator('footer a[href="/privacy"]')).toBeVisible();
+  await expect(page.locator('footer a[href="mailto:submissions@itemassist.com"]')).toBeVisible();
+});
+
+test("the contact copy does not advertise automatic paid access or checkout", async ({ page }) => {
+  await stubSite(page);
+  await page.goto("/");
+  const section = page.locator("#contact");
+  await expect(section).toContainText("Paid access is not available to purchase online");
+  await expect(section).toContainText("nothing is charged");
+  await expect(section).not.toContainText(/checkout|subscribe|subscription|buy now|pricing plan|per month|per claim|starting at/i);
+  await expect(page.locator('a[href*="checkout"], a[href*="billing"], button:has-text("Buy"), button:has-text("Subscribe")')).toHaveCount(0);
+});
+
+test("the form stays usable on a narrow screen: no overflow, nothing off-screen, button reachable", async ({ page }, testInfo) => {
   await stubSite(page);
   await openHome(page);
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-  expect(overflow).toBeLessThanOrEqual(0);
+  expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
   const box = await page.locator("#consultation-form").boundingBox();
   expect(box.x).toBeGreaterThanOrEqual(-0.5);
   expect(box.x + box.width).toBeLessThanOrEqual(testInfo.project.use.viewport.width + 0.5);
   await submit(page).scrollIntoViewIfNeeded();
   await expect(submit(page)).toBeInViewport();
+  // On narrow screens the pinned research composer steps aside while the form is in use, so it never covers a field.
+  if (testInfo.project.use.viewport.width <= 960) {
+    await page.locator("#consult-name").focus();
+    await expect(page.locator("body")).toHaveClass(/rf-contact-active/);
+    await expect(page.locator("#rf-composer")).toBeHidden();
+  }
 });

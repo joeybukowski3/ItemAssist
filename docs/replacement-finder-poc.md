@@ -1,5 +1,8 @@
 # Replacement Finder (proof of concept)
 
+> **Update 2026-11-10:** the workspace page is now the public homepage (`/`, `index.html`), indexable and in the sitemap, and
+> `/replacement-finder` redirects to it. See [ai-only-mode.md](ai-only-mode.md). The API contract and request flow below are unchanged.
+
 A standalone page, `/replacement-finder`, and a same-origin proxy, `POST /api/replacement-finder`. The page helps a user find the
 closest like-kind-and-quality (LKQ) replacement for a supported product. It is a proof of concept: it is `noindex`, is not linked
 from the site navigation, and is not in `sitemap.xml`.

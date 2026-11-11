@@ -9,8 +9,14 @@
 const REASONS = {
   consultation: "Free consultation",
   research_request: "Research request / assignment",
-  exploring: "Exploring options"
+  exploring: "Exploring options",
+  human_research: "Human-reviewed research request",
+  paid_access: "Additional or paid access inquiry",
+  general_question: "General question"
 };
+
+/** Request types on the AI research site, where the description is optional. The older types still need one. */
+const DESCRIPTION_OPTIONAL_REASONS = ["human_research", "paid_access", "general_question"];
 
 const ITEM_COUNT_BANDS = {
   "1-10": "1–10 items",
@@ -135,7 +141,9 @@ function validateConsultation(body) {
   }
 
   if (!description) {
-    errors.description = "Please add a short description of what you need.";
+    if (!DESCRIPTION_OPTIONAL_REASONS.includes(reason)) {
+      errors.description = "Please add a short description of what you need.";
+    }
   } else if (description.length > LIMITS.description) {
     errors.description = `Please keep the description under ${LIMITS.description} characters.`;
   }
@@ -165,6 +173,7 @@ function validateConsultation(body) {
 
 module.exports = {
   REASONS,
+  DESCRIPTION_OPTIONAL_REASONS,
   ITEM_COUNT_BANDS,
   LIMITS,
   cleanLine,

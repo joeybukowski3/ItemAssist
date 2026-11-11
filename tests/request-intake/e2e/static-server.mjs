@@ -28,7 +28,8 @@ function safeJoin(root, urlPath) {
 }
 
 const server = http.createServer((req, res) => {
-  let filePath = safeJoin(ROOT, req.url === "/" ? "/index.html" : req.url);
+  // "/" and "/?query" are the homepage, as on the deployed site.
+  let filePath = safeJoin(ROOT, req.url.split("?")[0] === "/" ? "/index.html" : req.url);
 
   if (!filePath) {
     res.writeHead(400);

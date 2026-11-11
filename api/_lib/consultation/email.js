@@ -35,6 +35,36 @@ const REQUEST_PROFILES = {
     textBanner: "INQUIRY - the sender is exploring options (marketing lead).",
     summary: "The sender is still exploring whether and how Item Assist can help.",
     nextStep: "Reply with an overview of the service and offer a free consultation."
+  },
+  human_research: {
+    leadType: "human_research_request",
+    idPrefix: "HR",
+    subjectLabel: "New Human-Reviewed Research Request",
+    badge: "Human-reviewed research request &middot; research site",
+    heading: "New Item Assist human-reviewed research request",
+    textBanner: "HUMAN-REVIEWED RESEARCH REQUEST - the sender wants a person to review or research an item.",
+    summary: "The sender asked for human-reviewed research. This is first contact only: no scope, price, or files have been agreed or received.",
+    nextStep: "Reply to confirm which items need research, the scope, turnaround, and price."
+  },
+  paid_access: {
+    leadType: "paid_access_inquiry",
+    idPrefix: "PA",
+    subjectLabel: "New Additional / Paid Access Inquiry",
+    badge: "Additional or paid access inquiry &middot; research site",
+    heading: "New Item Assist additional or paid access inquiry",
+    textBanner: "ADDITIONAL / PAID ACCESS INQUIRY - the sender is asking about access beyond the free research limits.",
+    summary: "The sender asked about additional or paid access to the research workspace. Paid access is not available for self-serve purchase, and nothing has been quoted or agreed.",
+    nextStep: "Reply to learn how they would use it (volume, frequency) and whether access can be offered."
+  },
+  general_question: {
+    leadType: "general_question",
+    idPrefix: "GQ",
+    subjectLabel: "New General Question",
+    badge: "General question &middot; research site",
+    heading: "New Item Assist general question",
+    textBanner: "GENERAL QUESTION - website message.",
+    summary: "The sender sent a general question through the website.",
+    nextStep: "Reply directly to the sender."
   }
 };
 

@@ -3,59 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7HWGRFJSFY"></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-7HWGRFJSFY');
+    // Google Analytics loads for real visitors only: automated browsers (navigator.webdriver) never request it.
+    if (!navigator.webdriver) {
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { window.dataLayer.push(arguments); };
+      window.gtag("js", new Date());
+      window.gtag("config", "G-7HWGRFJSFY");
+      var gaScript = document.createElement("script");
+      gaScript.async = true;
+      gaScript.src = "https://www.googletagmanager.com/gtag/js?id=G-7HWGRFJSFY";
+      document.head.appendChild(gaScript);
+    }
   </script>
   <title>Page Not Found | Item Assist</title>
-  <meta name="description" content="The page you requested could not be found. Return to Item Assist to review services, view the sample report, or submit a contents list.">
+  <meta name="description" content="The page you requested could not be found. Return to the Item Assist research workspace.">
   <meta name="robots" content="noindex,follow">
   <link rel="canonical" href="https://itemassist.com/404.html" />
-  <link rel="icon" type="image/svg+xml" href="assets/itemassist-logo.svg">
+  <link rel="icon" type="image/svg+xml" href="/assets/itemassist-logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/replacement-finder.css">
+  <link rel="stylesheet" href="/assets/css/rf-contact.css">
 </head>
 <body class="error-page">
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <nav>
-    <div class="nav-inner">
-      <a href="https://itemassist.com/" class="logo header-logo" aria-label="Item Assist home">
-        <img src="assets/itemassist-logo-header.svg" alt="Item Assist logo" class="site-logo-img header-logo-img" width="190" height="44">
-      </a>
-
-      <ul class="nav-links" id="site-nav">
-        <li><a href="https://itemassist.com/services">Services</a></li>
-        <li><a href="https://itemassist.com/report">Report</a></li>
-        <li><a href="https://itemassist.com/#how">How It Works</a></li>
-        <li><a href="https://itemassist.com/services#svc-pricing-tiers">Pricing</a></li>
-        <li><a href="https://itemassist.com/about">About</a></li>
-        <li><a href="https://itemassist.com/#contact">Contact</a></li>
-        <li class="nav-mobile-cta"><a href="/#consultation" class="nav-cta">Request a Free Consultation</a></li>
-      </ul>
-
-      <div class="nav-actions">
-        <a href="/#consultation" class="nav-cta">Request a Free Consultation</a>
-      </div>
-
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </nav>
+  <header class="rf-bar">
+    <a href="https://itemassist.com/" class="logo header-logo" aria-label="Item Assist home">
+      <img src="/assets/itemassist-logo-header.svg" alt="Item Assist" class="site-logo-img header-logo-img" width="190" height="44">
+    </a>
+    <nav class="rf-bar-label" aria-label="Site"><a href="/">Research workspace</a></nav>
+  </header>
 
   <main id="main">
     <section class="hero error-hero">
       <div class="hero-content">
         <h1>Page Not Found</h1>
-        <p class="hero-sub">The page you requested is not available. Return to the homepage, review household contents services, or request a free consultation.</p>
+        <p class="hero-sub">The page you requested is not available. Return to the research workspace to identify a product, compare replacement options and explore pricing information.</p>
       </div>
     </section>
 
@@ -63,17 +50,22 @@
       <div class="error-content-wrap">
         <div class="error-card">
           <h2>Need help finding the right page?</h2>
-          <p>Item Assist provides accuracy-first market-pricing research, documented LKQ replacement reasoning, and current retail sources for common household contents.</p>
+          <p>Item Assist is a conversational research workspace for product identification, replacement research and market pricing context.</p>
           <div class="error-actions">
-            <a href="https://itemassist.com/" class="btn-secondary">Back to Home</a>
-            <a href="https://itemassist.com/services" class="btn-secondary">View Services</a>
-            <a href="/#consultation" class="btn-primary">Request a Free Consultation</a>
+            <a href="https://itemassist.com/" class="btn-primary">Open the Research Workspace</a>
+            <a href="https://itemassist.com/#contact" class="btn-secondary">Contact Us</a>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <script src="script.js"></script>
+  <footer class="rf-foot">
+    <span>&copy; 2026 Item Assist. All rights reserved.</span>
+    <nav aria-label="Footer">
+      <a href="/privacy">Privacy Policy</a>
+      <a href="mailto:submissions@itemassist.com">submissions@itemassist.com</a>
+    </nav>
+  </footer>
 </body>
 </html>

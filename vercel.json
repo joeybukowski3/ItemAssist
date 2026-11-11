@@ -1,16 +1,23 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/about", "destination": "/", "permanent": false },
+    { "source": "/about.html", "destination": "/", "permanent": false },
+    { "source": "/services", "destination": "/", "permanent": false },
+    { "source": "/services.html", "destination": "/", "permanent": false },
+    { "source": "/report", "destination": "/", "permanent": false },
+    { "source": "/report.html", "destination": "/", "permanent": false },
+    { "source": "/request-age-verification", "destination": "/", "permanent": false },
+    { "source": "/request-age-verification.html", "destination": "/", "permanent": false },
+    { "source": "/what-does-lkq-mean-contents-claims", "destination": "/", "permanent": false },
+    { "source": "/what-does-lkq-mean-contents-claims.html", "destination": "/", "permanent": false },
+    { "source": "/discontinued-av-receiver-replacement-research", "destination": "/", "permanent": false },
+    { "source": "/discontinued-av-receiver-replacement-research.html", "destination": "/", "permanent": false },
+    { "source": "/replacement-finder", "destination": "/", "permanent": false },
+    { "source": "/replacement-finder.html", "destination": "/", "permanent": false }
+  ],
   "headers": [
-    {
-      "source": "/replacement-finder",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        }
-      ]
-    },
     {
       "source": "/api/replacement-finder",
       "headers": [

@@ -159,6 +159,61 @@ test("the three request types never share a subject label, tag or banner", async
   assert.equal(seen.size, 9);
 });
 
+const RESEARCH_SITE_TYPES = [
+  { reason: "human_research", prefix: "HR", subject: /^New Human-Reviewed Research Request HR-20261103-[0-9A-F]{8} — ItemAssist$/, tag: "human_research_request", banner: /^HUMAN-REVIEWED RESEARCH REQUEST - /, type: "Human-reviewed research request" },
+  { reason: "paid_access", prefix: "PA", subject: /^New Additional \/ Paid Access Inquiry PA-20261103-[0-9A-F]{8} — ItemAssist$/, tag: "paid_access_inquiry", banner: /^ADDITIONAL \/ PAID ACCESS INQUIRY - /, type: "Additional or paid access inquiry" },
+  { reason: "general_question", prefix: "GQ", subject: /^New General Question GQ-20261103-[0-9A-F]{8} — ItemAssist$/, tag: "general_question", banner: /^GENERAL QUESTION - /, type: "General question" }
+];
+
+for (const expected of RESEARCH_SITE_TYPES) {
+  test(`a ${expected.reason} inquiry is identified in the subject, banner, tag, request-type row and log, with a source and a Reply-To`, async () => {
+    const { handler, resend, events } = build();
+    const res = await post(handler, validConsultationBody({ reason: expected.reason }));
+    assert.equal(res.statusCode, 200);
+    assert.match(res.json().leadId, new RegExp(`^${expected.prefix}-20261103-[0-9A-F]{8}$`));
+    const [mail] = resend.sent;
+    assert.match(mail.subject, expected.subject);
+    assert.deepEqual(mail.tags, [{ name: "lead_type", value: expected.tag }]);
+    assert.match(mail.text, expected.banner);
+    assert.match(mail.text, new RegExp(`Request type: ${expected.type}`));
+    assert.match(mail.html, /Reply to this email to respond to the sender/);
+    assert.equal(mail.replyTo, "jane@example.com");
+    assert.match(mail.text, /Marketing source: source: linkedin, medium: social, campaign: launch-nov/);
+    assert.equal(events.at(-1).leadType, expected.tag);
+    assert.equal(events.at(-1).source, "linkedin");
+  });
+}
+
+test("the six request types never share a subject label, tag or banner", async () => {
+  const seen = new Set();
+  for (const reason of ["consultation", "research_request", "exploring", "human_research", "paid_access", "general_question"]) {
+    const { handler, resend } = build();
+    await post(handler, validConsultationBody({ reason }));
+    const [mail] = resend.sent;
+    seen.add(mail.subject.replace(/ [A-Z]{2}-\d{8}-[0-9A-F]{8} — ItemAssist$/, ""));
+    seen.add(mail.tags[0].value);
+    seen.add(mail.text.split("\n")[0]);
+  }
+  assert.equal(seen.size, 18);
+});
+
+test("the paid-access notification says paid access is not self-serve and nothing was quoted", async () => {
+  const { handler, resend } = build();
+  await post(handler, validConsultationBody({ reason: "paid_access" }));
+  const [mail] = resend.sent;
+  assert.match(mail.text, /not available for self-serve purchase, and nothing has been quoted or agreed/);
+});
+
+test("on the research site only name, email and the reason for the inquiry are required: no description, company, phone or item count", async () => {
+  for (const reason of ["human_research", "paid_access", "general_question"]) {
+    const { handler, resend } = build();
+    const res = await post(handler, { name: "Jane Smith", email: "jane@example.com", reason, submission_id: "sub_" + reason.padEnd(20, "x"), website: "", turnstileToken: "valid-token" });
+    assert.equal(res.statusCode, 200, reason);
+    const [mail] = resend.sent;
+    assert.ok(!/Short description:|Company:|Phone:|Approximate item count:/.test(mail.text), "blank optional fields are left out of the email");
+  }
+});
+
 test("the log line carries the lead type and the source but no name, email, phone or description", async () => {
   const { handler, events } = build();
   await post(handler, validConsultationBody());

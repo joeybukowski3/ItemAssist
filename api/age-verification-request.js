@@ -8,6 +8,7 @@ const { saveRequestRecord } = require("./_lib/age-verification/store");
 const { checkRateLimit } = require("./_lib/age-verification/ratelimit");
 const { verifyTurnstile } = require("./_lib/age-verification/turnstile");
 const { sendInternalNotification, sendCustomerConfirmation } = require("./_lib/age-verification/email");
+const { createRetiredHandler } = require("./_lib/retired-endpoint");
 const AVShared = require("../assets/js/av-shared.js");
 const AVFileRules = require("../assets/js/av-file-rules.js");
 
@@ -508,7 +509,9 @@ function createHandler(overrides = {}) {
   };
 }
 
-module.exports = createHandler();
+// Retired for the AI-only site: the public route answers 410 and processes nothing. `createHandler` is the full implementation, kept
+// for its tests and for restoring the commercial site (docs/ai-only-mode.md).
+module.exports = createRetiredHandler();
 module.exports.createHandler = createHandler;
 module.exports.buildItemsFromFields = buildItemsFromFields;
 module.exports.buildSubmission = buildSubmission;

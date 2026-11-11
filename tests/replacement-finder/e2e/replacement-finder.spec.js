@@ -30,9 +30,8 @@ test("initial: an application shell with an assistant pane and an empty Product 
   const seen = await prepare(page);
   await page.goto(PAGE);
 
-  await expect(page.getByRole("heading", { level: 1, name: "ItemAssist Assistant" })).toBeVisible();
-  if (page.viewportSize().width > PHONE_MAX) await expect(page.getByText("Research and replacement analysis")).toBeVisible();
-  else await expect(page.getByText("Research and replacement analysis")).toBeHidden(); // phones: one line less before the conversation
+  await expect(page.getByRole("heading", { level: 1, name: "Product Identification & Market Pricing Research" })).toBeVisible();
+  await expect(page.getByText("Research products, compare replacement options, and explore relevant specifications and pricing information through a conversational research workspace.")).toBeVisible();
   await expect(page.locator("#rf-log")).toContainText("Tell me what item you're researching. You can start with a brand and model number.");
   await expect(page.getByRole("button", { name: "Find Replacement" })).toBeEnabled();
   await expect(page.getByLabel("Message ItemAssist")).toBeVisible();
@@ -51,12 +50,15 @@ test("initial: an application shell with an assistant pane and an empty Product 
   await settle(seen);
 });
 
-test("initial: noindex, no site navigation, and a single header link", async ({ page }) => {
+test("initial: an indexable homepage whose only site navigation is a header link to the contact form and a footer", async ({ page }) => {
   await prepare(page);
   await page.goto(PAGE);
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex,nofollow");
-  await expect(page.locator("nav")).toHaveCount(0);
-  await expect(page.locator("header a")).toHaveCount(1);
+  await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://itemassist.com/");
+  await expect(page.locator("header a")).toHaveCount(2); // the logo and Contact
+  await expect(page.locator('header a[href="#contact"]')).toHaveText("Contact");
+  await expect(page.locator("footer a")).toHaveText(["Privacy Policy", "submissions@itemassist.com"]);
+  await expect(page.locator("main a")).toHaveCount(2); // the Privacy Policy link under the contact form and the mailto link in its (hidden) confirmation
 });
 
 test("initial: the availability check disables lookups when the feature flag is off", async ({ page }) => {
@@ -937,7 +939,7 @@ test("accessibility: landmarks, a live conversation log, labelled controls and v
   await page.goto(PAGE);
   await expect(page.getByRole("main")).toHaveCount(1);
   await expect(page.getByRole("log", { name: "Conversation" })).toHaveAttribute("aria-live", "polite");
-  await expect(page.getByRole("region", { name: "ItemAssist Assistant", includeHidden: true })).toBeAttached();
+  await expect(page.getByRole("region", { name: "Product Identification & Market Pricing Research", includeHidden: true })).toBeAttached();
   await expect(page.getByRole("region", { name: "Product Intelligence", includeHidden: true })).toBeAttached();
   for (const control of await page.locator("button, input:not([type=hidden]), textarea").all()) {
     if (!(await control.isVisible())) continue;

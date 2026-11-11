@@ -1,6 +1,6 @@
-// /api/contact is the detailed assignment endpoint. The homepage no longer posts to it, but the About page still does,
-// so the unified-inquiry work must leave its contract alone. These checks stop at the validation gates, so nothing
-// reaches Resend, Turnstile or the network.
+// /api/contact is the detailed assignment endpoint. In AI-only mode the public route is retired (410, see retired-endpoints.test.mjs),
+// but its full implementation is kept as `legacyHandler` so the archived commercial About page can be restored against an unchanged
+// contract. These checks run that implementation and stop at the validation gates, so nothing reaches Resend, Turnstile or the network.
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
@@ -34,7 +34,7 @@ after(() => {
 
 async function call(req) {
   const res = createFakeRes();
-  await contact(req, res);
+  await contact.legacyHandler(req, res);
   return res;
 }
 

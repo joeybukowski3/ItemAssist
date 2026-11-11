@@ -1,13 +1,17 @@
 # ItemAssist Static Site
 
-First-pass static homepage scaffold for ItemAssist.
+Static site for ItemAssist.
+
+> **Current public site: "AI Research Tool".** The homepage is the conversational research workspace plus one contact form.
+> The earlier commercial marketing site is archived and restorable; see [docs/ai-only-mode.md](docs/ai-only-mode.md) for the
+> archive branch and tag, the rollback deployment and the restore procedure.
 
 ## Structure
 
-- `index.html` contains the homepage markup.
-- `styles.css` contains all layout and visual styling.
-- `script.js` contains minimal interaction for the mobile navigation.
-- `assets/report-preview.png` is the hero preview image.
+- `index.html` is the research workspace homepage (assistant, Product Intelligence panel, contact form).
+- `styles.css` holds the shared design tokens; `replacement-finder.css`, `assets/css/rf-*.css` style the workspace and the contact section.
+- `replacement-finder.js` and `assets/js/rf-*.js` are the workspace; `consultation.js` is the contact form.
+- `privacy.html` and `404.html` are the only other public pages.
 - `Stitch-Export/` contains the raw Google Stitch reference export and prototype code.
 
 ## Local Preview

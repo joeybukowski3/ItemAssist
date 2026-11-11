@@ -18,9 +18,37 @@ test("a minimal valid body has no errors and trims every field", () => {
   assert.equal(fields.description, "A short note.");
 });
 
-test("the request types are exactly consultation, research request and exploring options", () => {
-  assert.deepEqual(v.REASONS, { consultation: "Free consultation", research_request: "Research request / assignment", exploring: "Exploring options" });
+test("the request types are the three earlier ones plus the research site's human-review, access and general-question types", () => {
+  assert.deepEqual(v.REASONS, {
+    consultation: "Free consultation",
+    research_request: "Research request / assignment",
+    exploring: "Exploring options",
+    human_research: "Human-reviewed research request",
+    paid_access: "Additional or paid access inquiry",
+    general_question: "General question"
+  });
   assert.deepEqual(Object.keys(v.validateConsultation({ ...base, reason: "", description: "" }).errors).sort(), ["description", "reason"]);
+});
+
+test("the description is optional for the research site's request types and still required for the earlier ones", () => {
+  assert.deepEqual(v.DESCRIPTION_OPTIONAL_REASONS, ["human_research", "paid_access", "general_question"]);
+  for (const reason of v.DESCRIPTION_OPTIONAL_REASONS) {
+    const { errors, fields } = v.validateConsultation({ ...base, reason, description: "  " });
+    assert.deepEqual(errors, {}, reason);
+    assert.equal(fields.description, "");
+  }
+  for (const reason of ["consultation", "research_request", "exploring"]) {
+    assert.deepEqual(Object.keys(v.validateConsultation({ ...base, reason, description: "" }).errors), ["description"], reason);
+  }
+  // Optional is not unlimited: a description that is given is still bounded.
+  assert.deepEqual(Object.keys(v.validateConsultation({ ...base, reason: "general_question", description: "x".repeat(1001) }).errors), ["description"]);
+});
+
+test("the research site's three required fields are name, email and reason; everything else may be blank", () => {
+  assert.deepEqual(Object.keys(v.validateConsultation({ name: "", email: "", reason: "general_question" }).errors).sort(), ["email", "name"]);
+  // Until a request type is chosen the description cannot be waived, so a blank form reports it as well.
+  assert.deepEqual(Object.keys(v.validateConsultation({ name: "", email: "", reason: "" }).errors).sort(), ["description", "email", "name", "reason"]);
+  assert.deepEqual(v.validateConsultation({ name: "Jane Smith", email: "jane@example.com", reason: "paid_access" }).errors, {});
 });
 
 test("every published request type and item-count band is accepted", () => {
