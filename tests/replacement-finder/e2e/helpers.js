@@ -3,7 +3,7 @@
 const { test, expect, isAnalyticsRequestUrl } = require("../../request-intake/e2e/fixtures.js");
 const contracts = require("../fixtures/contracts.js");
 
-const PAGE = "/replacement-finder.html";
+const PAGE = "/";
 const API = "**/api/replacement-finder";
 
 const errorBody = (errorCode, status = errorCode === "UNSUPPORTED" ? "UNSUPPORTED" : "ERROR") => ({
@@ -27,6 +27,10 @@ async function prepare(page, { enabled = true, reply = () => ({ status: 200, bod
   page.context().on("request", (request) => { if (isAnalyticsRequestUrl(request.url())) seen.analytics.push(request.url()); });
 
   await page.route(/fonts\.(googleapis|gstatic)\.com/, (route) => route.fulfill({ status: 200, contentType: "text/css", body: "" }));
+  // The homepage also carries the contact form. Its Cloudflare Turnstile script is answered with an empty file (so no browser ever contacts
+  // Cloudflare, and the widget simply never renders), and its site-key check is answered here; the form itself is covered in tests/marketing-home.
+  await page.route(/challenges\.cloudflare\.com/, (route) => route.fulfill({ status: 200, contentType: "text/javascript", body: "" }));
+  await page.route("**/api/consultation-request", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ turnstileSiteKey: "test-site-key" }) }));
   // ItemAssist Research route. By default it reports itself disabled, so the page is the classic lookup; `research: { reply }` enables it.
   // `reply` receives the parsed POST body and returns { status, body, delayMs } (or "abort").
   await page.route("**/api/itemassist-research", async (route) => {

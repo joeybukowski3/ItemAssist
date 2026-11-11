@@ -1,5 +1,5 @@
-/* Homepage inquiry form (free consultation, research request or exploring options). Posts JSON to /api/consultation-request.
-   Kept apart from script.js, which still owns the detailed assignment form on the About page. The server
+/* Inquiry form (human-reviewed research, additional or paid access, general question; the older consultation, research
+   request and exploring-options types still work). Posts JSON to /api/consultation-request. The server
    repeats every check here and is the authority. Nothing typed into the form is
    stored in the browser; only an explicit campaign tag (utm_source, utm_medium,
    utm_campaign or ref) is kept for the session so it survives moving between pages. */
@@ -33,7 +33,12 @@
   const field = (id) => document.getElementById(`consult-${id}`);
   const errorEl = (id) => document.getElementById(`consult-${id}-error`);
 
-  /* Rules mirror api/_lib/consultation/validation.js. */
+  // The earlier request types still need a description; the research site's types (human_research, paid_access, general_question) do not.
+  // The server (DESCRIPTION_OPTIONAL_REASONS in api/_lib/consultation/validation.js) is the authority. Here the description is only
+  // flagged once one of the earlier types is chosen, so an unfinished form never nags about an optional field.
+  const DESCRIPTION_REQUIRED_REASONS = ["consultation", "research_request", "exploring"];
+
+  /* Rules mirror api/_lib/consultation/validation.js. A rule whose field is not on this page (item count) is skipped. */
   const RULES = [
     { id: "name", required: "Please enter your name.", check: (v) => (v.length > 100 ? "Please keep your name under 100 characters." : "") },
     {
@@ -53,8 +58,13 @@
       }
     },
     { id: "count", check: () => "" },
-    { id: "description", required: "Please add a short description of what you need.", check: (v) => (v.length > 1000 ? "Please keep the description under 1,000 characters." : "") }
-  ];
+    {
+      id: "description",
+      required: "Please add a short description of what you need.",
+      requiredFor: DESCRIPTION_REQUIRED_REASONS,
+      check: (v) => (v.length > 1000 ? "Please keep the description under 1,000 characters." : "")
+    }
+  ].filter((rule) => field(rule.id));
 
   const SERVER_FIELD_IDS = { name: "name", email: "email", reason: "reason", company: "company", phone: "phone", item_count: "count", description: "description" };
 
@@ -103,7 +113,9 @@
 
   const validateField = (rule) => {
     const value = field(rule.id).value.trim();
-    const message = !value && rule.required ? rule.required : rule.check(value);
+    const reason = field("reason");
+    const waived = Boolean(rule.requiredFor && !(reason && rule.requiredFor.includes(reason.value)));
+    const message = !value && rule.required && !waived ? rule.required : rule.check(value);
 
     if (message) {
       showFieldError(rule.id, message);
@@ -125,6 +137,15 @@
     input.addEventListener("change", () => {
       if (input.getAttribute("aria-invalid") === "true") {
         validateField(rule);
+      }
+
+      // Choosing a request type can make the description optional (or required again).
+      if (rule.id === "reason") {
+        const description = RULES.find((other) => other.id === "description");
+
+        if (description && field("description").getAttribute("aria-invalid") === "true") {
+          validateField(description);
+        }
       }
     });
   });
@@ -263,12 +284,16 @@
       reason: field("reason").value,
       company: field("company").value.trim(),
       phone: field("phone").value.trim(),
-      item_count: field("count").value,
       description: field("description").value.trim(),
       website: document.getElementById("consult-website").value.trim(),
       submission_id: submissionId,
       turnstileToken: token
     };
+
+    // The item count only exists on the older form.
+    if (field("count")) {
+      payload.item_count = field("count").value;
+    }
 
     SOURCE_PARAMS.forEach((key) => {
       if (typeof source[key] === "string" && source[key]) {

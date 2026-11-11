@@ -1,0 +1,94 @@
+/*
+ * ItemAssist research site additions to the workspace shell (replacement-finder.css): the header link, the lead heading in the
+ * assistant pane, the contact section and the footer. Everything is namespaced .rf-* and built on the same tokens. The form keeps the
+ * element ids and the .form-* hooks that consultation.js reads, so those are styled here under .rf-contact.
+ */
+
+/* ---------- Header link ---------- */
+.rf-bar-label a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 0.75rem; color: var(--rf-ink); text-decoration: none; border: 1px solid var(--rf-line-strong); border-radius: 6px; transition: background 0.15s, border-color 0.15s; }
+.rf-bar-label a:hover { background: var(--rf-neutral-bg); border-color: var(--slate-mid); }
+
+/* ---------- Lead heading: the page's h1 and its supporting copy live in the assistant pane head ---------- */
+.rf-assistant .rf-pane-head.rf-pane-head--lead { display: flex; flex-direction: column; align-items: flex-start; flex-wrap: nowrap; gap: 0.4375rem; padding: 1rem clamp(1rem, 2vw, 1.25rem) 0.875rem; }
+.rf-assistant .rf-pane-title.rf-pane-title--lead { font-size: clamp(1.125rem, 0.55rem + 1.1vw, 1.375rem); font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; text-transform: none; }
+.rf-assistant .rf-pane-head--lead .rf-pane-sub { display: block; flex: none; overflow: visible; white-space: normal; text-overflow: clip; font-size: 0.875rem; line-height: 1.5; }
+.rf-assistant .rf-pane-head--lead .rf-convo-toggle { margin-left: 0; }
+
+@media (max-width: 1100px) {
+  .rf-assistant .rf-pane-head--lead .rf-pane-sub { font-size: 0.8125rem; line-height: 1.45; }
+}
+@media (max-width: 960px) {
+  .rf-assistant .rf-pane-head.rf-pane-head--lead { gap: 0.25rem; padding: 0.75rem var(--rf-col-pad) 0.625rem; }
+  .rf-assistant .rf-pane-title.rf-pane-title--lead { font-size: 1.125rem; }
+  .rf-assistant .rf-pane-head--lead .rf-pane-sub { font-size: 0.8125rem; line-height: 1.4; }
+}
+
+/* ---------- Contact section ---------- */
+.rf-contact { background: var(--white); border-top: 1px solid var(--rf-line-strong); padding: clamp(1.75rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem); scroll-margin-top: var(--rf-bar-h); }
+.rf-contact-inner { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(1.25rem, 4vw, 3rem); align-items: start; max-width: 1040px; margin: 0 auto; }
+.rf-contact-intro > * { margin: 0; }
+.rf-contact-intro h2 + p, .rf-contact-intro p + p { margin-top: 0.75rem; }
+.rf-contact-intro h2 { margin-top: 0.5rem; font-size: clamp(1.25rem, 0.9rem + 0.9vw, 1.625rem); font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; color: var(--rf-ink); }
+.rf-contact-intro h2:focus { outline: none; }
+.rf-contact-intro p { font-size: 0.9375rem; line-height: 1.55; color: var(--text-body); }
+.rf-contact-intro .rf-eyebrow { font-size: 0.6875rem; line-height: 1.4; color: var(--rf-muted); }
+.rf-contact-intro .rf-contact-note { padding-left: 0.75rem; border-left: 2px solid var(--rf-line-strong); font-size: 0.8125rem; color: var(--rf-muted); }
+.rf-contact-form { min-width: 0; padding: clamp(1rem, 2.5vw, 1.5rem); background: var(--bg-soft); border: 1px solid var(--rf-line-strong); border-top: 2px solid var(--navy); border-radius: var(--rf-radius); }
+
+.rf-contact form { display: flex; flex-direction: column; gap: 0.875rem; margin: 0; }
+.rf-contact form[hidden] { display: none; }
+.rf-contact .form-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.875rem; margin: 0; }
+.rf-contact .form-group { display: flex; flex-direction: column; gap: 0.3125rem; min-width: 0; margin: 0; }
+.rf-contact .form-group label { font-size: 0.625rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rf-ink); }
+.rf-contact .req { color: var(--rf-bad-text); }
+.rf-contact .form-opt { font-weight: 500; letter-spacing: 0.04em; text-transform: none; color: var(--rf-muted); }
+.rf-contact input[type="text"], .rf-contact input[type="email"], .rf-contact input[type="tel"], .rf-contact select, .rf-contact textarea {
+  width: 100%; min-height: 40px; margin: 0; padding: 7px 11px; font: inherit; font-size: 0.9375rem; color: var(--rf-ink); background: var(--white);
+  border: 1px solid var(--rf-line-strong); border-radius: 6px; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.rf-contact textarea { min-height: 76px; line-height: 1.4; resize: vertical; }
+.rf-contact input:hover, .rf-contact select:hover, .rf-contact textarea:hover { border-color: var(--slate-mid); }
+.rf-contact input:focus, .rf-contact select:focus, .rf-contact textarea:focus { outline: none; border-color: var(--rf-focus); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.22); }
+.rf-contact [aria-invalid="true"] { border-color: var(--rf-bad-text); box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12); }
+.rf-contact .form-help { margin: 0; font-size: 0.75rem; line-height: 1.45; color: var(--rf-muted); }
+.rf-contact .field-error { margin: 0; font-size: 0.8125rem; font-weight: 500; color: var(--rf-bad-text); }
+.rf-contact .field-error[hidden] { display: none; }
+.rf-contact .form-honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.rf-contact .form-turnstile { min-height: 65px; }
+.rf-contact .form-submit { align-self: flex-start; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 42px; padding: 0 1.25rem; font: inherit; font-size: 0.9375rem; font-weight: 600; color: var(--white); background: var(--navy); border: 0; border-radius: 6px; cursor: pointer; box-shadow: 0 1px 2px rgba(15, 32, 54, 0.25); transition: background 0.15s, box-shadow 0.15s; }
+.rf-contact .form-submit:hover { background: var(--navy-deep); box-shadow: 0 4px 12px rgba(15, 32, 54, 0.28); }
+.rf-contact .form-submit:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+.rf-contact .form-status { margin: 0; min-height: 0; font-size: 0.875rem; line-height: 1.45; }
+.rf-contact .form-status:empty { display: none; }
+.rf-contact .form-status--pending { color: var(--rf-muted); }
+.rf-contact .form-status--error { color: var(--rf-bad-text); font-weight: 500; }
+.rf-contact .form-status--success { color: var(--rf-ok-text); }
+.rf-contact .form-disclaimer { margin: 0; font-size: 0.75rem; line-height: 1.5; color: var(--rf-muted); }
+.rf-contact .form-disclaimer a { color: var(--rf-info-text); }
+
+.rf-contact .consult-success { padding: 1rem 1.125rem; background: var(--rf-ok-bg); border: 1px solid var(--rf-ok-line); border-radius: var(--rf-radius); color: var(--rf-ok-text); }
+.rf-contact .consult-success[hidden] { display: none; }
+.rf-contact .consult-success:focus { outline: 2px solid var(--rf-focus); outline-offset: 2px; }
+.rf-contact .consult-success-icon { display: inline-grid; place-items: center; width: 24px; height: 24px; margin-bottom: 0.375rem; font-size: 0.875rem; font-weight: 700; color: var(--white); background: var(--rf-ok-text); border-radius: 50%; }
+.rf-contact .consult-success h3 { margin: 0 0 0.375rem; font-size: 1.0625rem; font-weight: 700; color: var(--rf-ink); }
+.rf-contact .consult-success p { margin: 0; font-size: 0.875rem; line-height: 1.55; color: var(--text-body); }
+.rf-contact .consult-success a { color: var(--rf-info-text); }
+
+/* ---------- Footer ---------- */
+.rf-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1.5rem; padding: 1rem clamp(1rem, 3vw, 2rem); font-size: 0.8125rem; color: var(--rf-muted); background: var(--bg-soft); border-top: 1px solid var(--rf-line); }
+.rf-foot nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; }
+.rf-foot a { color: var(--rf-info-text); }
+
+@media (max-width: 960px) {
+  .rf-contact-inner { grid-template-columns: minmax(0, 1fr); max-width: 760px; }
+  /* The research composer is pinned to the bottom of the screen on narrow layouts. The page end clears it, and it steps aside only while the
+     contact form is in use or the workspace is out of view (assets/js/rf-contact-dock.js). */
+  .rf-foot { padding-bottom: calc(1rem + var(--rf-composer-h, 64px)); }
+  .rf-body .rf-composer { transition: transform 0.2s ease, visibility 0.2s; }
+  .rf-contact-active .rf-composer { transform: translateY(110%); visibility: hidden; }
+}
+@media (max-width: 520px) {
+  .rf-contact .form-row { grid-template-columns: minmax(0, 1fr); }
+  .rf-contact input[type="text"], .rf-contact input[type="email"], .rf-contact input[type="tel"], .rf-contact select, .rf-contact textarea { font-size: 1rem; } /* avoids iOS zoom-on-focus */
+  .rf-contact .form-submit { align-self: stretch; min-height: 44px; }
+}

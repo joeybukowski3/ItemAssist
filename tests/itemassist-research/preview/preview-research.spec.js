@@ -10,7 +10,7 @@ const { researchResponse, researchError } = require("../fixtures/research.js");
 const { resolvePreviewTarget } = require("./preview-target.js");
 
 const target = resolvePreviewTarget();
-const PAGE = "/replacement-finder";
+const PAGE = "/";
 const BYPASS = "VERCEL_AUTOMATION_BYPASS_SECRET";
 
 const test = base.extend({
@@ -83,7 +83,7 @@ test("the deployed Preview's workspace matches its own research status: research
 
   const response = await page.goto(PAGE);
   expect(response.status()).toBe(200);
-  expect(response.headers()["x-robots-tag"]).toMatch(/noindex/);
+  await expect(page).toHaveTitle(/Product Identification & Market Pricing Research/);
   // The research assets are served on every deployment, whichever way the status points.
   expect(await page.evaluate(() => [typeof window.RFResearch, typeof window.RFResearchView])).toEqual(["object", "object"]);
 

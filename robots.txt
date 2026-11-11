@@ -1,3 +1,4 @@
+# Retired pages are redirected to the homepage rather than disallowed, so crawlers can follow the redirect and drop the old URLs.
 User-agent: *
 Allow: /
 

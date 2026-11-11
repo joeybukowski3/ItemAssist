@@ -14,7 +14,13 @@ const box = (page, selector) => page.evaluate((query) => {
   return { top: r.top, bottom: r.bottom, left: r.left, right: r.right, height: r.height, width: r.width };
 }, selector);
 const settleScroll = (page) => page.waitForTimeout(1300); // smooth scrolling (the jump after a lookup) finishes
-const scrollFraction = (page, fraction) => page.evaluate((f) => window.scrollTo({ top: (document.documentElement.scrollHeight - window.innerHeight) * f, behavior: "instant" }), fraction);
+// The workspace (#rf-shell) used to be the whole page; the contact section and footer now follow it. Depth and height are measured on the
+// workspace: 0 is the top of the page, 1 is the end of the workspace (the composer's clearance included).
+const workspaceBottom = (page) => page.evaluate(() => document.getElementById("rf-shell").getBoundingClientRect().bottom + window.scrollY);
+const scrollFraction = (page, fraction) => page.evaluate((f) => {
+  const end = document.getElementById("rf-shell").getBoundingClientRect().bottom + window.scrollY;
+  window.scrollTo({ top: Math.max(0, end - window.innerHeight) * f, behavior: "instant" });
+}, fraction);
 const narrowOnly = (page) => test.skip(!isNarrowViewport(page), "applies at 960px and below");
 
 // ---- the pinned composer ---------------------------------------------------------------------------------------------
@@ -342,7 +348,7 @@ test("length: a typical result fits the page-height budget", async ({ page }) =>
   await prepare(page, best());
   await page.goto(PAGE);
   await runLookup(page, { notes: "Reusing existing wall mount" });
-  const height = await page.evaluate(() => document.documentElement.scrollHeight);
+  const height = await workspaceBottom(page); // the workspace, not the contact section and footer that follow it
   expect(height).toBeLessThanOrEqual(page.viewportSize().width <= PHONE_MAX ? PAGE_HEIGHT_BUDGET.phone : PAGE_HEIGHT_BUDGET.tablet);
 });
 
@@ -353,13 +359,18 @@ test("initial: the empty state is a single restrained message, and the page need
   await expect(page.locator(".rf-empty-lede")).toBeVisible();
   await expect(page.getByText("What appears here")).toBeHidden();
   await expect(page.locator(".rf-empty-list")).toBeHidden();
-  const [scrollHeight, innerHeight] = await page.evaluate(() => [document.documentElement.scrollHeight, window.innerHeight]);
-  expect(scrollHeight).toBeLessThanOrEqual(innerHeight);
+  // The workspace itself fits one screen; the contact section below it is reached by scrolling.
+  expect(await workspaceBottom(page)).toBeLessThanOrEqual(page.viewportSize().height);
   const [greeting, quick, divider, composer] = await Promise.all([box(page, "#rf-log"), box(page, "#rf-quick"), box(page, ".rf-pane-head--product"), box(page, "#rf-composer")]);
   expect(greeting.bottom).toBeLessThanOrEqual(quick.top + 1);
   expect(quick.bottom).toBeLessThanOrEqual(divider.top + 1);
   expect(composer.top).toBeGreaterThan(divider.bottom);
-  expect(divider.top).toBeLessThanOrEqual(260); // everything above the results is a handful of short rows
+  // Everything above the results is a handful of short rows. The page's heading and supporting copy (the h1 block) replaced a one-line
+  // pane title of about 38px, so the original 260px budget applies to the rows after allowing for that block, and the block is capped itself.
+  const COMPACT_TITLE_HEIGHT = 38;
+  const lead = await box(page, ".rf-pane-head--lead");
+  expect(lead.height).toBeLessThanOrEqual(150);
+  expect(divider.top - (lead.height - COMPACT_TITLE_HEIGHT)).toBeLessThanOrEqual(260);
   await expectNoHorizontalOverflow(page);
   await settle(seen);
 });
