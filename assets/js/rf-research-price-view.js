@@ -34,9 +34,19 @@
     return id ? data.pricing.evidence.filter(function (entry) { return entry.id === id; })[0] || null : null;
   }
 
+  /**
+   * A cited source as a link, except a bare seller address: that names the seller but does not identify the listing, so it is shown as text
+   * and said to be the seller's site only, never as a link that appears to verify the exact listing.
+   */
+  function evidenceLink(entry) {
+    var text = entry.sourceName + " (" + entry.sourceDomain + ")";
+    if (Res.isSellerSiteOnly(entry.sourceUrl)) return h("span", { class: "rf-rs-seller-only" }, [text, h("span", { class: "rf-muted", text: " · seller site only, no link to the listing" })]);
+    return R.sourceLink(entry.sourceUrl, text);
+  }
+
   function sourceLink(data, id) {
     var entry = evidenceOf(data, id);
-    return entry ? R.sourceLink(entry.sourceUrl, entry.sourceName + " (" + entry.sourceDomain + ")") : null;
+    return entry ? evidenceLink(entry) : null;
   }
 
   function requirementOf(data, id) {
@@ -92,24 +102,30 @@
     // One confirmed price is an observed anchor for one model, not a range.
     // One qualifying listing is likewise an anchor, not a range.
     var compatibility = Res.compatibilityLine(value);
-    var heading = value.method === "VERIFIED_SINGLE" ? "Replacement price anchor" : anchor ? "Current listing price anchor" : "Replacement value range";
+    var scope = Res.priceScope(data);
+    // A spread of family listings is not a price for one model, so it is not headed as the replacement's value. Listings that agree are one price
+    // seen at several sellers (an anchor); the scope sentence under the figure still says the model is not named.
+    var heading = scope.kind === "FAMILY_AMBIGUOUS" && !anchor ? "Family listing prices (not one model)" : value.method === "VERIFIED_SINGLE" ? "Replacement price anchor" : anchor ? "Current listing price anchor" : "Replacement value range";
     // Where the anchor comes from: the sellers behind the listings that set it.
     var sellers = anchor ? sellerNames(data, value) : "";
     // An AI-only figure beside prices seen for the original model: those say what the original cost, not what a replacement costs.
     var originalContext = value.method === "AI_ESTIMATE_ONLY" && data.pricing.prices.some(function (price) { return price.subject === "ORIGINAL" && price.kind !== "AI_ESTIMATE"; });
-    return h("section", { class: "rf-rs-value rf-rs-value--" + (value.verified ? "confirmed" : "estimate"), attrs: { "aria-labelledby": headingId } }, [
+    var scopeParagraphs = Res.scopeLines(data).map(function (sentence) { return h("p", { class: "rf-rs-scope rf-muted", text: sentence }); });
+    var children = [
       D.heading("h3", headingId, heading, "rf-eyebrow rf-rs-value-kicker"),
       range ? h("p", { class: "rf-rs-range rf-mono", text: range }) : h("p", { class: "rf-rs-range rf-rs-range--none", text: "Not enough evidence to estimate" }),
       // Directly under the figure: a range that rests on an unresolved fact about the original is not to be read without it.
       compatibility ? h("p", { class: "rf-rs-compat", text: compatibility }) : null,
       h("div", { class: "rf-lead-meta" }, pills),
-      h("p", { class: "rf-rs-value-line", text: Res.valuationLine(value) || "" }),
+      h("p", { class: "rf-rs-value-line", text: Res.valuationLine(value) || "" })
+    ].concat(scopeParagraphs, [
       originalContext ? h("p", { class: "rf-rs-value-line rf-muted rf-rs-original-context", text: ORIGINAL_CONTEXT_LINE }) : null,
       sellers ? h("p", { class: "rf-rs-value-sellers rf-muted", text: "Seen at: " + sellers + "." }) : null,
       tier.level !== "UNKNOWN" ? h("p", { class: "rf-rs-tier" }, [h("strong", { text: "Market tier: " }), label(Res.TIER_LABELS, tier.level) + ". " + label(Res.TIER_BASIS_LABELS, tier.basis) + "."]) : null,
       notes.length ? list(notes, "rf-rs-notes") : null,
       data.meta && data.meta.fixture === true ? h("p", { class: "rf-rs-demo-note", text: Res.DEMO_PRICE_NOTE }) : null
-    ].filter(Boolean));
+    ]).filter(Boolean);
+    return h("section", { class: "rf-rs-value rf-rs-value--" + (value.verified ? "confirmed" : "estimate"), attrs: { "aria-labelledby": headingId } }, children);
   }
 
   /** The role pill for a price, and the sentence that says why: whether it set the range, is context only, or was left out. */
@@ -124,6 +140,15 @@
     ];
   }
 
+  /**
+   * What a retail listing says about its own model: the model code its title names (evidence about the listing, not a confirmation of the model),
+   * or that it states none, so the price cannot be tied to one model.
+   */
+  function modelTag(price) {
+    if (price.kind !== "CURRENT_RETAIL_NEW" || price.subject !== "REPLACEMENT") return null;
+    return price.model ? D.pill("neutral", null, "Listing names " + price.model) : D.pill("warn", "q", "Listing does not state a model");
+  }
+
   function priceCard(data, price, className) {
     var amount = Res.formatRange(price.amount);
     var link = sourceLink(data, price.evidenceId);
@@ -134,7 +159,7 @@
         h("span", { class: "rf-rs-price-amount rf-mono", text: amount || "" })
       ]),
       h("p", { class: "rf-rs-price-meta" }, [subjectText(price) + (price.model ? " · " + price.model : "")]),
-      h("div", { class: "rf-rs-price-status" }, [verificationPill(price.verification), price.sizeConfirmed === false ? D.pill("warn", "q", "Size not confirmed") : null, price.configConfirmed === false ? D.pill("warn", "q", "Configuration not confirmed") : null, h("span", { class: "rf-rs-price-date", text: dateText(price) })].filter(Boolean)),
+      h("div", { class: "rf-rs-price-status" }, [verificationPill(price.verification), modelTag(price), price.sizeConfirmed === false ? D.pill("warn", "q", "Size not confirmed") : null, price.configConfirmed === false ? D.pill("warn", "q", "Configuration not confirmed") : null, h("span", { class: "rf-rs-price-date", text: dateText(price) })].filter(Boolean)),
       link ? h("p", { class: "rf-rs-price-source" }, [link, source ? " · " + label(Res.SOURCE_CLASS_LABELS, source.sourceClass) + ", " + label(Res.MODEL_RELATION_LABELS, source.modelRelation).toLowerCase() : ""]) : h("p", { class: "rf-rs-price-source rf-muted", text: "No source: this is an estimate." })
     ].concat(roleLines(data, price)));
   }
@@ -213,10 +238,13 @@
     return h("div", { class: "rf-rs-cmp" }, [summary ? h("p", { class: "rf-rs-cmp-summary", text: summary }) : null, rows.length ? h("ul", { class: "rf-rs-cmp-list" }, rows) : null].filter(Boolean));
   }
 
+  /** The price shown on a candidate card: a listing that sets the range (the lowest), with a line saying so when the figure rests on several. */
   function candidatePrice(data, key) {
-    var prices = data.pricing.prices.filter(function (price) { return price.candidate === key; });
-    var current = prices.filter(function (price) { return price.kind === "CURRENT_RETAIL_NEW"; })[0] || prices[0];
-    return current ? h("ul", { class: "rf-rs-prices rf-rs-prices--inline" }, [priceCard(data, current)]) : h("p", { class: "rf-muted", text: "No sourced price for this candidate is included in this research." });
+    var pick = Res.candidatePriceFor(data, key);
+    if (!pick.price) return [h("p", { class: "rf-muted", text: "No sourced price for this candidate is included in this research." })];
+    var nodes = [h("ul", { class: "rf-rs-prices rf-rs-prices--inline" }, [priceCard(data, pick.price)])];
+    if (pick.of > 1) nodes.push(h("p", { class: "rf-rs-price-caption rf-muted", text: Res.CANDIDATE_PRICE_CAPTION(pick.of) }));
+    return nodes;
   }
 
   /**
@@ -237,12 +265,11 @@
   /** The extra lines a candidate card carries in research.2: its price, any exclusion, and the requirement-by-requirement comparison. */
   function candidateDetail(data, item, key) {
     var excluded = data.pricing.valuation.excluded.filter(function (row) { return row.candidate === key; })[0];
-    return [
-      candidatePrice(data, key),
+    return candidatePrice(data, key).concat([
       otherSellerBlock(data, item, key),
       excluded ? h("p", { class: "rf-rs-excluded" }, [D.icon("info"), h("span", { text: label(Res.EXCLUSION_LABELS, excluded.reason) })]) : null,
       comparisonBlock(data, item)
-    ].filter(Boolean);
+    ]).filter(Boolean);
   }
 
   function rejectionLines(data) {
@@ -286,11 +313,11 @@
       pricing.evidence.length ? h("ul", { class: "rf-rs-sources" }, pricing.evidence.map(function (entry) {
         var seen = entry.observedAt ? "Seen " + Res.formatDay(entry.observedAt) : entry.publishedAt ? "Published " + Res.formatDay(entry.publishedAt) : "Date not stated";
         return h("li", {}, [
-          h("span", { class: "rf-rs-source-name" }, [R.sourceLink(entry.sourceUrl, entry.sourceName + " (" + entry.sourceDomain + ")")]),
+          h("span", { class: "rf-rs-source-name" }, [evidenceLink(entry)]),
           h("span", { class: "rf-rs-source-meta", text: label(Res.SOURCE_CLASS_LABELS, entry.sourceClass) + " · " + (entry.subject === "ORIGINAL" ? SUBJECT_ORIGINAL : label(Res.CANDIDATE_LABELS, entry.subject)) + " · " + seen + " · " + label(Res.MODEL_RELATION_LABELS, entry.modelRelation) })
         ]);
       })) : h("p", { class: "rf-muted", text: "No sources were cited." }),
-      h("p", { class: "rf-muted", text: "Links open the source in a new tab. A link shows where a figure came from; confirm availability and price with the seller." + (pricing.evidence.some(function (entry) { return /^https:\/\/[^/]+\/$/.test(entry.sourceUrl); }) ? " A listing's source links to the seller's site, not to a product page." : "") })
+      h("p", { class: "rf-muted", text: "Links open the source in a new tab. A link shows where a figure came from; confirm availability and price with the seller." + (pricing.evidence.some(function (entry) { return Res.isSellerSiteOnly(entry.sourceUrl); }) ? " A source shown as seller site only names the seller and has no link to the listing, so the listing itself cannot be checked from here." : "") })
     ]));
     var rejected = rejectionLines(data);
     if (rejected.length) children.push(block("rf-rejected-h", "Set aside", [list(rejected), h("p", { class: "rf-muted", text: "These were removed before anything was shown, so they do not affect the range." })]));

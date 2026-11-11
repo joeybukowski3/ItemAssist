@@ -80,13 +80,13 @@
   }
 
   function candidateMeta(item, v2) {
-    var conditional = item.standing === "CONDITIONAL";
-    // research.2: a caveat badge is shown only while a concern is actually shown beside it (research.1 keeps its badge as it was).
-    var showStanding = item.standing && (!conditional || !v2 || Boolean(item.concern));
+    // The badge comes from what the evidence supports, not from the model's own standing: only a model a cited page confirms is a
+    // "Direct successor"; a family, a model seen in a listing and an unconfirmed model code are each labelled as the likely successor they are.
+    var standing = Research.successorLabel(item, v2);
     return h("div", { class: "rf-lead-meta" }, [
       R.confidence(item.confidence),
       item.modelStatus ? D.pill(item.modelStatus === "VERIFIED_LISTING" ? "info" : "warn", item.modelStatus === "VERIFIED_LISTING" ? "check" : "q", Research.label(Research.MODEL_STATUS_LABELS, item.modelStatus, "")) : null,
-      showStanding ? D.pill(conditional ? "warn" : "info", conditional ? "q" : "check", conditional ? "Successor, with a caveat" : "Direct successor") : null,
+      standing ? D.pill(standing.tone, standing.icon, standing.text) : null,
       D.pill("neutral", "q", "Unverified suggestion")
     ].filter(Boolean));
   }
