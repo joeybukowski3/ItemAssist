@@ -1,6 +1,8 @@
 const Busboy = require("busboy");
 const { Resend } = require("resend");
 
+const { createRetiredHandler } = require("./_lib/retired-endpoint");
+
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const contactFromEmail = process.env.CONTACT_FROM_EMAIL || "";
 
@@ -323,7 +325,7 @@ async function parseRequest(req) {
   return parseJsonBody(body);
 }
 
-module.exports = async (req, res) => {
+const legacyHandler = async (req, res) => {
   if (req.method === "GET") {
     const siteKey = process.env.TURNSTILE_SITE_KEY;
 
@@ -439,3 +441,8 @@ module.exports = async (req, res) => {
     return json(res, 500, { ok: false, error: "We couldn't send your request. Please try again." });
   }
 };
+
+// Retired for the AI-only site: the public route answers 410 and processes nothing. `legacyHandler` is the full implementation, kept for
+// its tests and for restoring the commercial site (docs/ai-only-mode.md).
+module.exports = createRetiredHandler();
+module.exports.legacyHandler = legacyHandler;

@@ -32,8 +32,11 @@ Never delete or move the two `startup-commercial-*` tags or the archive branch. 
   research workspace and the new contact form.
 - `sitemap.xml` lists `/` and `/privacy` only. `robots.txt` still allows everything on purpose: retired URLs must stay crawlable so search
   engines can see the redirects.
-- `api/**` other than the consultation additions is untouched. `api/age-verification-request.js` and `api/contact.js` are still deployed
-  but no page links to them.
+- Retired upload endpoints: `/api/age-verification-request` (age-verification intake with file uploads) and `/api/contact` (assignment
+  form with attachments) answer every method with `410 Gone` through `api/_lib/retired-endpoint.js`. They read no request body, parse no
+  upload and use no mailer, store, limiter or Turnstile. Their full implementations remain in the same files (`createHandler`,
+  `legacyHandler`) and are covered by their original tests. `api/inbound-email.js` (a signature-verified Resend webhook) is not a public
+  form and is unchanged. The research proxy, replacement-finder proxy and consultation endpoint are in use. Other `api/**` is untouched.
 - No billing, checkout or subscription exists. The contact form says paid access is not available online.
 
 ## Restore the commercial site
@@ -80,7 +83,10 @@ Then, by hand:
    restore the `noindex` meta and the `/replacement-finder` entry in `vercel.json` `headers`, and drop its redirect.
 5. `assets/og-image.png` is the old social preview; point the metadata of the pages you restore at it.
 6. `privacy.html`: the commercial wording (assignment files, consultation form) is in the tag's copy; reconcile it with whatever the site then collects.
-7. Run `npm test` and the Playwright suites. The commercial specs (`homepage-content`, `site-consistency`, `request-age-verification`, `responsive`)
+7. Upload endpoints: if the restored pages post to `/api/age-verification-request` or `/api/contact`, restore those two files from the tag
+   (`git checkout startup-commercial-v7-2026-11-10 -- api/age-verification-request.js api/contact.js`), or change the last lines of each from
+   `module.exports = createRetiredHandler();` back to exporting the real handler (`createHandler()` / `legacyHandler`). Approach B (revert) does this automatically.
+8. Run `npm test` and the Playwright suites. The commercial specs (`homepage-content`, `site-consistency`, `request-age-verification`, `responsive`)
    are in the tag.
 
 ## Operating the research tool
