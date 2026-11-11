@@ -90,3 +90,31 @@ test("one listing that names its model is a single provisional listing price, la
   await expectNoHorizontalOverflow(page);
   settle(seen);
 });
+
+// ---- the new engine's output (optional `lineage` block) ------------------------------------------------------------------------------------
+
+test("the saved production request, as the new engine answers it: the C6 55-inch is named, labelled unconfirmed, says where its generation came from, and carries no borrowed price", async ({ page }) => {
+  const seen = await load(page, "lg-c3-saved-production-after-stage-b");
+  const overview = product(page).locator("#rf-rpanel-overview");
+  await expect(overview.locator(".rf-lead-name")).toHaveText("LG C6 OLED 55-inch (OLED55C6PUA)");
+  await expect(overview.locator(".rf-lead .rf-pill", { hasText: "Likely successor, model not confirmed" })).toHaveCount(1);
+  await expect(overview.locator(".rf-pill", { hasText: "Direct successor" })).toHaveCount(0);
+  await expect(overview.locator(".rf-lead-note", { hasText: "no price is attached" })).toHaveCount(1);
+  const replacements = await open(page, "replacements");
+  await expect(replacements.locator(".rf-rs-card").first().locator(".rf-rs-generation")).toHaveText("Generation C6, as stated in retailer listings.");
+  await expect(replacements.locator(".rf-rs-card").first().locator(".rf-rs-price")).toHaveCount(0);
+  await expect(replacements.locator(".rf-rs-card").first()).toContainText("No sourced price for this candidate is included in this research.");
+  await expect(log(page)).toContainText("Likely successor: LG C6 OLED 55-inch (OLED55C6PUA).");
+  await expect(product(page)).not.toContainText("$1,096");
+  await expectNoHorizontalOverflow(page);
+  settle(seen);
+});
+
+test("a response from Production's engine today (no lineage block) renders exactly as before: no generation line, no tier label", async ({ page }) => {
+  const seen = await load(page, "lg-c3-saved-production-before");
+  const replacements = await open(page, "replacements");
+  await expect(replacements.locator(".rf-rs-generation")).toHaveCount(0);
+  await expect(product(page).locator(".rf-pill", { hasText: /AI estimate\)/ })).toHaveCount(0);
+  await expect(product(page).locator("#rf-rpanel-overview .rf-lead .rf-pill", { hasText: "Likely Successor Family" })).toHaveCount(1);
+  settle(seen);
+});

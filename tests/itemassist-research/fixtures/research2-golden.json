@@ -87,7 +87,7 @@
           "differences": "Newer processor and a brighter panel on some sizes.",
           "concern": null,
           "confidence": "HIGH",
-          "standing": "RECOMMENDED",
+          "standing": "CONDITIONAL",
           "verified": false,
           "modelStatus": "LISTED_PROVISIONAL",
           "comparison": [
@@ -1812,7 +1812,7 @@
           "differences": null,
           "concern": null,
           "confidence": "MEDIUM",
-          "standing": "RECOMMENDED",
+          "standing": "CONDITIONAL",
           "verified": false,
           "modelStatus": "UNVERIFIED_MODEL",
           "comparison": [

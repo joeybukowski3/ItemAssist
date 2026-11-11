@@ -1,0 +1,235 @@
+{
+  "contractVersion": "research.2",
+  "kind": "ITEMASSIST_RESEARCH",
+  "status": "OK",
+  "category": "tv",
+  "profile": "tv",
+  "original": {
+    "identity": "Samsung S90C 65-inch QD-OLED smart TV (2023)",
+    "confidence": "HIGH",
+    "characteristics": [
+      "65-inch QD-OLED",
+      "4K"
+    ],
+    "uncertainty": null
+  },
+  "requirements": [
+    {
+      "id": "r1",
+      "key": "screenSize",
+      "text": "Screen size class close to the original",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r2",
+      "key": "resolution",
+      "text": "Same or better resolution (4K or higher)",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r3",
+      "key": "displayClass",
+      "text": "Same display technology class (OLED, QLED or LED)",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r4",
+      "key": "refresh",
+      "text": "Native refresh rate (120 Hz where the original had it)",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r5",
+      "key": "hdmi",
+      "text": "HDMI 2.1 ports for current consoles",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r6",
+      "key": "hdr",
+      "text": "The HDR formats the original supported",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r7",
+      "key": "smart",
+      "text": "A smart platform with the apps you use",
+      "importance": "MINOR",
+      "origin": "CATEGORY_RULE"
+    }
+  ],
+  "requirementsSource": "CATEGORY_GUIDANCE",
+  "successor": {
+    "name": "Samsung S90H OLED 65-inch (QN65S90HAEXZA)",
+    "why": "Continues the same OLED line.",
+    "differences": null,
+    "concern": "No clean listing of this model in the requested size was found (the listings were bundles, plans or unlisted sellers), so no price is attached.",
+    "confidence": "MEDIUM",
+    "standing": "CONDITIONAL",
+    "otherSellerListings": [
+      {
+        "seller": "Macy's",
+        "amount": 1679.99,
+        "model": "QN65S90HAEXZA"
+      }
+    ],
+    "lineage": {
+      "relation": "SAME_SERIES_NEWER",
+      "generation": "S90H",
+      "basis": "LISTINGS",
+      "tier": "UNKNOWN"
+    },
+    "verified": false,
+    "modelStatus": "UNVERIFIED_MODEL",
+    "comparison": []
+  },
+  "suggestions": [],
+  "pricing": {
+    "referenceDate": "2026-11-11",
+    "tier": {
+      "level": "PREMIUM",
+      "basis": "MSRP_EVIDENCE"
+    },
+    "prices": [
+      {
+        "id": "p1",
+        "kind": "HISTORICAL_RETAIL",
+        "subject": "ORIGINAL",
+        "candidate": null,
+        "model": "QN65S90C",
+        "amount": {
+          "currency": "USD",
+          "low": 2600,
+          "high": 2600
+        },
+        "asOf": "2023-04-11",
+        "asOfBasis": "PUBLISHED",
+        "verification": "SEARCH_SNIPPET",
+        "evidenceId": "e1"
+      },
+      {
+        "id": "p2",
+        "kind": "HISTORICAL_RETAIL",
+        "subject": "ORIGINAL",
+        "candidate": null,
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 3299,
+          "high": 3299
+        },
+        "asOf": "2025-05-14",
+        "asOfBasis": "PUBLISHED",
+        "verification": "SEARCH_SNIPPET",
+        "evidenceId": "e2"
+      },
+      {
+        "id": "p4",
+        "kind": "AI_ESTIMATE",
+        "subject": "REPLACEMENT",
+        "candidate": null,
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 1200,
+          "high": 1800
+        },
+        "asOf": null,
+        "asOfBasis": "UNKNOWN",
+        "verification": "NONE",
+        "evidenceId": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "subject": "ORIGINAL",
+        "sourceName": "CNET",
+        "sourceDomain": "cnet.com",
+        "sourceUrl": "https://www.cnet.com/tech/home-entertainment/samsung-and-lg-2023-oled-tvs-are-now-the-same-price-starting-at-1900/",
+        "sourceClass": "REVIEW",
+        "firstParty": false,
+        "publishedAt": "2023-04-11",
+        "observedAt": null,
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      },
+      {
+        "id": "e2",
+        "subject": "ORIGINAL",
+        "sourceName": "PCMag",
+        "sourceDomain": "pcmag.com",
+        "sourceUrl": "https://www.pcmag.com/deals/grab-the-65-inch-samsung-s90c-tv-at-over-60-off-may-14",
+        "sourceClass": "REVIEW",
+        "firstParty": false,
+        "publishedAt": "2025-05-14",
+        "observedAt": null,
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      }
+    ],
+    "valuation": {
+      "method": "HISTORICAL_TIER_ESTIMATE",
+      "basis": "TIER_ESTIMATE",
+      "verified": false,
+      "range": {
+        "currency": "USD",
+        "low": 1040,
+        "high": 2340
+      },
+      "confidence": "LOW",
+      "asOf": null,
+      "comparables": [],
+      "excluded": [
+        {
+          "candidate": "SUCCESSOR",
+          "reason": "NO_CURRENT_PRICE"
+        }
+      ],
+      "reference": {
+        "priceId": "p1",
+        "kind": "HISTORICAL_RETAIL"
+      },
+      "notes": [
+        {
+          "code": "TIER_ESTIMATE_BAND",
+          "low": 0.4,
+          "high": 0.9
+        },
+        {
+          "code": "NOT_AN_APPRAISAL"
+        }
+      ]
+    },
+    "rejections": [
+      {
+        "scope": "PRICE",
+        "reason": "MODEL_UNVERIFIED",
+        "action": "REJECTED",
+        "count": 1
+      }
+    ]
+  },
+  "clarify": [],
+  "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+  "warnings": [
+    "DIFFERENCES_MISSING",
+    "PRICE_EVIDENCE_REJECTED",
+    "MODEL_NOT_VERIFIED",
+    "VALUATION_ESTIMATE_ONLY"
+  ],
+  "meta": {
+    "requestId": "offline",
+    "elapsedMs": 100,
+    "cached": false,
+    "answerSource": "AI_ESTIMATE"
+  }
+}

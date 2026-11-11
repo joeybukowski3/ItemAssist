@@ -82,7 +82,7 @@
   function candidateMeta(item, v2) {
     // The badge comes from what the evidence supports, not from the model's own standing: only a model a cited page confirms is a
     // "Direct successor"; a family, a model seen in a listing and an unconfirmed model code are each labelled as the likely successor they are.
-    var standing = Research.successorLabel(item, v2);
+    var standing = item.standing ? Research.successorLabel(item, v2) : (v2 ? Research.alternativeLabel(item) : null);
     return h("div", { class: "rf-lead-meta" }, [
       R.confidence(item.confidence),
       item.modelStatus ? D.pill(item.modelStatus === "VERIFIED_LISTING" ? "info" : "warn", item.modelStatus === "VERIFIED_LISTING" ? "check" : "q", Research.label(Research.MODEL_STATUS_LABELS, item.modelStatus, "")) : null,
@@ -106,6 +106,7 @@
       h("p", { class: "rf-eyebrow rf-rs-card-label", text: label }),
       h("h4", { class: "rf-rs-card-name rf-mono", text: item.name }),
       candidateMeta(item, v2),
+      v2 && Research.generationLine(item) ? h("p", { class: "rf-rs-generation rf-muted", text: Research.generationLine(item) }) : null,
       h("p", { class: "rf-rs-why" }, [h("strong", { text: "Why it fits: " }), item.why]),
       differenceLine(item),
       concernLine(item)
