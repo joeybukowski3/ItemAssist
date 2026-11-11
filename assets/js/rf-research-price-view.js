@@ -243,7 +243,8 @@
     var pick = Res.candidatePriceFor(data, key);
     if (!pick.price) return [h("p", { class: "rf-muted", text: "No sourced price for this candidate is included in this research." })];
     var nodes = [h("ul", { class: "rf-rs-prices rf-rs-prices--inline" }, [priceCard(data, pick.price)])];
-    if (pick.of > 1) nodes.push(h("p", { class: "rf-rs-price-caption rf-muted", text: Res.CANDIDATE_PRICE_CAPTION(pick.of) }));
+    var caption = Res.CANDIDATE_PRICE_CAPTION(pick.of, pick.total);
+    if (caption) nodes.push(h("p", { class: "rf-rs-price-caption rf-muted", text: caption }));
     return nodes;
   }
 

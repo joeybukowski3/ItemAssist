@@ -366,8 +366,9 @@
     if (!v2) return conditional ? LABEL_CAVEAT : LABEL_DIRECT;
     if (item.modelStatus === "VERIFIED_LISTING") return !conditional ? LABEL_DIRECT : (item.concern ? LABEL_CAVEAT : null);
     if (item.modelStatus === "LISTED_PROVISIONAL") return LABEL_LISTED;
-    if (item.modelStatus === "UNVERIFIED_MODEL") return LABEL_UNCONFIRMED;
-    return LABEL_FAMILY;
+    if (item.modelStatus === "FAMILY_LEVEL") return LABEL_FAMILY;
+    // UNVERIFIED_MODEL, or a status this page does not know: the model is not confirmed, and nothing here claims to know it is only a family.
+    return LABEL_UNCONFIRMED;
   }
 
   /** The chat's sentence about the successor: it states what is and is not known about the candidate's identity. */
@@ -379,7 +380,8 @@
     }
     const seeConcern = concern ? " There is a concern; see Replacements." : "";
     if (item.modelStatus === "LISTED_PROVISIONAL") return "Likely successor: " + item.name + " (the model appears in a retailer listing; it is not confirmed)." + seeConcern;
-    if (item.modelStatus === "UNVERIFIED_MODEL") return "Likely successor: " + item.name + " (the exact model number is not confirmed)." + seeConcern;
+    // (The reply already adds a separate line saying the exact model identity is unconfirmed, so this sentence does not repeat it.)
+    if (item.modelStatus !== "FAMILY_LEVEL") return "Likely successor: " + item.name + "." + seeConcern;
     return "Likely successor family: " + item.name + ". I couldn't identify its generation or exact model, so treat it as a family, not a specific model." + seeConcern;
   }
 
@@ -409,18 +411,26 @@
     const listings = comparablePrices(data);
     if (!listings.length) return none;
     const domains = {};
+    let unresolved = 0;
     listings.forEach(function (price) {
       const source = (data.pricing.evidence || []).filter(function (entry) { return entry.id === price.evidenceId; })[0];
-      domains[source ? source.sourceDomain : "unknown:" + price.id] = true;
+      if (source) domains[source.sourceDomain] = true; else unresolved += 1;
     });
     const sellers = Object.keys(domains).length;
+    const candidates = [];
+    listings.forEach(function (price) { if (candidates.indexOf(price.candidate) === -1) candidates.push(price.candidate); });
+    const low = Math.min.apply(null, listings.map(function (price) { return price.amount.low; }));
+    const high = Math.max.apply(null, listings.map(function (price) { return price.amount.high; }));
     const models = [];
     listings.forEach(function (price) { if (price.model && models.indexOf(price.model) === -1) models.push(price.model); });
     const unnamed = listings.filter(function (price) { return !price.model; }).length;
-    const candidate = listings[0].candidate || null;
-    const base = { listings: listings.length, sellers: sellers, candidate: candidate };
+    const base = { listings: listings.length, sellers: sellers, candidate: candidates.length === 1 ? candidates[0] : null, candidates: candidates.length, agree: high <= low * NEAR_IDENTICAL_RATIO };
+    // Some of the prices are confirmed on the cited page: the valuation line already says which, and a listings-only scope would understate that.
+    if (listings.some(function (price) { return price.verification === "VERIFIED_PAGE"; })) return Object.assign({ kind: "MIXED_VERIFIED", model: null }, base);
+    if (candidates.length > 1) return Object.assign({ kind: "MULTI_CANDIDATE", model: null }, base);
     if (listings.length === 1 && !models.length) return Object.assign({ kind: "SINGLE_LISTING_MODEL_NOT_STATED", model: null }, base);
-    if (models.length === 1 && !unnamed) return Object.assign({ kind: sellers >= 2 ? "EXACT_MODEL_CORROBORATED" : "EXACT_MODEL_SINGLE_LISTING", model: models[0] }, base);
+    // Corroboration needs two sellers that the page can actually name; a listing whose source is missing never counts as another seller.
+    if (models.length === 1 && !unnamed) return Object.assign({ kind: sellers >= 2 && !unresolved ? "EXACT_MODEL_CORROBORATED" : "EXACT_MODEL_SINGLE_LISTING", model: models[0] }, base);
     return Object.assign({ kind: "FAMILY_AMBIGUOUS", model: null }, base);
   }
 
@@ -439,7 +449,9 @@
           : "Scope: " + n + " listings from one seller name " + scope.model + ". One seller cannot corroborate a price, so this is still a single-seller provisional price.");
         break;
       case "EXACT_MODEL_CORROBORATED":
-        lines.push("Scope: " + n + " listings from " + scope.sellers + " sellers name " + scope.model + ". They corroborate each other as listing prices, still not confirmed on a product page.");
+        lines.push(scope.agree
+          ? "Scope: " + n + " listings from " + scope.sellers + " sellers name " + scope.model + ". They corroborate each other as listing prices, still not confirmed on a product page."
+          : "Scope: " + n + " listings from " + scope.sellers + " sellers name " + scope.model + ", at different prices. They are listing prices, not confirmed on a product page.");
         break;
       case "SINGLE_LISTING_MODEL_NOT_STATED":
         lines.push("Scope: one retailer listing that does not state its exact model, so it cannot be tied to one specific model.");
@@ -447,6 +459,9 @@
       case "FAMILY_AMBIGUOUS":
         lines.push("Scope: family pricing. These " + n + " listings do not all name one model or generation, so the figure is not a price for one specific model.");
         break;
+      case "MULTI_CANDIDATE":
+        lines.push("Scope: these " + n + " listings are for more than one candidate, so the figure is not a price for one model.");
+        return lines;
       default:
         return [];
     }
@@ -454,7 +469,13 @@
     return lines;
   }
 
-  const CANDIDATE_PRICE_CAPTION = function (count) { return "This is the lowest of " + count + " listings behind the figure on the Overview."; };
+  /** The line under a candidate's price: how many of this candidate's listings sit behind the Overview figure, and any from other candidates it also includes. */
+  const CANDIDATE_PRICE_CAPTION = function (count, total) {
+    const others = (total || count) - count;
+    if (!others) return count > 1 ? "This is the lowest of " + count + " listings behind the figure on the Overview." : null;
+    return (count > 1 ? "This is the lowest of " + count + " listings of this candidate behind the figure on the Overview" : "This is the only listing of this candidate behind the figure on the Overview")
+      + ", which also includes " + others + (others === 1 ? " listing" : " listings") + " from other candidates.";
+  };
 
   /**
    * The one price the candidate card shows for a candidate key, and how many listings of that candidate set the valuation: a listing that sets
@@ -463,11 +484,11 @@
   function candidatePriceFor(data, key) {
     const own = (data.pricing.prices || []).filter(function (price) { return price.candidate === key; });
     const setting = comparablePrices(data).filter(function (price) { return price.candidate === key; }).sort(function (a, b) { return a.amount.low - b.amount.low; });
-    if (setting.length) return { price: setting[0], of: setting.length };
+    if (setting.length) return { price: setting[0], of: setting.length, total: comparablePrices(data).length };
     const confirmedSize = own.filter(function (price) { return price.sizeConfirmed !== false && price.configConfirmed !== false; });
     const current = confirmedSize.filter(function (price) { return price.kind === "CURRENT_RETAIL_NEW"; })[0];
     const pick = current || confirmedSize[0] || own[0] || null;
-    return { price: pick, of: pick ? 1 : 0 };
+    return { price: pick, of: pick ? 1 : 0, total: pick ? 1 : 0 };
   }
 
   /** True for a bare seller address (a host with no path): it names the seller but does not identify the listing, so it is not shown as a link. */

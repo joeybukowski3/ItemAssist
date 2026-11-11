@@ -34,7 +34,9 @@ test("a successor identified only as a product family is never called a direct s
   assert.equal(RS.successorLabel(family.successor, true).text, "Likely Successor Family");
   assert.equal(RS.successorLabel(withStatus(family, "UNVERIFIED_MODEL").successor, true).text, "Likely successor, model not confirmed");
   assert.equal(RS.successorLabel(withStatus(family, "LISTED_PROVISIONAL").successor, true).text, "Likely successor, model seen in a listing");
-  assert.equal(RS.successorLabel({ standing: "CONDITIONAL", concern: null, modelStatus: undefined }, true).text, "Likely Successor Family", "a missing status is the weakest reading");
+  // Only an explicit FAMILY_LEVEL is read as a family; a status this page does not know is "not confirmed", never a claim about what the candidate is.
+  assert.equal(RS.successorLabel({ standing: "CONDITIONAL", concern: null, modelStatus: undefined }, true).text, "Likely successor, model not confirmed");
+  assert.equal(RS.successorLabel({ standing: "RECOMMENDED", concern: null, modelStatus: "SOMETHING_NEW" }, true).text, "Likely successor, model not confirmed");
 });
 
 test("direct-successor wording is reserved for a model confirmed on a cited page; a caveat is shown only with its concern", () => {
@@ -76,9 +78,9 @@ test("price scope: one listing that names its model is a single provisional list
 test("price scope: listings from several sellers that name the same model corroborate each other, and are still listings", () => {
   const data = clone(projected("lg-c3-c6-single-listing"));
   const first = data.pricing.prices[0];
-  data.pricing.prices = [first, { ...first, id: "p3", amount: { currency: "USD", low: 1029.99, high: 1029.99 }, evidenceId: "e2" }, data.pricing.prices[1]];
+  data.pricing.prices = [first, { ...first, id: "p3", amount: { currency: "USD", low: 1009.99, high: 1009.99 }, evidenceId: "e2" }, data.pricing.prices[1]];
   data.pricing.evidence = [data.pricing.evidence[0], { ...data.pricing.evidence[0], id: "e2", sourceName: "Abt", sourceDomain: "abt.com", sourceUrl: "https://www.abt.com/" }];
-  data.pricing.valuation = { ...data.pricing.valuation, range: { currency: "USD", low: 999.99, high: 1029.99 }, comparables: [{ priceId: "p1", candidate: "SUCCESSOR", verification: "SEARCH_LISTING" }, { priceId: "p3", candidate: "SUCCESSOR", verification: "SEARCH_LISTING" }] };
+  data.pricing.valuation = { ...data.pricing.valuation, range: { currency: "USD", low: 999.99, high: 1009.99 }, comparables: [{ priceId: "p1", candidate: "SUCCESSOR", verification: "SEARCH_LISTING" }, { priceId: "p3", candidate: "SUCCESSOR", verification: "SEARCH_LISTING" }] };
   const scope = RS.priceScope(data);
   assert.equal(scope.kind, "EXACT_MODEL_CORROBORATED");
   assert.equal(scope.sellers, 2);
@@ -145,4 +147,74 @@ test("a seller's homepage is not a verifying link; a page on the seller's site i
   assert.equal(RS.isSellerSiteOnly("https://www.bestbuy.com/site/lg-c6/6590000.p"), false);
   assert.equal(RS.isSellerSiteOnly("not a url"), false);
   assert.equal(RS.isSellerSiteOnly(null), false);
+});
+
+// ---- findings from the independent review of Stage A -------------------------------------------------------------------------------------------
+
+const twoSellers = () => {
+  const data = clone(projected("lg-c3-c6-single-listing"));
+  const first = data.pricing.prices[0];
+  data.pricing.prices = [first, { ...first, id: "p3", amount: { currency: "USD", low: 1009.99, high: 1009.99 }, evidenceId: "e2" }, data.pricing.prices[1]];
+  data.pricing.evidence = [data.pricing.evidence[0], { ...data.pricing.evidence[0], id: "e2", sourceName: "Abt", sourceDomain: "abt.com", sourceUrl: "https://www.abt.com/" }];
+  data.pricing.valuation = { ...data.pricing.valuation, range: { currency: "USD", low: 999.99, high: 1009.99 }, comparables: [{ priceId: "p1", candidate: "SUCCESSOR", verification: "SEARCH_LISTING" }, { priceId: "p3", candidate: "SUCCESSOR", verification: "SEARCH_LISTING" }] };
+  return data;
+};
+
+test("listings of one model at very different prices are not said to corroborate each other", () => {
+  const data = twoSellers();
+  assert.equal(RS.priceScope(data).agree, true);
+  assert.match(RS.scopeLines(data)[0], /corroborate each other/);
+  data.pricing.prices[1] = { ...data.pricing.prices[1], amount: { currency: "USD", low: 1499, high: 1499 } };
+  data.pricing.valuation.range = { currency: "USD", low: 999.99, high: 1499 };
+  const scope = RS.priceScope(data);
+  assert.equal(scope.kind, "EXACT_MODEL_CORROBORATED");
+  assert.equal(scope.agree, false);
+  assert.doesNotMatch(RS.scopeLines(data)[0], /corroborate/);
+  assert.match(RS.scopeLines(data)[0], /name OLED55C6PUA, at different prices/);
+});
+
+test("a listing whose source is missing is never counted as another seller", () => {
+  const data = twoSellers();
+  data.pricing.prices[1] = { ...data.pricing.prices[1], evidenceId: "e99" };
+  const scope = RS.priceScope(data);
+  assert.equal(scope.sellers, 1);
+  assert.equal(scope.kind, "EXACT_MODEL_SINGLE_LISTING", "two listings, one nameable seller: not corroborated");
+  assert.doesNotMatch(RS.scopeLines(data).join(" "), /corroborate each other/);
+  assert.match(RS.scopeLines(data)[0], /One seller cannot corroborate a price/);
+});
+
+test("comparables across several candidates are described as such, and the candidate caption says what the figure also includes", () => {
+  const data = twoSellers();
+  const alt = { ...data.pricing.prices[0], id: "p4", candidate: "ALT_1", model: "XR65A95L", amount: { currency: "USD", low: 1698, high: 1698 } };
+  data.pricing.prices.push(alt);
+  data.pricing.valuation.comparables.push({ priceId: "p4", candidate: "ALT_1", verification: "SEARCH_LISTING" });
+  data.pricing.valuation.range = { currency: "USD", low: 999.99, high: 1698 };
+  const scope = RS.priceScope(data);
+  assert.deepEqual([scope.kind, scope.candidates, scope.candidate], ["MULTI_CANDIDATE", 2, null]);
+  const lines = RS.scopeLines(data);
+  assert.equal(lines.length, 1);
+  assert.match(lines[0], /3 listings are for more than one candidate/);
+  assert.doesNotMatch(lines.join(" "), /shows the lowest/, "no claim that one candidate card shows the lowest of all the listings");
+  const successor = RS.candidatePriceFor(data, "SUCCESSOR");
+  assert.deepEqual([successor.of, successor.total], [2, 3]);
+  assert.equal(RS.CANDIDATE_PRICE_CAPTION(successor.of, successor.total), "This is the lowest of 2 listings of this candidate behind the figure on the Overview, which also includes 1 listing from other candidates.");
+  const other = RS.candidatePriceFor(data, "ALT_1");
+  assert.equal(RS.CANDIDATE_PRICE_CAPTION(other.of, other.total), "This is the only listing of this candidate behind the figure on the Overview, which also includes 2 listings from other candidates.");
+  assert.equal(RS.CANDIDATE_PRICE_CAPTION(1, 1), null);
+});
+
+test("a valuation that includes prices confirmed on the cited page is not described as listings only", () => {
+  const data = twoSellers();
+  data.pricing.prices[1] = { ...data.pricing.prices[1], verification: "VERIFIED_PAGE" };
+  data.pricing.valuation.comparables[1] = { ...data.pricing.valuation.comparables[1], verification: "VERIFIED_PAGE" };
+  data.pricing.valuation.method = "MIXED_VERIFIED_AND_LISTINGS";
+  assert.equal(RS.priceScope(data).kind, "MIXED_VERIFIED");
+  assert.deepEqual(RS.scopeLines(data), [], "the valuation line already says which prices are confirmed");
+});
+
+test("the unverified-model chat line does not repeat the unconfirmed-identity line the reply already adds", () => {
+  const unconfirmed = withStatus(projected("lg-c3-c6-single-listing"), "UNVERIFIED_MODEL");
+  const lines = RS.reply(unconfirmed, null).lines;
+  assert.ok(lines.includes("Likely successor: LG C6 OLED 55-inch (OLED55C6PUA)."));
+  assert.equal(lines.filter((line) => /exact model/i.test(line)).length, 1, "one line about the unconfirmed model identity, not two");
 });
