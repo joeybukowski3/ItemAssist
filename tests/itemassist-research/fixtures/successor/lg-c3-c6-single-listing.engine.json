@@ -1,0 +1,203 @@
+{
+  "contractVersion": "research.2",
+  "kind": "ITEMASSIST_RESEARCH",
+  "status": "OK",
+  "category": "tv",
+  "profile": "tv",
+  "original": {
+    "identity": "LG C3 series 55-inch 4K OLED evo smart TV (2023)",
+    "confidence": "HIGH",
+    "characteristics": [
+      "55-inch OLED",
+      "4K",
+      "120 Hz"
+    ],
+    "uncertainty": null
+  },
+  "requirements": [
+    {
+      "id": "r1",
+      "key": "screenSize",
+      "text": "Screen size class close to the original",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r2",
+      "key": "resolution",
+      "text": "Same or better resolution (4K or higher)",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r3",
+      "key": "displayClass",
+      "text": "Same display technology class (OLED, QLED or LED)",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r4",
+      "key": "refresh",
+      "text": "Native refresh rate (120 Hz where the original had it)",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r5",
+      "key": "hdmi",
+      "text": "HDMI 2.1 ports for current consoles",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r6",
+      "key": "hdr",
+      "text": "The HDR formats the original supported",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r7",
+      "key": "smart",
+      "text": "A smart platform with the apps you use",
+      "importance": "MINOR",
+      "origin": "CATEGORY_RULE"
+    }
+  ],
+  "requirementsSource": "CATEGORY_GUIDANCE",
+  "successor": {
+    "name": "LG C6 OLED 55-inch (OLED55C6PUA)",
+    "why": "Continues the same OLED line with a newer processor.",
+    "differences": null,
+    "concern": null,
+    "confidence": "HIGH",
+    "standing": "RECOMMENDED",
+    "verified": false,
+    "modelStatus": "LISTED_PROVISIONAL",
+    "comparison": []
+  },
+  "suggestions": [
+    {
+      "name": "Sony Bravia 8 OLED",
+      "why": "Similar premium OLED class.",
+      "differences": "Different processing and sound.",
+      "concern": null,
+      "confidence": "MEDIUM",
+      "verified": false,
+      "modelStatus": "FAMILY_LEVEL",
+      "comparison": []
+    }
+  ],
+  "pricing": {
+    "referenceDate": "2026-11-11",
+    "tier": {
+      "level": "PREMIUM",
+      "basis": "AI_ESTIMATE"
+    },
+    "prices": [
+      {
+        "id": "p1",
+        "kind": "CURRENT_RETAIL_NEW",
+        "subject": "REPLACEMENT",
+        "candidate": "SUCCESSOR",
+        "model": "OLED55C6PUA",
+        "amount": {
+          "currency": "USD",
+          "low": 999.99,
+          "high": 999.99
+        },
+        "asOf": "2026-11-11",
+        "asOfBasis": "OBSERVED",
+        "verification": "SEARCH_LISTING",
+        "evidenceId": "e1"
+      },
+      {
+        "id": "p2",
+        "kind": "AI_ESTIMATE",
+        "subject": "ORIGINAL",
+        "candidate": null,
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 1500,
+          "high": 2000
+        },
+        "asOf": null,
+        "asOfBasis": "UNKNOWN",
+        "verification": "NONE",
+        "evidenceId": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "subject": "SUCCESSOR",
+        "sourceName": "Best Buy",
+        "sourceDomain": "bestbuy.com",
+        "sourceUrl": "https://www.bestbuy.com/",
+        "sourceClass": "RETAILER",
+        "firstParty": true,
+        "publishedAt": null,
+        "observedAt": "2026-11-11",
+        "subjectModel": "OLED55C6PUA",
+        "expectedModel": "OLED55C6PUA",
+        "modelRelation": "EXACT"
+      }
+    ],
+    "valuation": {
+      "method": "PROVISIONAL_LISTINGS",
+      "basis": "PROVISIONAL_LISTINGS",
+      "verified": false,
+      "range": {
+        "currency": "USD",
+        "low": 999.99,
+        "high": 999.99
+      },
+      "confidence": "LOW",
+      "asOf": "2026-11-11",
+      "comparables": [
+        {
+          "priceId": "p1",
+          "candidate": "SUCCESSOR",
+          "verification": "SEARCH_LISTING"
+        }
+      ],
+      "excluded": [
+        {
+          "candidate": "ALT_1",
+          "reason": "NO_CURRENT_PRICE"
+        }
+      ],
+      "reference": null,
+      "notes": [
+        {
+          "code": "BASED_ON_LISTINGS",
+          "count": 1
+        },
+        {
+          "code": "LISTINGS_NOT_CONFIRMED"
+        },
+        {
+          "code": "EXCLUDED_NO_CURRENT_PRICE",
+          "candidate": "ALT_1"
+        },
+        {
+          "code": "NOT_AN_APPRAISAL"
+        }
+      ]
+    },
+    "rejections": []
+  },
+  "clarify": [],
+  "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+  "warnings": [
+    "DIFFERENCES_MISSING"
+  ],
+  "meta": {
+    "requestId": "offline",
+    "elapsedMs": 100,
+    "cached": false,
+    "answerSource": "AI_ESTIMATE"
+  }
+}

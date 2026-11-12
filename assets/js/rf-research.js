@@ -345,6 +345,157 @@
     return (pricing.prices || []).filter(function (price) { return price.id === pricing.valuation.reference.priceId; })[0] || null;
   }
 
+  /* ---------- research.2: how strongly a candidate is identified, and what a price is the price of ---------- */
+
+  // The engine's `standing` is the model's own confidence. It is never evidence, so a label is chosen from what the evidence supports
+  // (`modelStatus`), and "Direct successor" is kept for a model a cited page confirms.
+  const LABEL_DIRECT = Object.freeze({ text: "Direct successor", tone: "info", icon: "check" });
+  const LABEL_CAVEAT = Object.freeze({ text: "Successor, with a caveat", tone: "warn", icon: "q" });
+  const LABEL_LISTED = Object.freeze({ text: "Likely successor, model seen in a listing", tone: "warn", icon: "q" });
+  const LABEL_UNCONFIRMED = Object.freeze({ text: "Likely successor, model not confirmed", tone: "warn", icon: "q" });
+  const LABEL_FAMILY = Object.freeze({ text: "Likely Successor Family", tone: "warn", icon: "q" });
+
+  /**
+   * The badge for the successor candidate, or null when it has none: `{text, tone, icon}`. research.1 keeps its two labels. In research.2 only a
+   * model confirmed on a cited page is a "Direct successor"; a model named in a listing, a model code nothing confirms, and a family are each
+   * labelled as the likely successor they are.
+   */
+  function successorLabel(item, v2) {
+    if (!item || !item.standing) return null;
+    const conditional = item.standing === "CONDITIONAL";
+    if (!v2) return conditional ? LABEL_CAVEAT : LABEL_DIRECT;
+    if (item.modelStatus === "VERIFIED_LISTING") return !conditional ? LABEL_DIRECT : (item.concern ? LABEL_CAVEAT : null);
+    if (item.modelStatus === "LISTED_PROVISIONAL") return LABEL_LISTED;
+    if (item.modelStatus === "FAMILY_LEVEL") return LABEL_FAMILY;
+    // UNVERIFIED_MODEL, or a status this page does not know: the model is not confirmed, and nothing here claims to know it is only a family.
+    return LABEL_UNCONFIRMED;
+  }
+
+  /** The chat's sentence about the successor: it states what is and is not known about the candidate's identity. */
+  function successorLine(data) {
+    const item = data.successor;
+    const concern = Boolean(item.concern);
+    if (!isV2(data) || item.modelStatus === "VERIFIED_LISTING") {
+      return "Closest successor to consider: " + item.name + (item.standing === "CONDITIONAL" && (!isV2(data) || concern) ? " (with a caveat, see Replacements)." : ".");
+    }
+    const seeConcern = concern ? " There is a concern; see Replacements." : "";
+    if (item.modelStatus === "LISTED_PROVISIONAL") return "Likely successor: " + item.name + " (the model appears in a retailer listing; it is not confirmed)." + seeConcern;
+    // (The reply already adds a separate line saying the exact model identity is unconfirmed, so this sentence does not repeat it.)
+    if (item.modelStatus !== "FAMILY_LEVEL") return "Likely successor: " + item.name + "." + seeConcern;
+    return "Likely successor family: " + item.name + ". I couldn't identify its generation or exact model, so treat it as a family, not a specific model." + seeConcern;
+  }
+
+  /** The prices that set the valuation's range, in valuation order. */
+  function comparablePrices(data) {
+    const value = data && data.pricing && data.pricing.valuation;
+    if (!value || !Array.isArray(value.comparables)) return [];
+    return value.comparables.map(function (row) { return (data.pricing.prices || []).filter(function (price) { return price.id === row.priceId; })[0]; }).filter(Boolean);
+  }
+
+  /**
+   * What the valuation's figure is the price of, from the prices behind it: `{kind, model, listings, sellers, candidate}`.
+   *   CONFIRMED                       current prices shown on cited seller pages
+   *   EXACT_MODEL_CORROBORATED        listings from two or more sellers that all name one model
+   *   EXACT_MODEL_SINGLE_LISTING      listings of one seller (usually one) that name one model
+   *   SINGLE_LISTING_MODEL_NOT_STATED one listing that does not state its model
+   *   FAMILY_AMBIGUOUS                several listings that do not all name one model: family pricing, not a model's price
+   *   ESTIMATE / NONE                 an AI or tier estimate, or no figure
+   * A listing is evidence about the model it names, never a confirmation of it, so no kind here says a model's price is confirmed.
+   */
+  function priceScope(data) {
+    const none = { kind: "NONE", model: null, listings: 0, sellers: 0, candidate: null };
+    const value = isV2(data) && data.pricing && data.pricing.valuation;
+    if (!value || value.method === "INSUFFICIENT" || !value.range) return none;
+    if (value.verified) return { kind: "CONFIRMED", model: null, listings: (value.comparables || []).length, sellers: 0, candidate: null };
+    if (value.method === "AI_ESTIMATE_ONLY" || value.method === "HISTORICAL_TIER_ESTIMATE") return { kind: "ESTIMATE", model: null, listings: 0, sellers: 0, candidate: null };
+    const listings = comparablePrices(data);
+    if (!listings.length) return none;
+    const domains = {};
+    let unresolved = 0;
+    listings.forEach(function (price) {
+      const source = (data.pricing.evidence || []).filter(function (entry) { return entry.id === price.evidenceId; })[0];
+      if (source) domains[source.sourceDomain] = true; else unresolved += 1;
+    });
+    const sellers = Object.keys(domains).length;
+    const candidates = [];
+    listings.forEach(function (price) { if (candidates.indexOf(price.candidate) === -1) candidates.push(price.candidate); });
+    const low = Math.min.apply(null, listings.map(function (price) { return price.amount.low; }));
+    const high = Math.max.apply(null, listings.map(function (price) { return price.amount.high; }));
+    const models = [];
+    listings.forEach(function (price) { if (price.model && models.indexOf(price.model) === -1) models.push(price.model); });
+    const unnamed = listings.filter(function (price) { return !price.model; }).length;
+    const base = { listings: listings.length, sellers: sellers, candidate: candidates.length === 1 ? candidates[0] : null, candidates: candidates.length, agree: high <= low * NEAR_IDENTICAL_RATIO };
+    // Some of the prices are confirmed on the cited page: the valuation line already says which, and a listings-only scope would understate that.
+    if (listings.some(function (price) { return price.verification === "VERIFIED_PAGE"; })) return Object.assign({ kind: "MIXED_VERIFIED", model: null }, base);
+    if (candidates.length > 1) return Object.assign({ kind: "MULTI_CANDIDATE", model: null }, base);
+    if (listings.length === 1 && !models.length) return Object.assign({ kind: "SINGLE_LISTING_MODEL_NOT_STATED", model: null }, base);
+    // Corroboration needs two sellers that the page can actually name; a listing whose source is missing never counts as another seller.
+    if (models.length === 1 && !unnamed) return Object.assign({ kind: sellers >= 2 && !unresolved ? "EXACT_MODEL_CORROBORATED" : "EXACT_MODEL_SINGLE_LISTING", model: models[0] }, base);
+    return Object.assign({ kind: "FAMILY_AMBIGUOUS", model: null }, base);
+  }
+
+  /**
+   * The sentences that say what the figure covers, shared by the chat and the pricing card so they always describe the same scope. When the figure
+   * rests on more than one listing, a second sentence says the candidate card shows only the lowest of them.
+   */
+  function scopeLines(data) {
+    const scope = priceScope(data);
+    const n = scope.listings;
+    const lines = [];
+    switch (scope.kind) {
+      case "EXACT_MODEL_SINGLE_LISTING":
+        lines.push(n === 1
+          ? "Scope: one retailer listing that names " + scope.model + ". It is a single provisional listing price and does not confirm what that model sells for."
+          : "Scope: " + n + " listings from one seller name " + scope.model + ". One seller cannot corroborate a price, so this is still a single-seller provisional price.");
+        break;
+      case "EXACT_MODEL_CORROBORATED":
+        lines.push(scope.agree
+          ? "Scope: " + n + " listings from " + scope.sellers + " sellers name " + scope.model + ". They corroborate each other as listing prices, still not confirmed on a product page."
+          : "Scope: " + n + " listings from " + scope.sellers + " sellers name " + scope.model + ", at different prices. They are listing prices, not confirmed on a product page.");
+        break;
+      case "SINGLE_LISTING_MODEL_NOT_STATED":
+        lines.push("Scope: one retailer listing that does not state its exact model, so it cannot be tied to one specific model.");
+        break;
+      case "FAMILY_AMBIGUOUS":
+        lines.push("Scope: family pricing. These " + n + " listings do not all name one model or generation, so the figure is not a price for one specific model.");
+        break;
+      case "MULTI_CANDIDATE":
+        lines.push("Scope: these " + n + " listings are for more than one candidate, so the figure is not a price for one model.");
+        return lines;
+      default:
+        return [];
+    }
+    if (n > 1) lines.push("The candidate card on the Replacements tab shows the lowest of the " + n + " listings; the figure covers all of them.");
+    return lines;
+  }
+
+  /** The line under a candidate's price: how many of this candidate's listings sit behind the Overview figure, and any from other candidates it also includes. */
+  const CANDIDATE_PRICE_CAPTION = function (count, total) {
+    const others = (total || count) - count;
+    if (!others) return count > 1 ? "This is the lowest of " + count + " listings behind the figure on the Overview." : null;
+    return (count > 1 ? "This is the lowest of " + count + " listings of this candidate behind the figure on the Overview" : "This is the only listing of this candidate behind the figure on the Overview")
+      + ", which also includes " + others + (others === 1 ? " listing" : " listings") + " from other candidates.";
+  };
+
+  /**
+   * The one price the candidate card shows for a candidate key, and how many listings of that candidate set the valuation: a listing that sets
+   * the range (the lowest), else a sized current listing, else any price. `price` is null when the candidate has none.
+   */
+  function candidatePriceFor(data, key) {
+    const own = (data.pricing.prices || []).filter(function (price) { return price.candidate === key; });
+    const setting = comparablePrices(data).filter(function (price) { return price.candidate === key; }).sort(function (a, b) { return a.amount.low - b.amount.low; });
+    if (setting.length) return { price: setting[0], of: setting.length, total: comparablePrices(data).length };
+    const confirmedSize = own.filter(function (price) { return price.sizeConfirmed !== false && price.configConfirmed !== false; });
+    const current = confirmedSize.filter(function (price) { return price.kind === "CURRENT_RETAIL_NEW"; })[0];
+    const pick = current || confirmedSize[0] || own[0] || null;
+    return { price: pick, of: pick ? 1 : 0, total: pick ? 1 : 0 };
+  }
+
+  /** True for a bare seller address (a host with no path): it names the seller but does not identify the listing, so it is not shown as a link. */
+  function isSellerSiteOnly(url) {
+    return typeof url === "string" && /^https:\/\/[^/?#\s]+\/?$/.test(url);
+  }
+
   /* ---------- Session ---------- */
 
   function initialSession() {
@@ -528,7 +679,7 @@
       const line = valuationLine(data.pricing.valuation);
       const caution = compatibilityLine(data.pricing.valuation);
       const cited = data.pricing.evidence.length;
-      return [line, caution, cited ? "The sources are listed under Pricing & evidence, with the date each was seen." : null, "Check specifications, availability and price with a seller before buying."].filter(Boolean);
+      return [line].concat(scopeLines(data), [caution, cited ? "The sources are listed under Pricing & evidence, with the date each was seen." : null, "Check specifications, availability and price with a seller before buying."]).filter(Boolean);
     }
     if (topic === "value" || topic === "buying") {
       return ["ItemAssist Research doesn't check prices, stock or where to buy, and none of these candidates is confirmed available. Check specifications, availability and price with a seller before buying."];
@@ -595,7 +746,7 @@
       tone = "best";
       lines.push("This looks like " + data.original.identity + (data.original.confidence === "HIGH" ? "." : " (" + data.original.confidence.toLowerCase() + " confidence)."));
       if (data.successor) {
-        lines.push("Closest successor to consider: " + data.successor.name + (data.successor.standing === "CONDITIONAL" && (!isV2(data) || data.successor.concern) ? " (with a caveat, see Replacements)." : "."));
+        lines.push(successorLine(data));
       } else {
         lines.push("I couldn't name a direct successor with confidence.");
       }
@@ -609,6 +760,7 @@
         });
         const valueLine = valuationLine(data.pricing.valuation);
         if (valueLine) lines.push(valueLine);
+        scopeLines(data).forEach(function (sentence) { lines.push(sentence); });
         if (compatibilityLine(data.pricing.valuation)) lines.push(COMPATIBILITY_TEXT);
         const left = shortfallCount(data.pricing.valuation);
         if (left) lines.push(left === 1 ? "I left 1 candidate out of the value range because it falls short of an essential requirement." : "I left " + left + " candidates out of the value range because they fall short of an essential requirement.");
@@ -687,6 +839,8 @@
     reply: reply, categoryLabel: categoryLabel, isResearchResponse: isResearchResponse, createVisitorId: createVisitorId, modelCodes: modelCodes,
     isV2: isV2, SUMMARY_NOTE_V2: SUMMARY_NOTE_V2, DEMO_PRICE_NOTE: DEMO_PRICE_NOTE, label: label, noteText: noteText, formatMoney: formatMoney, formatRange: formatRange, formatDay: formatDay,
     providerIncomplete: providerIncomplete, INCOMPLETE_KICKER: INCOMPLETE_KICKER, INCOMPLETE_RETRY: INCOMPLETE_RETRY,
+    successorLabel: successorLabel, successorLine: successorLine, priceScope: priceScope, scopeLines: scopeLines, candidatePriceFor: candidatePriceFor, isSellerSiteOnly: isSellerSiteOnly,
+    CANDIDATE_PRICE_CAPTION: CANDIDATE_PRICE_CAPTION,
     valuationLine: valuationLine, compatibilityLine: compatibilityLine, isListingAnchor: isListingAnchor, shortfallCount: shortfallCount, referencePrice: referencePrice, originalPrices: originalPrices, historySummary: historySummary, priceRole: priceRole, pricesByRole: pricesByRole,
     PRICE_ROLE_LABELS: PRICE_ROLE_LABELS, PRICE_ROLE_REASONS: PRICE_ROLE_REASONS,
     PRICE_KIND_LABELS: PRICE_KIND_LABELS, VERIFICATION_LABELS: VERIFICATION_LABELS, DATE_LABELS: DATE_LABELS, METHOD_LABELS: METHOD_LABELS, TIER_LABELS: TIER_LABELS,

@@ -186,7 +186,7 @@ test("Live answer: listing prices are labelled as listings, never styled as conf
   await expect(page.locator(".rf-rs-demo-note")).toHaveCount(0);
   await expect(page.getByText("Demo research data")).toHaveCount(0);
   const pricing = await open(page, "pricing");
-  await expect(pricing).toContainText("A listing's source links to the seller's site, not to a product page.");
+  await expect(pricing).toContainText("A source shown as seller site only names the seller and has no link to the listing");
   await expect(pricing.locator(".rf-pill--ok")).toHaveCount(0);
   await expect(pricing).not.toContainText("Shown on the cited source page");
   settle(seen);
@@ -365,7 +365,9 @@ test("Replacements: a candidate with a confirmed essential shortfall is shown as
   await expect(ge.locator(".rf-rs-excluded")).toContainText("Not in the range: it falls short of an essential requirement (confirmed by a cited source)");
   await expect(ge).toContainText("Essential requirements: 1 met, 1 short, 1 not known.");
   await expect(ge.locator(".rf-rs-cmp-row", { hasText: "Same door layout" })).toContainText("Falls short");
-  await expect(ge.locator(".rf-rs-cmp-row", { hasText: "Same door layout" }).locator("a")).toHaveAttribute("href", "https://www.geappliances.com/");
+  // The cited source is the seller's bare address: shown as text saying so, not as a link that appears to verify the comparison.
+  await expect(ge.locator(".rf-rs-cmp-row", { hasText: "Same door layout" }).locator("a")).toHaveCount(0);
+  await expect(ge.locator(".rf-rs-cmp-row", { hasText: "Same door layout" }).locator(".rf-rs-seller-only")).toContainText("seller site only, no link to the listing");
   await expect(ge.locator(".rf-rs-price")).toContainText("$3,299");
   await expect(ge.locator(".rf-rs-price")).toContainText("Excluded from the range");
   // The successor, which is in the range, is not marked excluded.
@@ -415,7 +417,11 @@ test("Pricing & evidence: every price carries its kind, verification level, date
   await expect(panel.locator(".rf-rs-sources li")).toHaveCount(4);
   await expect(panel.locator(".rf-rs-sources li").nth(1)).toContainText("Retailer · The successor candidate · Seen Oct 21, 2026 · Same model code");
   const links = await panel.locator("a").evaluateAll((nodes) => nodes.map((node) => ({ href: node.href, rel: node.rel, target: node.target })));
-  expect(links.length).toBeGreaterThanOrEqual(4);
+  // Every source is either a safe link or, for a bare seller address, text that says it names the seller only.
+  const sellerOnly = await panel.locator(".rf-rs-sources .rf-rs-seller-only").count();
+  expect(sellerOnly).toBeGreaterThanOrEqual(2);
+  expect(await panel.locator(".rf-rs-sources a").count() + sellerOnly).toBe(4);
+  expect(links.length).toBeGreaterThanOrEqual(2);
   for (const link of links) {
     expect(link.href).toMatch(/^https:\/\/(www\.)?(samsung|lowes|homedepot|geappliances)\.com\//);
     expect(link.rel).toContain("noopener");

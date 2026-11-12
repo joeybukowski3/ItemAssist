@@ -138,11 +138,12 @@ test("listings set aside for being too far from the rest are said to be, and the
   settle(seen);
 });
 
-test("a retailer homepage is labelled as the seller's site, never as a product or purchase link; only a real page path drops that label", async ({ page }) => {
+test("a retailer homepage is text labelled as the seller's site only, never a link that appears to verify the listing; only a real page path is a link", async ({ page }) => {
   const seen = await runLive(page, "tv-premium-oled", () => {});
   let pricing = await open(page, "pricing");
-  await expect(pricing).toContainText("A listing's source links to the seller's site, not to a product page.");
-  await expect(pricing.locator(".rf-rs-sources a").first()).toHaveAttribute("href", /^https:\/\/www\.[a-z.]+\/(us\/)?$/);
+  await expect(pricing).toContainText("A source shown as seller site only names the seller and has no link to the listing");
+  await expect(pricing.locator(".rf-rs-sources .rf-rs-seller-only").first()).toContainText("seller site only, no link to the listing");
+  for (const href of await pricing.locator(".rf-rs-sources a").evaluateAll((links) => links.map((link) => link.getAttribute("href")))) expect(href).not.toMatch(/^https:\/\/[^/]+\/?$/);
   await expect(pricing).not.toContainText(/buy now|buy at|purchase link|add to cart/i);
   settle(seen);
 });
@@ -154,7 +155,7 @@ test("when every listing carries its seller's own page, the seller's-site caveat
     body.pricing.evidence.find((entry) => entry.id === "e1").sourceUrl = "https://www.cnet.com/tech/lg-c3-review/";
   });
   const pricing = await open(page, "pricing");
-  await expect(pricing).not.toContainText("not to a product page");
+  await expect(pricing).not.toContainText("seller site only");
   await expect(pricing.locator(".rf-rs-sources a[href='https://www.bestbuy.com/site/lg-c-series-oled/6590000.p']")).toHaveCount(1);
   settle(seen);
 });
