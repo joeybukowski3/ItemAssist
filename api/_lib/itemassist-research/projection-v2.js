@@ -1,4 +1,5 @@
 const { safeSourceUrl, SOURCE_CLASSES, FIRST_PARTY_CLASSES } = require("./sources");
+const { projectManufacturerPages } = require("./original-source");
 
 /**
  * research.2 projection for ItemAssist Research. The engine already validates its own response; this layer re-projects it field by field
@@ -17,7 +18,8 @@ const { safeSourceUrl, SOURCE_CLASSES, FIRST_PARTY_CLASSES } = require("./source
  *   - A comparison row is "confirmed" only by a confirming source about that candidate's own model.
  *   - An essential requirement is trusted only when the standard criteria for the item type set it; an AI-added one is demoted to important.
  *   - Estimates never carry a source and never appear verified. `verified` is recomputed here, not read.
- *   - A model status can only be as strong as the evidence that survived.
+ *   - A model status can only be as strong as the evidence that survived, and a candidate's confidence is at most MEDIUM unless that status is a cited page's confirmation.
+ *   - The original's manufacturer page (optional) is re-derived from its address and kept only for the maker's US storefront and one model code; it is never evidence about a candidate.
  *   - The valuation is checked against the surviving prices. If it cannot be reconciled, it becomes "insufficient evidence" rather than a figure.
  *   - A candidate with an essential shortfall never sets the range, however good its price.
  * What it cannot do: it has no way to see whether a page was really fetched. `verification`, `subjectModel` and `expectedModel` are the engine's
@@ -157,6 +159,9 @@ const modelKey = (value) => String(value || "").toUpperCase().replace(/[^A-Z0-9]
 const cleanModel = (value) => (typeof value === "string" && MODEL_PATTERN.test(value.trim()) ? value.trim().slice(0, 40) : null);
 /** A name that looks like an exact model code (RF28B5100SR) rather than a series (C4, S90D). */
 const looksLikeExactModel = (name) => /\b(?=[A-Z0-9-]*[A-Z])(?=(?:[A-Z0-9-]*\d){3})[A-Z0-9-]{6,}\b/.test(String(name || "").toUpperCase());
+
+/** A candidate's confidence is the model's opinion of the match: it is HIGH only when a cited page confirms the model, otherwise at most MEDIUM. */
+const cappedConfidence = (confidence, modelStatus) => (confidence === "HIGH" && modelStatus !== "VERIFIED_LISTING" ? "MEDIUM" : confidence);
 
 function modelRelation(subject, expected) {
   const a = modelKey(subject);
@@ -557,6 +562,7 @@ function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = fa
 
   const identity = safeText(body.original.identity, 120);
   const unidentified = !identity && status !== "UNAVAILABLE";
+  const manufacturerPages = projectManufacturerPages(body.original.manufacturerPages, { identity, safeText, modelRelation, modelPattern: MODEL_PATTERN });
   const { items: requirements, demoted: demotedRequirements } = projectRequirements(body.requirements, helpers);
   const requirementIds = new Set(requirements.map((item) => item.id));
 
@@ -596,7 +602,7 @@ function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = fa
     const capacityOpen = Boolean(capacityId) && (!capacityRow || capacityRow.status === "UNKNOWN" || capacityRow.status === "SHORTFALL");
     return {
       key: entry.key, name: entry.name, why: capacityOpen ? withoutCapacityClaim(entry.why) || NEUTRAL_WHY : entry.why,
-      differences: capacityOpen ? withoutCapacityClaim(entry.differences) : entry.differences, concern: entry.concern, confidence: entry.confidence, standing: entry.standing, modelStatus, comparison,
+      differences: capacityOpen ? withoutCapacityClaim(entry.differences) : entry.differences, concern: entry.concern, confidence: cappedConfidence(entry.confidence, modelStatus), standing: entry.standing, modelStatus, comparison,
       ...(entry.otherSellerListings.length ? { otherSellerListings: entry.otherSellerListings } : {}),
       ...(entry.lineage ? { lineage: entry.lineage } : {})
     };
@@ -641,7 +647,8 @@ function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = fa
       identity,
       confidence: oneOf(typeof body.original.confidence === "string" ? body.original.confidence.toUpperCase() : "", CONFIDENCES) || "LOW",
       characteristics: safeList(body.original.characteristics, 4),
-      uncertainty: safeText(body.original.uncertainty)
+      uncertainty: safeText(body.original.uncertainty),
+      ...(manufacturerPages.length ? { manufacturerPages } : {})
     },
     requirements,
     requirementsSource: requirements.some((item) => item.origin === "AI_ESTIMATE") ? "AI_ESTIMATE_PLUS_CATEGORY_GUIDANCE" : "CATEGORY_GUIDANCE",

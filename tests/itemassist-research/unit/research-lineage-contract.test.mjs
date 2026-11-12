@@ -15,6 +15,8 @@ const project = (body) => projectResearch(body, LIVE);
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const without = (value) => { const copy = clone(value); delete copy.meta; delete copy.quota; return copy; };
 const canon = (value) => JSON.stringify(value, (key, item) => (item && typeof item === "object" && !Array.isArray(item) ? Object.fromEntries(Object.keys(item).sort().map((name) => [name, item[name]])) : item));
+// A candidate's confidence is HIGH only when a cited page confirms its model; an engine that predates the cap may still send HIGH, and this side lowers it.
+const capConfidence = (body) => { const copy = clone(body); for (const entry of [copy.successor, ...copy.suggestions]) if (entry && entry.confidence === "HIGH" && entry.modelStatus !== "VERIFIED_LISTING") entry.confidence = "MEDIUM"; return copy; };
 const AFTER = ["lg-c3-after-stage-b", "lg-c3-saved-production-after-stage-b", "samsung-s90c-after-stage-b"];
 const BEFORE = ["lg-c3-family-mixed", "lg-c3-c6-single-listing", "lg-c3-saved-production-before"];
 
@@ -24,7 +26,7 @@ test("what Production's engine returns today (no lineage) is accepted unchanged,
     const out = project(clone(body));
     assert.ok(out, name);
     assert.equal(RS.isResearchResponse(out), true, name);
-    assert.equal(canon(without(out)), canon(without(body)), `${name}: the projection equals the engine's typed content`);
+    assert.equal(canon(without(out)), canon(without(capConfidence(body))), `${name}: the projection equals the engine's typed content, with confidence capped`);
   }
   for (const name of BEFORE) assert.equal(project(fixture(name)).successor.lineage, undefined, `${name}: no block is invented`);
 });
