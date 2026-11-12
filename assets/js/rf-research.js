@@ -145,6 +145,7 @@
   // What a confidence label is a confidence in. The identification, the match to a candidate, the lineage and the price evidence are separate statements.
   const IDENTIFICATION_CONFIDENCE = " confidence in the identification";
   const MATCH_CONFIDENCE = " confidence in the match (model estimate)";
+  const PRICE_CONFIDENCE = " confidence in the price range";
   const MANUFACTURER_PAGE_NOTE = "Found in the search results and not opened. It shows the maker lists this model; no specification or price is taken from it, and it says nothing about a replacement.";
 
   /** The original's manufacturer pages, ready to show: a link label and a short note each. Empty when the engine sent none. */
@@ -893,6 +894,7 @@
     PRICE_KIND_LABELS: PRICE_KIND_LABELS, VERIFICATION_LABELS: VERIFICATION_LABELS, DATE_LABELS: DATE_LABELS, METHOD_LABELS: METHOD_LABELS, TIER_LABELS: TIER_LABELS,
     TIER_BASIS_LABELS: TIER_BASIS_LABELS, IMPORTANCE_LABELS: IMPORTANCE_LABELS, ORIGIN_LABELS: ORIGIN_LABELS, COMPARISON_LABELS: COMPARISON_LABELS, BASIS_LABELS: BASIS_LABELS,
     MODEL_STATUS_LABELS: MODEL_STATUS_LABELS, SOURCE_CLASS_LABELS: SOURCE_CLASS_LABELS, MODEL_RELATION_LABELS: MODEL_RELATION_LABELS, EXCLUSION_LABELS: EXCLUSION_LABELS,
+    IDENTIFICATION_CONFIDENCE: IDENTIFICATION_CONFIDENCE, MATCH_CONFIDENCE: MATCH_CONFIDENCE, PRICE_CONFIDENCE: PRICE_CONFIDENCE, MANUFACTURER_PAGE_NOTE: MANUFACTURER_PAGE_NOTE, manufacturerPageLines: manufacturerPageLines,
     REJECTION_REASON_LABELS: REJECTION_REASON_LABELS, REJECTION_ACTION_LABELS: REJECTION_ACTION_LABELS, CANDIDATE_LABELS: CANDIDATE_LABELS, NOTE_TEXT: NOTE_TEXT
   };
   if (typeof module === "object" && module.exports) module.exports = api;

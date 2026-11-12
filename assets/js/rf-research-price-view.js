@@ -93,7 +93,7 @@
     var asOf = Res.formatDay(value.asOf);
     var pills = [
       D.pill(value.verified ? "ok" : "warn", value.verified ? "check" : "q", label(Res.METHOD_LABELS, value.method)),
-      R.confidence(value.confidence),
+      R.confidence(value.confidence, Res.PRICE_CONFIDENCE),
       asOf ? D.pill("neutral", null, "Prices as of " + asOf) : null
     ].filter(Boolean);
     // The line above already says a listing price is unconfirmed; saying it again as a note only adds noise.

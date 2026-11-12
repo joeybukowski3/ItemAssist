@@ -102,3 +102,22 @@ test("a blog, review or accessory page, and a trailing-slash duplicate, are not 
   const kept = pagesOf(withPages([clone(PAGE), { ...clone(PAGE), url: PAGE.url + "/" }]));
   assert.equal(kept.length, 1);
 });
+
+test("the view helpers the page calls are exported, and each confidence label names what it is a confidence in", () => {
+  assert.equal(typeof RS.manufacturerPageLines, "function", "a missing export made every result fail to render in the browser");
+  assert.match(RS.IDENTIFICATION_CONFIDENCE, /identification/);
+  assert.match(RS.MATCH_CONFIDENCE, /match/);
+  assert.match(RS.PRICE_CONFIDENCE, /price range/);
+  const lines = RS.manufacturerPageLines({ original: { manufacturerPages: [PAGE, { ...PAGE, url: "https://www.lg.com/us/support/product/lg-OLED55C3PUA", pageKind: "SUPPORT" }] } });
+  assert.deepEqual(lines.map((line) => line.label), ["LG product page", "LG support page"]);
+  assert.deepEqual(RS.manufacturerPageLines({ original: {} }), []);
+  assert.match(RS.MANUFACTURER_PAGE_NOTE, /not opened/);
+});
+
+test("the chat says what a candidate's confidence is, and why it is capped when no page confirms a model", () => {
+  const out = project(fixture("lg-c3-after-stage-b"));
+  const answer = RS.localAnswer({ last: out }, "How confident are you?");
+  const text = JSON.stringify(answer);
+  assert.match(text, /confidence in the identification is high/i);
+  assert.match(text, /capped at medium because no cited page confirms any candidate's model/);
+});
