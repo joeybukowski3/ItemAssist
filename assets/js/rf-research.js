@@ -354,6 +354,11 @@
   const LABEL_LISTED = Object.freeze({ text: "Likely successor, model seen in a listing", tone: "warn", icon: "q" });
   const LABEL_UNCONFIRMED = Object.freeze({ text: "Likely successor, model not confirmed", tone: "warn", icon: "q" });
   const LABEL_FAMILY = Object.freeze({ text: "Likely Successor Family", tone: "warn", icon: "q" });
+  const LABEL_OLDER = Object.freeze({ text: "Older same-series alternative", tone: "warn", icon: "q" });
+  // The model's own estimate of an alternative's tier against the original: always worded as an estimate, never as a finding.
+  const TIER_LABELS_ALT = Object.freeze({
+    HIGHER: "Higher-tier alternative (AI estimate)", LOWER: "Lower-tier alternative (AI estimate)", SAME: "Close equivalent (AI estimate)"
+  });
 
   /**
    * The badge for the successor candidate, or null when it has none: `{text, tone, icon}`. research.1 keeps its two labels. In research.2 only a
@@ -364,6 +369,8 @@
     if (!item || !item.standing) return null;
     const conditional = item.standing === "CONDITIONAL";
     if (!v2) return conditional ? LABEL_CAVEAT : LABEL_DIRECT;
+    // A newer generation exists in the series but is not the one presented (no listing in the size, or it fails an essential requirement).
+    if (item.lineage && item.lineage.relation === "SAME_SERIES_OLDER") return LABEL_OLDER;
     if (item.modelStatus === "VERIFIED_LISTING") return !conditional ? LABEL_DIRECT : (item.concern ? LABEL_CAVEAT : null);
     if (item.modelStatus === "LISTED_PROVISIONAL") return LABEL_LISTED;
     if (item.modelStatus === "FAMILY_LEVEL") return LABEL_FAMILY;
@@ -371,10 +378,28 @@
     return LABEL_UNCONFIRMED;
   }
 
+  /** The badge for an alternative (not the successor) from the model's tier estimate, or null when there is none. */
+  function alternativeLabel(item) {
+    const tier = item && item.lineage ? item.lineage.tier : null;
+    return tier && Object.prototype.hasOwnProperty.call(TIER_LABELS_ALT, tier) ? { text: TIER_LABELS_ALT[tier], tone: "neutral", icon: "q" } : null;
+  }
+
+  /** Where the generation a candidate is presented as came from, or null when none is stated. */
+  function generationLine(item) {
+    const lineage = item && item.lineage;
+    if (!lineage || !lineage.generation) return null;
+    if (lineage.basis === "LISTINGS") return "Generation " + lineage.generation + ", as stated in retailer listings.";
+    if (lineage.basis === "AI_HYPOTHESIS") return "Generation " + lineage.generation + " is the AI's guess; no listing states it.";
+    return null;
+  }
+
   /** The chat's sentence about the successor: it states what is and is not known about the candidate's identity. */
   function successorLine(data) {
     const item = data.successor;
     const concern = Boolean(item.concern);
+    if (isV2(data) && item.lineage && item.lineage.relation === "SAME_SERIES_OLDER") {
+      return "Older same-series alternative: " + item.name + ". A newer generation was seen in listings; see the concern under Replacements.";
+    }
     if (!isV2(data) || item.modelStatus === "VERIFIED_LISTING") {
       return "Closest successor to consider: " + item.name + (item.standing === "CONDITIONAL" && (!isV2(data) || concern) ? " (with a caveat, see Replacements)." : ".");
     }
@@ -839,7 +864,7 @@
     reply: reply, categoryLabel: categoryLabel, isResearchResponse: isResearchResponse, createVisitorId: createVisitorId, modelCodes: modelCodes,
     isV2: isV2, SUMMARY_NOTE_V2: SUMMARY_NOTE_V2, DEMO_PRICE_NOTE: DEMO_PRICE_NOTE, label: label, noteText: noteText, formatMoney: formatMoney, formatRange: formatRange, formatDay: formatDay,
     providerIncomplete: providerIncomplete, INCOMPLETE_KICKER: INCOMPLETE_KICKER, INCOMPLETE_RETRY: INCOMPLETE_RETRY,
-    successorLabel: successorLabel, successorLine: successorLine, priceScope: priceScope, scopeLines: scopeLines, candidatePriceFor: candidatePriceFor, isSellerSiteOnly: isSellerSiteOnly,
+    successorLabel: successorLabel, successorLine: successorLine, alternativeLabel: alternativeLabel, generationLine: generationLine, priceScope: priceScope, scopeLines: scopeLines, candidatePriceFor: candidatePriceFor, isSellerSiteOnly: isSellerSiteOnly,
     CANDIDATE_PRICE_CAPTION: CANDIDATE_PRICE_CAPTION,
     valuationLine: valuationLine, compatibilityLine: compatibilityLine, isListingAnchor: isListingAnchor, shortfallCount: shortfallCount, referencePrice: referencePrice, originalPrices: originalPrices, historySummary: historySummary, priceRole: priceRole, pricesByRole: pricesByRole,
     PRICE_ROLE_LABELS: PRICE_ROLE_LABELS, PRICE_ROLE_REASONS: PRICE_ROLE_REASONS,

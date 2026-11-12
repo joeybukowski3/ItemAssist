@@ -50,6 +50,12 @@ const SUBJECTS = Object.freeze(["ORIGINAL", "SUCCESSOR", "ALT_1", "ALT_2"]);
 const CANDIDATE_KEYS = Object.freeze(["SUCCESSOR", "ALT_1", "ALT_2"]);
 const MODEL_STATUSES = Object.freeze(["VERIFIED_LISTING", "LISTED_PROVISIONAL", "FAMILY_LEVEL", "UNVERIFIED_MODEL"]);
 const MODEL_RELATIONS = Object.freeze(["EXACT", "VARIANT", "DIFFERENT", "UNKNOWN"]);
+// Lineage (optional): how a candidate relates to the original, the generation it is presented as and where that came from, and the AI's tier estimate.
+// It is product lineage only: not comparability (the comparison rows) and not evidence confidence (the model status), and it can change neither.
+const LINEAGE_RELATIONS = Object.freeze(["SAME_SERIES_NEWER", "SAME_SERIES_OLDER", "SAME_BRAND_OTHER_SERIES", "OTHER_BRAND", "UNKNOWN"]);
+const LINEAGE_BASES = Object.freeze(["LISTINGS", "AI_HYPOTHESIS", "NONE"]);
+const LINEAGE_TIERS = Object.freeze(["SAME", "HIGHER", "LOWER", "UNKNOWN"]);
+const GENERATION_PATTERN = /^[A-Z0-9][A-Z0-9-]{1,11}$/;
 const TIER_LEVELS = Object.freeze(["VALUE", "STANDARD", "PREMIUM", "UPPER_PREMIUM", "LUXURY", "UNKNOWN"]);
 const COMPARISON_STATUSES = Object.freeze(["MEETS", "EXCEEDS", "SHORTFALL", "UNKNOWN"]);
 const METHODS = Object.freeze({
@@ -291,6 +297,17 @@ function projectTier(raw, prices) {
 }
 
 /* ---------- Candidates ---------- */
+
+/** The lineage block exactly as the engine's validator defines it, or null when it is absent or anything about it is off (it is never repaired). */
+function projectLineage(raw) {
+  if (!isObject(raw) || Object.keys(raw).some((key) => !["relation", "generation", "basis", "tier"].includes(key))) return null;
+  const generation = raw.generation === null ? null : (typeof raw.generation === "string" && GENERATION_PATTERN.test(raw.generation) ? raw.generation : undefined);
+  const relation = oneOf(raw.relation, LINEAGE_RELATIONS);
+  const basis = oneOf(raw.basis, LINEAGE_BASES);
+  const tier = oneOf(raw.tier, LINEAGE_TIERS);
+  if (!relation || !basis || !tier || generation === undefined || (generation === null) !== (basis === "NONE")) return null;
+  return { relation, generation, basis, tier };
+}
 
 /** True when `source` (cited evidence, or undefined) is a confirming source about candidate `key`'s own model. */
 const confirms = (source, key) => Boolean(source) && CONFIRMING_CLASSES.includes(source.sourceClass) && source.subject === key && SAME_MODEL_RELATIONS.includes(source.modelRelation);
@@ -557,7 +574,8 @@ function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = fa
       raw: item, name, why, differences: safeText(item.differences), concern,
       confidence: oneOf(typeof item.confidence === "string" ? item.confidence.toUpperCase() : "", CONFIDENCES) || "LOW",
       standing: withStanding ? (oneOf(item.standing, STANDINGS) && !concernWithheld ? item.standing : "CONDITIONAL") : null,
-      otherSellerListings: projectOtherListings(item.otherSellerListings, safeText)
+      otherSellerListings: projectOtherListings(item.otherSellerListings, safeText),
+      lineage: projectLineage(item.lineage)
     };
   };
   const successorDraft = successorRaw ? cleanCandidate(successorRaw, true) : null;
@@ -579,7 +597,8 @@ function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = fa
     return {
       key: entry.key, name: entry.name, why: capacityOpen ? withoutCapacityClaim(entry.why) || NEUTRAL_WHY : entry.why,
       differences: capacityOpen ? withoutCapacityClaim(entry.differences) : entry.differences, concern: entry.concern, confidence: entry.confidence, standing: entry.standing, modelStatus, comparison,
-      ...(entry.otherSellerListings.length ? { otherSellerListings: entry.otherSellerListings } : {})
+      ...(entry.otherSellerListings.length ? { otherSellerListings: entry.otherSellerListings } : {}),
+      ...(entry.lineage ? { lineage: entry.lineage } : {})
     };
   });
 

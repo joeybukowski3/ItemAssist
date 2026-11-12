@@ -1,0 +1,382 @@
+{
+  "contractVersion": "research.2",
+  "kind": "ITEMASSIST_RESEARCH",
+  "status": "OK",
+  "category": "tv",
+  "profile": "tv",
+  "original": {
+    "identity": "LG C3 55-inch OLED TV",
+    "confidence": "HIGH",
+    "characteristics": [
+      "55 inch screen size",
+      "4K resolution",
+      "OLED display technology",
+      "120Hz refresh rate"
+    ],
+    "uncertainty": null
+  },
+  "requirements": [
+    {
+      "id": "r1",
+      "key": "screenSize",
+      "text": "Screen size class close to the original",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r2",
+      "key": "resolution",
+      "text": "Same or better resolution (4K or higher)",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r3",
+      "key": "displayClass",
+      "text": "Same display technology class (OLED, QLED or LED)",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r4",
+      "key": "refresh",
+      "text": "Native refresh rate (120 Hz where the original had it)",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r5",
+      "key": "hdmi",
+      "text": "HDMI 2.1 ports for current consoles",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r6",
+      "key": "hdr",
+      "text": "The HDR formats the original supported",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r7",
+      "key": "smart",
+      "text": "A smart platform with the apps you use",
+      "importance": "MINOR",
+      "origin": "CATEGORY_RULE"
+    }
+  ],
+  "requirementsSource": "CATEGORY_GUIDANCE",
+  "successor": {
+    "name": "LG C-series OLED",
+    "why": "Direct continuation of the C-series OLED line",
+    "differences": null,
+    "concern": null,
+    "confidence": "MEDIUM",
+    "standing": "RECOMMENDED",
+    "verified": false,
+    "modelStatus": "FAMILY_LEVEL",
+    "comparison": []
+  },
+  "suggestions": [
+    {
+      "name": "Sony Bravia 8 OLED",
+      "why": "Matches display technology and premium performance class",
+      "differences": "Different image processing engine and software platform",
+      "concern": null,
+      "confidence": "MEDIUM",
+      "otherSellerListings": [
+        {
+          "seller": "St-Barth Electronique",
+          "amount": 1567.19,
+          "model": null
+        },
+        {
+          "seller": "McGrocer",
+          "amount": 2361.09,
+          "model": "K55XR80"
+        }
+      ],
+      "verified": false,
+      "modelStatus": "FAMILY_LEVEL",
+      "comparison": []
+    },
+    {
+      "name": "Samsung S90 OLED",
+      "why": "Matches screen size and high refresh rate OLED performance",
+      "differences": "Uses QD-OLED panel technology instead of W-OLED",
+      "concern": null,
+      "confidence": "MEDIUM",
+      "verified": false,
+      "modelStatus": "FAMILY_LEVEL",
+      "comparison": []
+    }
+  ],
+  "pricing": {
+    "referenceDate": "2026-10-26",
+    "tier": {
+      "level": "PREMIUM",
+      "basis": "MSRP_EVIDENCE"
+    },
+    "prices": [
+      {
+        "id": "p1",
+        "kind": "HISTORICAL_RETAIL",
+        "subject": "ORIGINAL",
+        "candidate": null,
+        "model": "OLED55C3PUA",
+        "amount": {
+          "currency": "USD",
+          "low": 1899,
+          "high": 1899
+        },
+        "asOf": "2023-03-02",
+        "asOfBasis": "PUBLISHED",
+        "verification": "SEARCH_SNIPPET",
+        "evidenceId": "e1"
+      },
+      {
+        "id": "p2",
+        "kind": "CURRENT_RETAIL_NEW",
+        "subject": "REPLACEMENT",
+        "candidate": "SUCCESSOR",
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 1096,
+          "high": 1096
+        },
+        "asOf": "2026-10-26",
+        "asOfBasis": "OBSERVED",
+        "verification": "SEARCH_LISTING",
+        "evidenceId": "e2"
+      },
+      {
+        "id": "p3",
+        "kind": "CURRENT_RETAIL_NEW",
+        "subject": "REPLACEMENT",
+        "candidate": "SUCCESSOR",
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 999.99,
+          "high": 999.99
+        },
+        "asOf": "2026-10-26",
+        "asOfBasis": "OBSERVED",
+        "verification": "SEARCH_LISTING",
+        "evidenceId": "e3",
+        "sizeConfirmed": false
+      },
+      {
+        "id": "p4",
+        "kind": "CURRENT_RETAIL_NEW",
+        "subject": "REPLACEMENT",
+        "candidate": "SUCCESSOR",
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 999.99,
+          "high": 999.99
+        },
+        "asOf": "2026-10-26",
+        "asOfBasis": "OBSERVED",
+        "verification": "SEARCH_LISTING",
+        "evidenceId": "e4",
+        "sizeConfirmed": false
+      },
+      {
+        "id": "p5",
+        "kind": "CURRENT_RETAIL_NEW",
+        "subject": "REPLACEMENT",
+        "candidate": "ALT_1",
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 1398,
+          "high": 1398
+        },
+        "asOf": "2026-10-26",
+        "asOfBasis": "OBSERVED",
+        "verification": "SEARCH_LISTING",
+        "evidenceId": "e5",
+        "sizeConfirmed": false
+      },
+      {
+        "id": "p6",
+        "kind": "CURRENT_RETAIL_NEW",
+        "subject": "REPLACEMENT",
+        "candidate": "ALT_1",
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 2359.41,
+          "high": 2359.41
+        },
+        "asOf": "2026-10-26",
+        "asOfBasis": "OBSERVED",
+        "verification": "SEARCH_LISTING",
+        "evidenceId": "e6",
+        "sizeConfirmed": false
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "subject": "ORIGINAL",
+        "sourceName": "Tom’s Guide",
+        "sourceDomain": "tomsguide.com",
+        "sourceUrl": "https://www.tomsguide.com/news/lg-unveils-c3-and-g3-oled-release-dates-and-prices-what-you-need-to-know",
+        "sourceClass": "REVIEW",
+        "firstParty": false,
+        "publishedAt": "2023-03-02",
+        "observedAt": null,
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      },
+      {
+        "id": "e2",
+        "subject": "SUCCESSOR",
+        "sourceName": "Newegg",
+        "sourceDomain": "newegg.com",
+        "sourceUrl": "https://www.newegg.com/",
+        "sourceClass": "RETAILER",
+        "firstParty": true,
+        "publishedAt": null,
+        "observedAt": "2026-10-26",
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      },
+      {
+        "id": "e3",
+        "subject": "SUCCESSOR",
+        "sourceName": "Best Buy",
+        "sourceDomain": "bestbuy.com",
+        "sourceUrl": "https://www.bestbuy.com/",
+        "sourceClass": "RETAILER",
+        "firstParty": true,
+        "publishedAt": null,
+        "observedAt": "2026-10-26",
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      },
+      {
+        "id": "e4",
+        "subject": "SUCCESSOR",
+        "sourceName": "B&H",
+        "sourceDomain": "bhphotovideo.com",
+        "sourceUrl": "https://www.bhphotovideo.com/",
+        "sourceClass": "RETAILER",
+        "firstParty": true,
+        "publishedAt": null,
+        "observedAt": "2026-10-26",
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      },
+      {
+        "id": "e5",
+        "subject": "ALT_1",
+        "sourceName": "Best Buy",
+        "sourceDomain": "bestbuy.com",
+        "sourceUrl": "https://www.bestbuy.com/",
+        "sourceClass": "RETAILER",
+        "firstParty": true,
+        "publishedAt": null,
+        "observedAt": "2026-10-26",
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      },
+      {
+        "id": "e6",
+        "subject": "ALT_1",
+        "sourceName": "Target",
+        "sourceDomain": "target.com",
+        "sourceUrl": "https://www.target.com/",
+        "sourceClass": "RETAILER",
+        "firstParty": true,
+        "publishedAt": null,
+        "observedAt": "2026-10-26",
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      }
+    ],
+    "valuation": {
+      "method": "PROVISIONAL_LISTINGS",
+      "basis": "PROVISIONAL_LISTINGS",
+      "verified": false,
+      "range": {
+        "currency": "USD",
+        "low": 1096,
+        "high": 1096
+      },
+      "confidence": "LOW",
+      "asOf": "2026-10-26",
+      "comparables": [
+        {
+          "priceId": "p2",
+          "candidate": "SUCCESSOR",
+          "verification": "SEARCH_LISTING"
+        }
+      ],
+      "excluded": [
+        {
+          "candidate": "ALT_1",
+          "reason": "NO_CURRENT_PRICE"
+        },
+        {
+          "candidate": "ALT_2",
+          "reason": "NO_CURRENT_PRICE"
+        }
+      ],
+      "reference": {
+        "priceId": "p1",
+        "kind": "HISTORICAL_RETAIL"
+      },
+      "notes": [
+        {
+          "code": "BASED_ON_LISTINGS",
+          "count": 1
+        },
+        {
+          "code": "LISTINGS_NOT_CONFIRMED"
+        },
+        {
+          "code": "EXCLUDED_NO_CURRENT_PRICE",
+          "candidate": "ALT_1"
+        },
+        {
+          "code": "EXCLUDED_NO_CURRENT_PRICE",
+          "candidate": "ALT_2"
+        },
+        {
+          "code": "MSRP_CONTEXT_ONLY"
+        },
+        {
+          "code": "CURRENT_BELOW_ORIGINAL",
+          "ratio": 0.58
+        },
+        {
+          "code": "NOT_AN_APPRAISAL"
+        }
+      ]
+    },
+    "rejections": []
+  },
+  "clarify": [],
+  "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+  "warnings": [
+    "DIFFERENCES_MISSING"
+  ],
+  "meta": {
+    "requestId": "offline",
+    "elapsedMs": 100,
+    "cached": false,
+    "answerSource": "AI_ESTIMATE"
+  }
+}
