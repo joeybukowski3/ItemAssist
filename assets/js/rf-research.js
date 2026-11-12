@@ -156,6 +156,69 @@
     });
   }
 
+  /* ---------- Model observations and specification comparison (Release 2) ----------
+   * Pure wording shared by the candidate cards and the chat, so the two always say the same thing. Nothing here is a claim the response does not carry: an observed
+   * model code is what a listing title states, a compared value is what its named basis states, and an attribute no source states is "Not established". */
+
+  const OBSERVATION_NOTE = "A model code seen in a seller's listing title is an observation. It does not verify the model or its specifications, and it is not used as a price.";
+  const EXCLUSION_REASON = Object.freeze({ PROTECTION_PLAN: "the listing includes a protection plan", BUNDLE: "the listing is sold as a bundle", NOT_USED_IN_PRICE: "no price from it is used in the range", CONFLICTING_CODES: "the listings name more than one model code, so it is not priced as an exact model" });
+  const SPEC_LABELS = Object.freeze({ SCREEN_SIZE: "Screen size", DISPLAY_CLASS: "Display class", RESOLUTION: "Resolution", REFRESH_RATE: "Refresh rate", DOLBY_VISION: "Dolby Vision", HDMI_2_1: "HDMI 2.1" });
+  const SPEC_RESULT_LABELS = Object.freeze({ MATCH: "Match", DIFFERENT: "Different", NOT_ESTABLISHED: "Not established" });
+  const COMPARISON_NOTE = "Listing titles are the seller's wording, not manufacturer specifications. Nothing is inferred from the model year or generation.";
+
+  function joinNames(names) {
+    return names.length <= 1 ? (names[0] || "") : names.slice(0, -1).join(", ") + " and " + names[names.length - 1];
+  }
+
+  /** The observed model codes of a candidate as sentences, with a conflict first. Empty when the response carries none. */
+  function observationLines(item) {
+    const block = item && item.modelObservations;
+    if (!block || !Array.isArray(block.items) || !block.items.length) return [];
+    const lines = [];
+    if (block.conflict) lines.push("Listings name more than one model code (" + block.items.map(function (entry) { return entry.model; }).join(", ") + "), so none is chosen.");
+    block.items.forEach(function (entry) {
+      const where = entry.retailers.length ? (entry.listings > 1 ? " in " + entry.listings + " listing titles (" + joinNames(entry.retailers) + ")" : " in a " + joinNames(entry.retailers) + " listing title") : " in listing titles";
+      const price = entry.status === "PRICED_LISTING" ? " Its eligible listings set the price shown." : " Price excluded: " + (EXCLUSION_REASON[entry.exclusion] || "no price from it is used") + ".";
+      const when = entry.retrievedBasis === "RETRIEVED" && entry.retrievedAt ? " Retrieved " + formatDay(entry.retrievedAt) + "." : " Retrieval date not recorded.";
+      lines.push("Model code observed: " + entry.model + where + "." + price + when);
+    });
+    return lines;
+  }
+
+  function sideText(side) {
+    if (!side) return "Not established";
+    const basis = side.basis === "USER_STATED" ? "your description" : side.basis === "MANUFACTURER_PAGE_TITLE" ? "manufacturer page title" : (side.sources === 1 ? "1 seller listing title" : side.sources + " seller listing titles");
+    return side.value + " (" + basis + ")";
+  }
+
+  /** The comparison rows for display: a label, each side with its basis, and the result. Empty when the response carries no comparison. */
+  function comparisonRows(item) {
+    const block = item && item.specComparison;
+    if (!block || !Array.isArray(block.rows)) return [];
+    return block.rows.map(function (row) {
+      return { attribute: row.attribute, label: SPEC_LABELS[row.attribute] || "Attribute", original: sideText(row.original), candidate: sideText(row.candidate), result: row.result, resultLabel: SPEC_RESULT_LABELS[row.result] || "Not established" };
+    });
+  }
+
+  /** One sentence on what was compared and what was not established; null when there is no comparison. */
+  function comparisonSummary(item) {
+    const block = item && item.specComparison;
+    if (!block || !Array.isArray(block.rows)) return null;
+    const names = function (list) { return joinNames(list.map(function (attribute) { return (SPEC_LABELS[attribute] || "attribute").toLowerCase(); })); };
+    const compared = block.compared.length ? "Compared: " + names(block.compared) + "." : "Nothing could be compared from the sources found.";
+    return compared + (block.notEstablished.length ? " Not established: " + names(block.notEstablished) + "." : "");
+  }
+
+  /** The chat's sentence for a candidate's comparison: the summary, and any difference stated with both values. */
+  function comparisonSentence(item) {
+    const summary = comparisonSummary(item);
+    if (!summary) return null;
+    const different = comparisonRows(item).filter(function (row) { return row.result === "DIFFERENT"; }).map(function (row) {
+      return row.label + " differs: " + row.original + " for the original, " + row.candidate + " for this candidate.";
+    });
+    return [summary].concat(different).join(" ");
+  }
+
   const COMPATIBILITY_TEXT = "Compatibility not fully established. Confirm the original door configuration and fit before relying on this range.";
 
   const percent = (ratio) => Math.round(ratio * 100) + "%";
@@ -680,6 +743,7 @@
   /* ---------- Answers that need no AI call ---------- */
 
   const TOPICS = Object.freeze([
+    ["model", /\b(?:model\s+(?:number|code|name)|which\s+model|what\s+model|exact\s+model|sku)\b/i],
     ["requirements", /\b(?:requirement|requirements|match|specs?|specifications?|look\s+for|important)\b/i],
     ["differences", /\b(?:differ\w*|compare|comparison|versus|vs|better|worse)\b/i],
     ["why", /\b(?:why|reason|explain|successor|chosen|pick|recommend)\w*/i],
@@ -738,8 +802,17 @@
       })) : null;
     }
     if (!items.length) return ["I don't have a candidate to explain yet. Add detail such as size, color or finish and I'll research again."];
+    if (topic === "model" && isV2(data)) {
+      return items.map(function (item) {
+        const lines = observationLines(item);
+        return item.name + ": " + (lines.length ? lines.join(" ") + " " + OBSERVATION_NOTE : "no model code was seen in the listings I found, so the exact model is not established.");
+      });
+    }
     if (topic === "differences") {
-      return items.map(function (item) { return item.name + ": " + (item.differences || "no specific difference was stated, so check the specifications."); });
+      return items.map(function (item) {
+        const sentence = isV2(data) ? comparisonSentence(item) : null;
+        return item.name + ": " + (sentence ? sentence + " " + COMPARISON_NOTE : (item.differences || "no specific difference was stated, so check the specifications."));
+      });
     }
     return items.slice(0, 3).map(function (item) {
       return item.name + ": " + item.why + (item.concern ? " Concern: " + item.concern : "");
@@ -894,6 +967,7 @@
     PRICE_KIND_LABELS: PRICE_KIND_LABELS, VERIFICATION_LABELS: VERIFICATION_LABELS, DATE_LABELS: DATE_LABELS, METHOD_LABELS: METHOD_LABELS, TIER_LABELS: TIER_LABELS,
     TIER_BASIS_LABELS: TIER_BASIS_LABELS, IMPORTANCE_LABELS: IMPORTANCE_LABELS, ORIGIN_LABELS: ORIGIN_LABELS, COMPARISON_LABELS: COMPARISON_LABELS, BASIS_LABELS: BASIS_LABELS,
     MODEL_STATUS_LABELS: MODEL_STATUS_LABELS, SOURCE_CLASS_LABELS: SOURCE_CLASS_LABELS, MODEL_RELATION_LABELS: MODEL_RELATION_LABELS, EXCLUSION_LABELS: EXCLUSION_LABELS,
+    OBSERVATION_NOTE: OBSERVATION_NOTE, COMPARISON_NOTE: COMPARISON_NOTE, observationLines: observationLines, comparisonRows: comparisonRows, comparisonSummary: comparisonSummary, comparisonSentence: comparisonSentence,
     IDENTIFICATION_CONFIDENCE: IDENTIFICATION_CONFIDENCE, MATCH_CONFIDENCE: MATCH_CONFIDENCE, PRICE_CONFIDENCE: PRICE_CONFIDENCE, MANUFACTURER_PAGE_NOTE: MANUFACTURER_PAGE_NOTE, manufacturerPageLines: manufacturerPageLines,
     REJECTION_REASON_LABELS: REJECTION_REASON_LABELS, REJECTION_ACTION_LABELS: REJECTION_ACTION_LABELS, CANDIDATE_LABELS: CANDIDATE_LABELS, NOTE_TEXT: NOTE_TEXT
   };

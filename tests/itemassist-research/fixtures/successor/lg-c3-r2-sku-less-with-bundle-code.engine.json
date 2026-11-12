@@ -1,0 +1,295 @@
+{
+  "contractVersion": "research.2",
+  "kind": "ITEMASSIST_RESEARCH",
+  "status": "OK",
+  "category": "tv",
+  "profile": "tv",
+  "original": {
+    "identity": "LG C3 series 55-inch 4K OLED evo smart TV (2023)",
+    "confidence": "HIGH",
+    "characteristics": [
+      "55-inch OLED",
+      "4K",
+      "120 Hz"
+    ],
+    "uncertainty": null
+  },
+  "requirements": [
+    {
+      "id": "r1",
+      "key": "screenSize",
+      "text": "Screen size class close to the original",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r2",
+      "key": "resolution",
+      "text": "Same or better resolution (4K or higher)",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r3",
+      "key": "displayClass",
+      "text": "Same display technology class (OLED, QLED or LED)",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r4",
+      "key": "refresh",
+      "text": "Native refresh rate (120 Hz where the original had it)",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r5",
+      "key": "hdmi",
+      "text": "HDMI 2.1 ports for current consoles",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r6",
+      "key": "hdr",
+      "text": "The HDR formats the original supported",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r7",
+      "key": "smart",
+      "text": "A smart platform with the apps you use",
+      "importance": "MINOR",
+      "origin": "CATEGORY_RULE"
+    }
+  ],
+  "requirementsSource": "CATEGORY_GUIDANCE",
+  "successor": {
+    "name": "LG C6 OLED 55-inch",
+    "why": "Continues the line.",
+    "differences": null,
+    "concern": null,
+    "confidence": "MEDIUM",
+    "standing": "CONDITIONAL",
+    "lineage": {
+      "relation": "SAME_SERIES_NEWER",
+      "generation": "C6",
+      "basis": "LISTINGS",
+      "tier": "UNKNOWN"
+    },
+    "specComparison": {
+      "rows": [
+        {
+          "attribute": "SCREEN_SIZE",
+          "original": {
+            "value": "55-inch",
+            "basis": "USER_STATED",
+            "sources": 1
+          },
+          "candidate": {
+            "value": "55-inch",
+            "basis": "LISTING_TITLE",
+            "sources": 2
+          },
+          "result": "MATCH"
+        },
+        {
+          "attribute": "DISPLAY_CLASS",
+          "original": null,
+          "candidate": {
+            "value": "OLED",
+            "basis": "LISTING_TITLE",
+            "sources": 2
+          },
+          "result": "NOT_ESTABLISHED"
+        },
+        {
+          "attribute": "RESOLUTION",
+          "original": null,
+          "candidate": {
+            "value": "4K",
+            "basis": "LISTING_TITLE",
+            "sources": 2
+          },
+          "result": "NOT_ESTABLISHED"
+        },
+        {
+          "attribute": "REFRESH_RATE",
+          "original": null,
+          "candidate": null,
+          "result": "NOT_ESTABLISHED"
+        },
+        {
+          "attribute": "DOLBY_VISION",
+          "original": null,
+          "candidate": {
+            "value": "Dolby Vision",
+            "basis": "LISTING_TITLE",
+            "sources": 1
+          },
+          "result": "NOT_ESTABLISHED"
+        }
+      ],
+      "compared": [
+        "SCREEN_SIZE"
+      ],
+      "notEstablished": [
+        "DISPLAY_CLASS",
+        "RESOLUTION",
+        "REFRESH_RATE",
+        "DOLBY_VISION"
+      ]
+    },
+    "modelObservations": {
+      "conflict": false,
+      "items": [
+        {
+          "model": "OLED55C6PUA",
+          "status": "EXCLUDED_FROM_PRICE",
+          "listings": 1,
+          "retailers": [
+            "Best Buy"
+          ],
+          "excerpt": "LG Oled55c6pua 55 inch Class OLED AI C6 4K Smart TV with 2 Year Amber Protection Plan",
+          "exclusion": "PROTECTION_PLAN",
+          "retrievedAt": "2026-11-11",
+          "retrievedBasis": "RETRIEVED"
+        }
+      ]
+    },
+    "verified": false,
+    "modelStatus": "FAMILY_LEVEL",
+    "comparison": []
+  },
+  "suggestions": [
+    {
+      "name": "Samsung S90-series QD-OLED",
+      "why": "Comparable premium OLED-class picture quality.",
+      "differences": "Different smart platform.",
+      "concern": null,
+      "confidence": "MEDIUM",
+      "lineage": {
+        "relation": "OTHER_BRAND",
+        "generation": null,
+        "basis": "NONE",
+        "tier": "UNKNOWN"
+      },
+      "verified": false,
+      "modelStatus": "FAMILY_LEVEL",
+      "comparison": []
+    }
+  ],
+  "pricing": {
+    "referenceDate": "2026-11-11",
+    "tier": {
+      "level": "PREMIUM",
+      "basis": "AI_ESTIMATE"
+    },
+    "prices": [
+      {
+        "id": "p1",
+        "kind": "CURRENT_RETAIL_NEW",
+        "subject": "REPLACEMENT",
+        "candidate": "SUCCESSOR",
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 1449.99,
+          "high": 1449.99
+        },
+        "asOf": "2026-11-11",
+        "asOfBasis": "OBSERVED",
+        "verification": "SEARCH_LISTING",
+        "evidenceId": "e1"
+      },
+      {
+        "id": "p2",
+        "kind": "AI_ESTIMATE",
+        "subject": "ORIGINAL",
+        "candidate": null,
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 1500,
+          "high": 2000
+        },
+        "asOf": null,
+        "asOfBasis": "UNKNOWN",
+        "verification": "NONE",
+        "evidenceId": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "subject": "SUCCESSOR",
+        "sourceName": "Target",
+        "sourceDomain": "target.com",
+        "sourceUrl": "https://www.target.com/",
+        "sourceClass": "RETAILER",
+        "firstParty": true,
+        "publishedAt": null,
+        "observedAt": "2026-11-11",
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      }
+    ],
+    "valuation": {
+      "method": "PROVISIONAL_LISTINGS",
+      "basis": "PROVISIONAL_LISTINGS",
+      "verified": false,
+      "range": {
+        "currency": "USD",
+        "low": 1449.99,
+        "high": 1449.99
+      },
+      "confidence": "LOW",
+      "asOf": "2026-11-11",
+      "comparables": [
+        {
+          "priceId": "p1",
+          "candidate": "SUCCESSOR",
+          "verification": "SEARCH_LISTING"
+        }
+      ],
+      "excluded": [
+        {
+          "candidate": "ALT_1",
+          "reason": "NO_CURRENT_PRICE"
+        }
+      ],
+      "reference": null,
+      "notes": [
+        {
+          "code": "BASED_ON_LISTINGS",
+          "count": 1
+        },
+        {
+          "code": "LISTINGS_NOT_CONFIRMED"
+        },
+        {
+          "code": "EXCLUDED_NO_CURRENT_PRICE",
+          "candidate": "ALT_1"
+        },
+        {
+          "code": "NOT_AN_APPRAISAL"
+        }
+      ]
+    },
+    "rejections": []
+  },
+  "clarify": [],
+  "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+  "warnings": [
+    "DIFFERENCES_MISSING"
+  ],
+  "meta": {
+    "requestId": "offline",
+    "elapsedMs": 100,
+    "cached": false,
+    "answerSource": "AI_ESTIMATE"
+  }
+}

@@ -97,3 +97,11 @@
 .rf-rs-cmp-source { grid-column: 1 / -1; font-size: 0.8125rem; }
 .rf-rs-excluded { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.5rem 0.625rem; background: var(--rf-warn-bg); border: 1px solid var(--rf-warn-line); border-radius: 6px; font-size: 0.875rem; font-weight: 600; color: var(--rf-warn-text); }
 .rf-rs-excluded .rf-ic { margin-top: 2px; }
+.rf-rs-observed, .rf-rs-speccmp { margin-top: 0.75rem; }
+.rf-rs-spec-list { list-style: none; margin: 0.25rem 0 0.5rem; padding: 0; display: grid; gap: 0.5rem; }
+.rf-rs-spec-row { display: grid; gap: 0.125rem; padding: 0.5rem 0.625rem; border: 1px solid var(--rf-line-strong); border-left-width: 3px; border-radius: 6px; overflow-wrap: anywhere; }
+.rf-rs-spec-row--match { border-left-color: var(--rf-ok-line, #2e7d32); }
+.rf-rs-spec-row--different { border-left-color: var(--rf-warn-line); }
+.rf-rs-spec-row .rf-pill { justify-self: start; margin-top: 0.25rem; }
+.rf-rs-spec-who { color: var(--rf-muted); }
+.rf-rs-spec-summary { margin: 0.25rem 0; font-weight: 600; }
