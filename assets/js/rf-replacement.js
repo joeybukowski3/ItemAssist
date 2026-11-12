@@ -15,12 +15,13 @@
   var MAX_ALTERNATIVES = 2;
   var CONFIDENCE_RANK = { LOW: 1, MEDIUM: 2, HIGH: 3 };
 
-  function confidence(level) {
+  // `suffix` says what the confidence is in; the classic flow keeps the plain "Confidence".
+  function confidence(level, suffix) {
     var rank = CONFIDENCE_RANK[level] || 0;
     var bars = [1, 2, 3].map(function (n) { return h("i", { class: n <= rank ? "on" : "", attrs: { "aria-hidden": "true" } }); });
     return h("span", { class: "rf-conf" }, [
       h("span", { class: "rf-conf-bars", attrs: { "aria-hidden": "true" } }, bars),
-      h("span", {}, [h("strong", { text: RF.CONFIDENCE_LABELS[level] || "Unknown" }), " Confidence"])
+      h("span", {}, [h("strong", { text: RF.CONFIDENCE_LABELS[level] || "Unknown" }), suffix || " Confidence"])
     ]);
   }
 

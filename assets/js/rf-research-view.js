@@ -66,7 +66,7 @@
 
   function headerParts(data) {
     var identified = Boolean(data.original.identity);
-    var confidence = identified ? R.confidence(data.original.confidence) : null;
+    var confidence = identified ? R.confidence(data.original.confidence, Research.IDENTIFICATION_CONFIDENCE) : null;
     return [
       h("p", { class: "rf-ph-brand", text: Research.categoryLabel(data.category) + " research" }),
       D.heading("h3", "rf-product-name", identified ? data.original.identity : data.status === "UNAVAILABLE" ? "Research unavailable" : Research.providerIncomplete(data) ? Research.INCOMPLETE_KICKER : "Product not identified", "rf-ph-model"),
@@ -84,7 +84,7 @@
     // "Direct successor"; a family, a model seen in a listing and an unconfirmed model code are each labelled as the likely successor they are.
     var standing = item.standing ? Research.successorLabel(item, v2) : (v2 ? Research.alternativeLabel(item) : null);
     return h("div", { class: "rf-lead-meta" }, [
-      R.confidence(item.confidence),
+      R.confidence(item.confidence, Research.MATCH_CONFIDENCE),
       item.modelStatus ? D.pill(item.modelStatus === "VERIFIED_LISTING" ? "info" : "warn", item.modelStatus === "VERIFIED_LISTING" ? "check" : "q", Research.label(Research.MODEL_STATUS_LABELS, item.modelStatus, "")) : null,
       standing ? D.pill(standing.tone, standing.icon, standing.text) : null,
       D.pill("neutral", "q", "Unverified suggestion")
@@ -164,9 +164,11 @@
     // A request that failed at the provider says nothing about the item: it is never reported as an item that could not be identified.
     if (!data.original.identity && (data.status === "UNAVAILABLE" || Research.providerIncomplete(data))) return [D.emptyNote(data.status === "UNAVAILABLE" ? "Research unavailable" : Research.INCOMPLETE_KICKER, "The research step didn't finish, so nothing is known about this item yet. " + Research.INCOMPLETE_RETRY)];
     if (!data.original.identity) return [D.emptyNote("Product not identified", "The item couldn't be identified from the description. Add a brand, model number or key detail in the conversation.")];
-    var children = [h("p", { class: "rf-rs-identity", text: data.original.identity }), R.confidence(data.original.confidence)];
+    var children = [h("p", { class: "rf-rs-identity", text: data.original.identity }), R.confidence(data.original.confidence, Research.IDENTIFICATION_CONFIDENCE)];
     children.push(data.original.characteristics.length ? h("div", {}, [h("p", { class: "rf-rs-sub", text: "Key characteristics" }), list(data.original.characteristics)]) : h("p", { class: "rf-muted", text: "No characteristics were stated." }));
     if (data.original.uncertainty) children.push(h("p", { class: "rf-rs-unsure" }, [h("strong", { text: "Not sure about: " }), data.original.uncertainty]));
+    var pages = Research.manufacturerPageLines(data);
+    if (pages.length) children.push(h("div", {}, [h("p", { class: "rf-rs-sub", text: "Manufacturer page" }), h("ul", { class: "rf-rs-list" }, pages.map(function (page) { return h("li", {}, [R.sourceLink(page.url, page.label), " " + page.note]); })), h("p", { class: "rf-muted", text: Research.MANUFACTURER_PAGE_NOTE })]));
     var identified = block("rf-orig-h", "Identified product", children);
     return Research.isV2(data) ? [identified, P.originalPriceBlock(data)] : [identified];
   }

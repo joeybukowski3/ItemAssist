@@ -142,6 +142,19 @@
   const REJECTION_ACTION_LABELS = Object.freeze({ REJECTED: "Set aside", DOWNGRADED: "Downgraded" });
   const CANDIDATE_LABELS = Object.freeze({ SUCCESSOR: "The successor candidate", ALT_1: "Alternative 1", ALT_2: "Alternative 2" });
   const DEMO_PRICE_NOTE = "Demo data: the figures and sources in this panel are illustrative, not real prices.";
+  // What a confidence label is a confidence in. The identification, the match to a candidate, the lineage and the price evidence are separate statements.
+  const IDENTIFICATION_CONFIDENCE = " confidence in the identification";
+  const MATCH_CONFIDENCE = " confidence in the match (model estimate)";
+  const MANUFACTURER_PAGE_NOTE = "Found in the search results and not opened. It shows the maker lists this model; no specification or price is taken from it, and it says nothing about a replacement.";
+
+  /** The original's manufacturer pages, ready to show: a link label and a short note each. Empty when the engine sent none. */
+  function manufacturerPageLines(data) {
+    const pages = data.original && Array.isArray(data.original.manufacturerPages) ? data.original.manufacturerPages : [];
+    return pages.map(function (page) {
+      return { url: page.url, label: page.sourceName + (page.pageKind === "SUPPORT" ? " support page" : " product page"), note: "(names the model " + page.model + ")" };
+    });
+  }
+
   const COMPATIBILITY_TEXT = "Compatibility not fully established. Confirm the original door configuration and fit before relying on this range.";
 
   const percent = (ratio) => Math.round(ratio * 100) + "%";
@@ -713,6 +726,7 @@
       const level = { HIGH: "high", MEDIUM: "medium", LOW: "low" }[data.original.confidence] || "low";
       return [
         data.original.identity ? "My confidence in the identification is " + level + "." : providerIncomplete(data) ? "The research step didn't finish, so I can't say yet." : "I wasn't able to identify the product.",
+        data.original.identity && isV2(data) ? confidenceScopeLine(data) : null,
         data.original.uncertainty || null,
         data.disclosure
       ].filter(Boolean);
@@ -802,6 +816,14 @@
       questions: (data.clarify || []).slice(0, 2),
       quotaLine: remaining ? remaining.remaining + " of " + remaining.limit + " free research requests left today." : null
     };
+  }
+
+  /** Says what the confidence labels are and are not: the identification is one statement, a candidate's match another, and neither is a check by a source. */
+  function confidenceScopeLine(data) {
+    const confirmed = candidateOf(data).some(function (item) { return item.modelStatus === "VERIFIED_LISTING"; });
+    return confirmed
+      ? "A candidate's confidence is the model's estimate of the match; where it is high, a cited page confirms that model."
+      : "A candidate's confidence is the model's estimate of the match, capped at medium because no cited page confirms any candidate's model.";
   }
 
   /** The right-pane label for the product category. */
