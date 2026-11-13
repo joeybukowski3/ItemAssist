@@ -264,11 +264,44 @@
   }
 
   /** The extra lines a candidate card carries in research.2: its price, any exclusion, and the requirement-by-requirement comparison. */
+  /** Model codes seen in retailer listing titles: an observation, kept apart from the price and from any verified identity. */
+  function observationBlock(item) {
+    var lines = Res.observationLines(item);
+    if (!lines.length) return null;
+    return h("div", { class: "rf-rs-observed" }, [
+      h("p", { class: "rf-rs-sub", text: "Model code evidence" }),
+      h("ul", { class: "rf-rs-list" }, lines.map(function (line) { return h("li", { text: line }); })),
+      h("p", { class: "rf-muted", text: Res.OBSERVATION_NOTE })
+    ]);
+  }
+
+  /** The attributes compared with the original, each with the basis that states it. Stacked, never a wide table, so it fits a phone. */
+  function specComparisonBlock(item) {
+    var rows = Res.comparisonRows(item);
+    var summary = Res.comparisonSummary(item);
+    if (!rows.length || !summary) return null;
+    return h("div", { class: "rf-rs-speccmp" }, [
+      h("p", { class: "rf-rs-sub", text: "Specification comparison" }),
+      h("ul", { class: "rf-rs-spec-list" }, rows.map(function (row) {
+        return h("li", { class: "rf-rs-spec-row rf-rs-spec-row--" + row.result.toLowerCase().replace(/_/g, "-") }, [
+          h("strong", { class: "rf-rs-spec-name", text: row.label }),
+          h("span", { class: "rf-rs-spec-side" }, [h("span", { class: "rf-rs-spec-who", text: "Original: " }), row.original]),
+          h("span", { class: "rf-rs-spec-side" }, [h("span", { class: "rf-rs-spec-who", text: "This candidate: " }), row.candidate]),
+          D.pill(row.result === "MATCH" ? "ok" : row.result === "DIFFERENT" ? "warn" : "neutral", row.result === "MATCH" ? "check" : "q", row.resultLabel)
+        ]);
+      })),
+      h("p", { class: "rf-rs-spec-summary", text: summary }),
+      h("p", { class: "rf-muted", text: Res.COMPARISON_NOTE })
+    ]);
+  }
+
   function candidateDetail(data, item, key) {
     var excluded = data.pricing.valuation.excluded.filter(function (row) { return row.candidate === key; })[0];
     return candidatePrice(data, key).concat([
       otherSellerBlock(data, item, key),
       excluded ? h("p", { class: "rf-rs-excluded" }, [D.icon("info"), h("span", { text: label(Res.EXCLUSION_LABELS, excluded.reason) })]) : null,
+      observationBlock(item),
+      specComparisonBlock(item),
       comparisonBlock(data, item)
     ]).filter(Boolean);
   }

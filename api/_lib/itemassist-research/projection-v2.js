@@ -1,5 +1,6 @@
 const { safeSourceUrl, SOURCE_CLASSES, FIRST_PARTY_CLASSES } = require("./sources");
 const { projectManufacturerPages } = require("./original-source");
+const { projectModelObservations, projectSpecComparison, observationsFit, blocksFitReferences } = require("./evidence-blocks");
 
 /**
  * research.2 projection for ItemAssist Research. The engine already validates its own response; this layer re-projects it field by field
@@ -600,11 +601,22 @@ function projectResearch2(body, { requestId, elapsedMs, quota, allowFixture = fa
     // The comparison row is the result and is never changed here; only the model's prose is held to it (see `withoutCapacityClaim`).
     const capacityRow = capacityId ? comparison.find((row) => row.requirementId === capacityId) : null;
     const capacityOpen = Boolean(capacityId) && (!capacityRow || capacityRow.status === "UNKNOWN" || capacityRow.status === "SHORTFALL");
+    // Release 2 blocks, each re-validated whole and dropped, never repaired. Observations must fit the recomputed status and prices; a comparison needs a lineage block.
+    const blockHelpers = { modelPattern: MODEL_PATTERN, looksLikeExactModel, safeText };
+    const observedRaw = projectModelObservations(entry.raw.modelObservations, blockHelpers);
+    const observed = observedRaw && observationsFit(observedRaw, { name: entry.name, modelStatus, prices, key: entry.key, modelRelation, looksLikeExactModel }) ? observedRaw : null;
+    const comparedRaw = entry.lineage ? projectSpecComparison(entry.raw.specComparison) : null;
+    const hasPages = manufacturerPages.length > 0;
+    const fits = (block, kind) => (block && blocksFitReferences({ observations: kind === "obs" ? block : null, comparison: kind === "cmp" ? block : null, referenceDate, hasPages }) ? block : null);
+    const compared = fits(comparedRaw, "cmp");
+    const observedChecked = fits(observed, "obs");
     return {
       key: entry.key, name: entry.name, why: capacityOpen ? withoutCapacityClaim(entry.why) || NEUTRAL_WHY : entry.why,
       differences: capacityOpen ? withoutCapacityClaim(entry.differences) : entry.differences, concern: entry.concern, confidence: cappedConfidence(entry.confidence, modelStatus), standing: entry.standing, modelStatus, comparison,
       ...(entry.otherSellerListings.length ? { otherSellerListings: entry.otherSellerListings } : {}),
-      ...(entry.lineage ? { lineage: entry.lineage } : {})
+      ...(entry.lineage ? { lineage: entry.lineage } : {}),
+      ...(observedChecked ? { modelObservations: observedChecked } : {}),
+      ...(compared ? { specComparison: compared } : {})
     };
   });
 
