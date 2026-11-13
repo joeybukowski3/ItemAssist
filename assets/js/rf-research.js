@@ -164,6 +164,10 @@
   const EXCLUSION_REASON = Object.freeze({ PROTECTION_PLAN: "the listing includes a protection plan", BUNDLE: "the listing is sold as a bundle", NOT_USED_IN_PRICE: "no price from it is used in the range", CONFLICTING_CODES: "the listings name more than one model code, so it is not priced as an exact model" });
   const SPEC_LABELS = Object.freeze({ SCREEN_SIZE: "Screen size", DISPLAY_CLASS: "Display class", RESOLUTION: "Resolution", REFRESH_RATE: "Refresh rate", DOLBY_VISION: "Dolby Vision", HDMI_2_1: "HDMI 2.1" });
   const SPEC_RESULT_LABELS = Object.freeze({ MATCH: "Match", DIFFERENT: "Different", NOT_ESTABLISHED: "Not established" });
+  // The original's characteristics are the model's general knowledge (a loose check against search text keeps or drops them, it does not verify them). The sourced facts are
+  // the specification comparison's, each with its basis.
+  const CHARACTERISTICS_LABEL = "Key characteristics (AI estimate)";
+  const CHARACTERISTICS_NOTE = "From the AI's general knowledge and not verified against the maker's specifications. Where a specification comparison is shown, it states what its sources say.";
   const COMPARISON_NOTE = "Listing titles are the seller's wording, not manufacturer specifications. Nothing is inferred from the model year or generation.";
 
   function joinNames(names) {
@@ -232,11 +236,13 @@
     AI_ESTIMATE_ONLY: () => "No source supports this range. It is an AI estimate.",
     INSUFFICIENT: () => "There is not enough evidence to estimate a value yet.",
     // A past retail price is not a list price: the sentence names the kind of price the valuation actually points at.
-    MSRP_CONTEXT_ONLY: (note, context) => "The original's " + (context && context.referenceKind === "HISTORICAL_RETAIL" ? "past retail price" : "list price") + " is context only. It does not set the replacement range.",
+    MSRP_CONTEXT_ONLY: (note, context) => "The original's " + (context && context.referenceKind === "HISTORICAL_RETAIL" ? "past retail price" : "list price") + " is context only. It does not set the replacement range. It is a past price for a different model and is not compared with today's listings.",
     OTHER_FAMILIES_SEPARATE: (note) => (note.count === 1 ? "Prices for another candidate family are" : "Prices for " + note.count + " other candidate families are") + " listed separately. They do not set this range.",
     COMPATIBILITY_NOT_ESTABLISHED: () => COMPATIBILITY_TEXT,
     LISTINGS_SPREAD_TRIMMED: (note) => plural(note.count, "listing was", "listings were") + " left out because " + (note.count === 1 ? "its price is" : "their prices are") + " too far from the others to be the same product or configuration.",
-    CURRENT_BELOW_ORIGINAL: (note) => "Current prices are about " + percent(note.ratio) + " of the original's list price.",
+    // Not shown: a replacement is a different model, so its present-day price is never expressed as a share of the original's older price. An engine that predates Release 2.1,
+    // and an answer cached before it, still send this note; a null sentence is simply left out.
+    CURRENT_BELOW_ORIGINAL: () => null,
     ORIGINAL_DATE_UNKNOWN: () => "The date of the original's price is not stated, so a wider band is used.",
     TIER_UNKNOWN_WIDENED: () => "The market tier is not known, so the band is wider.",
     EXCLUDED_CONFIRMED_SHORTFALL: (note) => CANDIDATE_LABELS[note.candidate] + " is left out: it falls short of an essential requirement.",
@@ -253,6 +259,9 @@
   function compatibilityLine(valuation) {
     return valuation && Array.isArray(valuation.notes) && valuation.notes.some(function (note) { return note && note.code === "COMPATIBILITY_NOT_ESTABLISHED"; }) ? COMPATIBILITY_TEXT : null;
   }
+
+  /** Codes the proxy may send that this page deliberately leaves unworded (see CURRENT_BELOW_ORIGINAL above). */
+  const SILENT_NOTE_CODES = Object.freeze(["CURRENT_BELOW_ORIGINAL"]);
 
   /** The fixed sentence for a valuation note, or null for a code this page does not know. `context` (optional) names the kind of price the valuation points at. */
   function noteText(note, context) {
@@ -470,6 +479,32 @@
     return null;
   }
 
+  /**
+   * The generation a candidate's structured lineage states and where it came from, or null. The chat reads this (never the card's text), so the chat and the card
+   * cannot disagree about whether a generation is known.
+   */
+  function statedGeneration(item) {
+    const lineage = item && item.lineage;
+    if (!lineage || !lineage.generation) return null;
+    if (lineage.basis === "LISTINGS") return { label: lineage.generation, fromListings: true };
+    return lineage.basis === "AI_HYPOTHESIS" ? { label: lineage.generation, fromListings: false } : null;
+  }
+
+  /**
+   * What the chat says about a candidate's exact model: the generation the lineage establishes (from listings, or the AI's guess), any model code a listing title
+   * states (an observation, never a verified identity) and what is not established. With no generation evidence the conservative answer is unchanged.
+   */
+  function modelIdentityLine(item) {
+    const generation = statedGeneration(item);
+    const observed = observationLines(item);
+    const lead = generation ? (generation.fromListings ? "Retailer listings identify generation " + generation.label + ". " : "Generation " + generation.label + " is the AI's guess; no listing states it. ") : "";
+    if (observed.length) return lead + observed.join(" ") + " " + OBSERVATION_NOTE;
+    if (!generation) return "no model code was seen in the listings I found, so the exact model is not established.";
+    return generation.fromListings
+      ? "Retailer listings identify generation " + generation.label + ", but I couldn't confirm the exact model code from the available listings."
+      : lead + "No model code was seen in the listings, so the exact model is not established.";
+  }
+
   /** The chat's sentence about the successor: it states what is and is not known about the candidate's identity. */
   function successorLine(data) {
     const item = data.successor;
@@ -484,6 +519,12 @@
     if (item.modelStatus === "LISTED_PROVISIONAL") return "Likely successor: " + item.name + " (the model appears in a retailer listing; it is not confirmed)." + seeConcern;
     // (The reply already adds a separate line saying the exact model identity is unconfirmed, so this sentence does not repeat it.)
     if (item.modelStatus !== "FAMILY_LEVEL") return "Likely successor: " + item.name + "." + seeConcern;
+    const generation = statedGeneration(item);
+    if (generation) {
+      return "Likely successor family: " + item.name + ". " + (generation.fromListings
+        ? "Retailer listings identify generation " + generation.label + ", but I couldn't confirm the exact model, so treat it as a family, not a specific model."
+        : "Generation " + generation.label + " is the AI's guess (no listing states it) and the exact model is not confirmed, so treat it as a family, not a specific model.") + seeConcern;
+    }
     return "Likely successor family: " + item.name + ". I couldn't identify its generation or exact model, so treat it as a family, not a specific model." + seeConcern;
   }
 
@@ -804,8 +845,7 @@
     if (!items.length) return ["I don't have a candidate to explain yet. Add detail such as size, color or finish and I'll research again."];
     if (topic === "model" && isV2(data)) {
       return items.map(function (item) {
-        const lines = observationLines(item);
-        return item.name + ": " + (lines.length ? lines.join(" ") + " " + OBSERVATION_NOTE : "no model code was seen in the listings I found, so the exact model is not established.");
+        return item.name + ": " + modelIdentityLine(item);
       });
     }
     if (topic === "differences") {
@@ -960,7 +1000,7 @@
     reply: reply, categoryLabel: categoryLabel, isResearchResponse: isResearchResponse, createVisitorId: createVisitorId, modelCodes: modelCodes,
     isV2: isV2, SUMMARY_NOTE_V2: SUMMARY_NOTE_V2, DEMO_PRICE_NOTE: DEMO_PRICE_NOTE, label: label, noteText: noteText, formatMoney: formatMoney, formatRange: formatRange, formatDay: formatDay,
     providerIncomplete: providerIncomplete, INCOMPLETE_KICKER: INCOMPLETE_KICKER, INCOMPLETE_RETRY: INCOMPLETE_RETRY,
-    successorLabel: successorLabel, successorLine: successorLine, alternativeLabel: alternativeLabel, generationLine: generationLine, priceScope: priceScope, scopeLines: scopeLines, candidatePriceFor: candidatePriceFor, isSellerSiteOnly: isSellerSiteOnly,
+    successorLabel: successorLabel, successorLine: successorLine, statedGeneration: statedGeneration, modelIdentityLine: modelIdentityLine, CHARACTERISTICS_LABEL: CHARACTERISTICS_LABEL, CHARACTERISTICS_NOTE: CHARACTERISTICS_NOTE, alternativeLabel: alternativeLabel, generationLine: generationLine, priceScope: priceScope, scopeLines: scopeLines, candidatePriceFor: candidatePriceFor, isSellerSiteOnly: isSellerSiteOnly,
     CANDIDATE_PRICE_CAPTION: CANDIDATE_PRICE_CAPTION,
     valuationLine: valuationLine, compatibilityLine: compatibilityLine, isListingAnchor: isListingAnchor, shortfallCount: shortfallCount, referencePrice: referencePrice, originalPrices: originalPrices, historySummary: historySummary, priceRole: priceRole, pricesByRole: pricesByRole,
     PRICE_ROLE_LABELS: PRICE_ROLE_LABELS, PRICE_ROLE_REASONS: PRICE_ROLE_REASONS,
@@ -969,7 +1009,7 @@
     MODEL_STATUS_LABELS: MODEL_STATUS_LABELS, SOURCE_CLASS_LABELS: SOURCE_CLASS_LABELS, MODEL_RELATION_LABELS: MODEL_RELATION_LABELS, EXCLUSION_LABELS: EXCLUSION_LABELS,
     OBSERVATION_NOTE: OBSERVATION_NOTE, COMPARISON_NOTE: COMPARISON_NOTE, observationLines: observationLines, comparisonRows: comparisonRows, comparisonSummary: comparisonSummary, comparisonSentence: comparisonSentence,
     IDENTIFICATION_CONFIDENCE: IDENTIFICATION_CONFIDENCE, MATCH_CONFIDENCE: MATCH_CONFIDENCE, PRICE_CONFIDENCE: PRICE_CONFIDENCE, MANUFACTURER_PAGE_NOTE: MANUFACTURER_PAGE_NOTE, manufacturerPageLines: manufacturerPageLines,
-    REJECTION_REASON_LABELS: REJECTION_REASON_LABELS, REJECTION_ACTION_LABELS: REJECTION_ACTION_LABELS, CANDIDATE_LABELS: CANDIDATE_LABELS, NOTE_TEXT: NOTE_TEXT
+    REJECTION_REASON_LABELS: REJECTION_REASON_LABELS, REJECTION_ACTION_LABELS: REJECTION_ACTION_LABELS, CANDIDATE_LABELS: CANDIDATE_LABELS, NOTE_TEXT: NOTE_TEXT, SILENT_NOTE_CODES: SILENT_NOTE_CODES
   };
   if (typeof module === "object" && module.exports) module.exports = api;
   else root.RFResearch = api;

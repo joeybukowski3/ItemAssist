@@ -102,7 +102,8 @@ test("a response from an engine without Release 2 shows neither section", async 
   await expect(card.locator(".rf-rs-observed")).toHaveCount(0);
   await expect(card.locator(".rf-rs-speccmp")).toHaveCount(0);
   await ask(page, "What is the exact model number?");
-  await expect(log(page)).toContainText("exact model is not established");
+  // The pre-Release-2 fixture states generation C6 from listings: the chat acknowledges it and still says the exact model code is not confirmed.
+  await expect(log(page)).toContainText("Retailer listings identify generation C6, but I couldn't confirm the exact model code from the available listings.");
   await expectNoHorizontalOverflow(page);
   settle(seen);
 });

@@ -153,6 +153,8 @@ test("every code the proxy can send has fixed wording: no code falls through to 
   for (const [code, params] of Object.entries(V2.NOTE_PARAMS)) {
     const sample = { code, ...Object.fromEntries(params.map((param) => [param, param === "candidate" ? "ALT_1" : param === "count" ? 2 : 0.8])) };
     const text = RS.noteText(sample);
+    // A deliberately silent code (Release 2.1) renders nothing; every other code must have fixed wording.
+    if (RS.SILENT_NOTE_CODES.includes(code)) { assert.equal(text, null, code); continue; }
     assert.ok(text && !/undefined|NaN/.test(text), code);
   }
   assert.equal(RS.noteText({ code: "SELLING_FAST" }), null);
@@ -172,7 +174,7 @@ test("the wording never claims a search, a fetch or a source check that did not 
   const everything = [
     ...Object.values(RS.VERIFICATION_LABELS), ...Object.values(RS.MODEL_STATUS_LABELS), ...Object.values(RS.MODEL_RELATION_LABELS), ...Object.values(RS.EXCLUSION_LABELS),
     ...Object.values(RS.REJECTION_REASON_LABELS), ...Object.values(RS.PRICE_ROLE_REASONS), ...Object.values(RS.PRICE_ROLE_LABELS), ...Object.values(RS.METHOD_LABELS),
-    ...Object.entries(V2.NOTE_PARAMS).map(([code, params]) => RS.noteText({ code, ...Object.fromEntries(params.map((param) => [param, param === "candidate" ? "ALT_1" : param === "count" ? 2 : 0.8])) }))
+    ...Object.entries(V2.NOTE_PARAMS).map(([code, params]) => RS.noteText({ code, ...Object.fromEntries(params.map((param) => [param, param === "candidate" ? "ALT_1" : param === "count" ? 2 : 0.8])) })).filter(Boolean)
   ];
   for (const text of everything) {
     assert.doesNotMatch(text, /not found in any|in any source|was found|were found|couldn't find|could not find|could not be confirmed as real|searched|looked for|exhaustive|every source/i, text);
