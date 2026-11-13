@@ -1,0 +1,440 @@
+{
+  "contractVersion": "research.2",
+  "kind": "ITEMASSIST_RESEARCH",
+  "status": "OK",
+  "category": "tv",
+  "profile": "tv",
+  "original": {
+    "identity": "LG C3 series 55-inch OLED TV",
+    "confidence": "HIGH",
+    "characteristics": [
+      "55-inch screen",
+      "OLED panel",
+      "4K resolution",
+      "120Hz refresh rate"
+    ],
+    "uncertainty": "Not found in the sources checked: 120Hz or higher refresh rate for gaming.",
+    "manufacturerPages": [
+      {
+        "url": "https://www.lg.com/us/tvs/lg-oled55c3pua-oled-4k-tv",
+        "domain": "lg.com",
+        "sourceName": "LG",
+        "sourceClass": "MANUFACTURER",
+        "model": "OLED55C3PUA",
+        "pageKind": "PRODUCT",
+        "title": "55 inch Class LG OLED evo C3 4k Smart TV OLED55C3PUA",
+        "foundVia": "SEARCH_RESULT"
+      }
+    ]
+  },
+  "requirements": [
+    {
+      "id": "r1",
+      "key": "screenSize",
+      "text": "Screen size class close to the original",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r2",
+      "key": "resolution",
+      "text": "Same or better resolution (4K or higher)",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r3",
+      "key": "displayClass",
+      "text": "Same display technology class (OLED, QLED or LED)",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r4",
+      "key": "refresh",
+      "text": "Native refresh rate (120 Hz where the original had it)",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r5",
+      "key": "hdmi",
+      "text": "HDMI 2.1 ports for current consoles",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r6",
+      "key": "hdr",
+      "text": "The HDR formats the original supported",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r7",
+      "key": "smart",
+      "text": "A smart platform with the apps you use",
+      "importance": "MINOR",
+      "origin": "CATEGORY_RULE"
+    }
+  ],
+  "requirementsSource": "CATEGORY_GUIDANCE",
+  "successor": {
+    "name": "LG C6 OLED TV 55-inch",
+    "why": "Direct continuation of LG's OLED C-series line.",
+    "differences": null,
+    "concern": null,
+    "confidence": "MEDIUM",
+    "modelStatus": "FAMILY_LEVEL",
+    "comparison": [
+      {
+        "requirementId": "r1",
+        "status": "MEETS",
+        "basis": "AI_ESTIMATE",
+        "evidenceId": null
+      },
+      {
+        "requirementId": "r2",
+        "status": "MEETS",
+        "basis": "AI_ESTIMATE",
+        "evidenceId": null
+      },
+      {
+        "requirementId": "r3",
+        "status": "MEETS",
+        "basis": "AI_ESTIMATE",
+        "evidenceId": null
+      }
+    ],
+    "lineage": {
+      "relation": "SAME_SERIES_NEWER",
+      "generation": "C6",
+      "basis": "LISTINGS",
+      "tier": "SAME"
+    },
+    "specComparison": {
+      "rows": [
+        {
+          "attribute": "SCREEN_SIZE",
+          "original": {
+            "value": "55-inch",
+            "basis": "MANUFACTURER_PAGE_TITLE",
+            "sources": 1
+          },
+          "candidate": {
+            "value": "55-inch",
+            "basis": "LISTING_TITLE",
+            "sources": 1
+          },
+          "result": "MATCH"
+        },
+        {
+          "attribute": "DISPLAY_CLASS",
+          "original": {
+            "value": "OLED",
+            "basis": "USER_STATED",
+            "sources": 1
+          },
+          "candidate": {
+            "value": "OLED",
+            "basis": "LISTING_TITLE",
+            "sources": 1
+          },
+          "result": "MATCH"
+        },
+        {
+          "attribute": "RESOLUTION",
+          "original": {
+            "value": "4K",
+            "basis": "MANUFACTURER_PAGE_TITLE",
+            "sources": 1
+          },
+          "candidate": {
+            "value": "4K",
+            "basis": "LISTING_TITLE",
+            "sources": 1
+          },
+          "result": "MATCH"
+        },
+        {
+          "attribute": "REFRESH_RATE",
+          "original": null,
+          "candidate": null,
+          "result": "NOT_ESTABLISHED"
+        },
+        {
+          "attribute": "DOLBY_VISION",
+          "original": null,
+          "candidate": {
+            "value": "Dolby Vision",
+            "basis": "LISTING_TITLE",
+            "sources": 1
+          },
+          "result": "NOT_ESTABLISHED"
+        }
+      ],
+      "compared": [
+        "SCREEN_SIZE",
+        "DISPLAY_CLASS",
+        "RESOLUTION"
+      ],
+      "notEstablished": [
+        "REFRESH_RATE",
+        "DOLBY_VISION"
+      ]
+    },
+    "standing": "CONDITIONAL",
+    "verified": false
+  },
+  "suggestions": [
+    {
+      "name": "Sony A Series OLED TV",
+      "why": "Matches the OLED display technology and premium tier positioning.",
+      "differences": "Uses Sony's proprietary image processing and acoustic surface audio.",
+      "concern": null,
+      "confidence": "MEDIUM",
+      "modelStatus": "FAMILY_LEVEL",
+      "comparison": [
+        {
+          "requirementId": "r1",
+          "status": "MEETS",
+          "basis": "AI_ESTIMATE",
+          "evidenceId": null
+        },
+        {
+          "requirementId": "r2",
+          "status": "MEETS",
+          "basis": "AI_ESTIMATE",
+          "evidenceId": null
+        },
+        {
+          "requirementId": "r3",
+          "status": "MEETS",
+          "basis": "AI_ESTIMATE",
+          "evidenceId": null
+        }
+      ],
+      "lineage": {
+        "relation": "OTHER_BRAND",
+        "generation": null,
+        "basis": "NONE",
+        "tier": "SAME"
+      },
+      "verified": false
+    },
+    {
+      "name": "Samsung S Series OLED TV",
+      "why": "Offers a direct competitor 55-inch OLED screen with high refresh rates.",
+      "differences": "Uses QD-OLED technology on select models with Tizen OS.",
+      "concern": null,
+      "confidence": "MEDIUM",
+      "modelStatus": "FAMILY_LEVEL",
+      "comparison": [
+        {
+          "requirementId": "r1",
+          "status": "MEETS",
+          "basis": "AI_ESTIMATE",
+          "evidenceId": null
+        },
+        {
+          "requirementId": "r2",
+          "status": "MEETS",
+          "basis": "AI_ESTIMATE",
+          "evidenceId": null
+        },
+        {
+          "requirementId": "r3",
+          "status": "MEETS",
+          "basis": "AI_ESTIMATE",
+          "evidenceId": null
+        }
+      ],
+      "lineage": {
+        "relation": "OTHER_BRAND",
+        "generation": null,
+        "basis": "NONE",
+        "tier": "SAME"
+      },
+      "verified": false
+    }
+  ],
+  "pricing": {
+    "referenceDate": "2026-11-13",
+    "tier": {
+      "level": "PREMIUM",
+      "basis": "MSRP_EVIDENCE"
+    },
+    "prices": [
+      {
+        "id": "p1",
+        "kind": "MSRP",
+        "subject": "ORIGINAL",
+        "candidate": null,
+        "model": "OLED55C3PUA",
+        "amount": {
+          "currency": "USD",
+          "low": 1899.99,
+          "high": 1899.99
+        },
+        "asOf": "2023-04-14",
+        "asOfBasis": "PUBLISHED",
+        "verification": "SEARCH_SNIPPET",
+        "evidenceId": "e1"
+      },
+      {
+        "id": "p2",
+        "kind": "CURRENT_RETAIL_NEW",
+        "subject": "REPLACEMENT",
+        "candidate": "SUCCESSOR",
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 1025,
+          "high": 1025
+        },
+        "asOf": "2026-11-13",
+        "asOfBasis": "OBSERVED",
+        "verification": "SEARCH_LISTING",
+        "evidenceId": "e2"
+      },
+      {
+        "id": "p3",
+        "kind": "CURRENT_RETAIL_NEW",
+        "subject": "REPLACEMENT",
+        "candidate": "SUCCESSOR",
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 999.99,
+          "high": 999.99
+        },
+        "asOf": "2026-11-13",
+        "asOfBasis": "OBSERVED",
+        "verification": "SEARCH_LISTING",
+        "evidenceId": "e3",
+        "sizeConfirmed": false
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "subject": "ORIGINAL",
+        "sourceName": "Reviewed",
+        "sourceDomain": "reviewed.com",
+        "sourceUrl": "https://www.reviewed.com/televisions/features/lg-c3-vs-lg-c2",
+        "sourceClass": "REVIEW",
+        "firstParty": false,
+        "publishedAt": "2023-04-14",
+        "observedAt": null,
+        "subjectModel": "OLED55C3PUA",
+        "expectedModel": "OLED55C3PUA",
+        "modelRelation": "EXACT"
+      },
+      {
+        "id": "e2",
+        "subject": "SUCCESSOR",
+        "sourceName": "Target",
+        "sourceDomain": "target.com",
+        "sourceUrl": "https://www.target.com/",
+        "sourceClass": "RETAILER",
+        "firstParty": true,
+        "publishedAt": null,
+        "observedAt": "2026-11-13",
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      },
+      {
+        "id": "e3",
+        "subject": "SUCCESSOR",
+        "sourceName": "P.C. Richard & Son",
+        "sourceDomain": "pcrichard.com",
+        "sourceUrl": "https://www.pcrichard.com/",
+        "sourceClass": "RETAILER",
+        "firstParty": true,
+        "publishedAt": null,
+        "observedAt": "2026-11-13",
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      }
+    ],
+    "valuation": {
+      "method": "PROVISIONAL_LISTINGS",
+      "basis": "PROVISIONAL_LISTINGS",
+      "verified": false,
+      "range": {
+        "currency": "USD",
+        "low": 1025,
+        "high": 1025
+      },
+      "confidence": "LOW",
+      "asOf": "2026-11-13",
+      "comparables": [
+        {
+          "priceId": "p2",
+          "candidate": "SUCCESSOR",
+          "verification": "SEARCH_LISTING"
+        }
+      ],
+      "excluded": [
+        {
+          "candidate": "ALT_1",
+          "reason": "NO_CURRENT_PRICE"
+        },
+        {
+          "candidate": "ALT_2",
+          "reason": "NO_CURRENT_PRICE"
+        }
+      ],
+      "reference": {
+        "priceId": "p1",
+        "kind": "MSRP"
+      },
+      "notes": [
+        {
+          "code": "BASED_ON_LISTINGS",
+          "count": 1
+        },
+        {
+          "code": "LISTINGS_NOT_CONFIRMED"
+        },
+        {
+          "code": "EXCLUDED_NO_CURRENT_PRICE",
+          "candidate": "ALT_1"
+        },
+        {
+          "code": "EXCLUDED_NO_CURRENT_PRICE",
+          "candidate": "ALT_2"
+        },
+        {
+          "code": "MSRP_CONTEXT_ONLY"
+        },
+        {
+          "code": "CURRENT_BELOW_ORIGINAL",
+          "ratio": 0.54
+        },
+        {
+          "code": "NOT_AN_APPRAISAL"
+        }
+      ]
+    },
+    "rejections": []
+  },
+  "clarify": [],
+  "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+  "warnings": [
+    "DIFFERENCES_MISSING"
+  ],
+  "meta": {
+    "requestId": "req-production-fresh",
+    "elapsedMs": 3404,
+    "cached": false,
+    "answerSource": "AI_ESTIMATE"
+  },
+  "quota": {
+    "limit": 5,
+    "remaining": 4,
+    "charged": true
+  }
+}

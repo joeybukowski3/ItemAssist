@@ -1,0 +1,363 @@
+{
+  "contractVersion": "research.2",
+  "kind": "ITEMASSIST_RESEARCH",
+  "status": "OK",
+  "category": "tv",
+  "profile": "tv",
+  "original": {
+    "identity": "LG C3 OLED TV",
+    "confidence": "HIGH",
+    "characteristics": [
+      "55-inch screen",
+      "OLED display technology",
+      "4K resolution",
+      "120Hz refresh rate"
+    ],
+    "uncertainty": null
+  },
+  "requirements": [
+    {
+      "id": "r1",
+      "key": "screenSize",
+      "text": "Screen size class close to the original",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r2",
+      "key": "resolution",
+      "text": "Same or better resolution (4K or higher)",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r3",
+      "key": "displayClass",
+      "text": "Same display technology class (OLED, QLED or LED)",
+      "importance": "ESSENTIAL",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r4",
+      "key": "refresh",
+      "text": "Native refresh rate (120 Hz where the original had it)",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r5",
+      "key": "hdmi",
+      "text": "HDMI 2.1 ports for current consoles",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r6",
+      "key": "hdr",
+      "text": "The HDR formats the original supported",
+      "importance": "IMPORTANT",
+      "origin": "CATEGORY_RULE"
+    },
+    {
+      "id": "r7",
+      "key": "smart",
+      "text": "A smart platform with the apps you use",
+      "importance": "MINOR",
+      "origin": "CATEGORY_RULE"
+    }
+  ],
+  "requirementsSource": "CATEGORY_GUIDANCE",
+  "successor": {
+    "name": "LG C6 55-inch",
+    "why": "It is the direct generational successor in LG's OLED lineup.",
+    "differences": null,
+    "concern": null,
+    "confidence": "MEDIUM",
+    "modelStatus": "FAMILY_LEVEL",
+    "comparison": [
+      {
+        "requirementId": "r1",
+        "status": "MEETS",
+        "basis": "AI_ESTIMATE",
+        "evidenceId": null
+      },
+      {
+        "requirementId": "r2",
+        "status": "MEETS",
+        "basis": "AI_ESTIMATE",
+        "evidenceId": null
+      },
+      {
+        "requirementId": "r3",
+        "status": "MEETS",
+        "basis": "AI_ESTIMATE",
+        "evidenceId": null
+      }
+    ],
+    "lineage": {
+      "relation": "SAME_SERIES_NEWER",
+      "generation": "C6",
+      "basis": "LISTINGS",
+      "tier": "SAME"
+    },
+    "standing": "CONDITIONAL",
+    "verified": false
+  },
+  "suggestions": [
+    {
+      "name": "Sony A Series OLED",
+      "why": "Matches the premium OLED display quality and 4K 120Hz gaming capabilities.",
+      "differences": "Uses Sony's proprietary image processing and acoustic surface audio.",
+      "concern": null,
+      "confidence": "MEDIUM",
+      "modelStatus": "FAMILY_LEVEL",
+      "comparison": [
+        {
+          "requirementId": "r1",
+          "status": "MEETS",
+          "basis": "AI_ESTIMATE",
+          "evidenceId": null
+        },
+        {
+          "requirementId": "r2",
+          "status": "MEETS",
+          "basis": "AI_ESTIMATE",
+          "evidenceId": null
+        },
+        {
+          "requirementId": "r3",
+          "status": "MEETS",
+          "basis": "AI_ESTIMATE",
+          "evidenceId": null
+        }
+      ],
+      "lineage": {
+        "relation": "OTHER_BRAND",
+        "generation": null,
+        "basis": "NONE",
+        "tier": "SAME"
+      },
+      "verified": false
+    },
+    {
+      "name": "Samsung S Series OLED",
+      "why": "Offers a competing high-end 55-inch 4K OLED display with 120Hz refresh rate.",
+      "differences": "Uses QD-OLED panel technology which can provide brighter vibrant highlights.",
+      "concern": null,
+      "confidence": "MEDIUM",
+      "modelStatus": "FAMILY_LEVEL",
+      "comparison": [
+        {
+          "requirementId": "r1",
+          "status": "MEETS",
+          "basis": "AI_ESTIMATE",
+          "evidenceId": null
+        },
+        {
+          "requirementId": "r2",
+          "status": "MEETS",
+          "basis": "AI_ESTIMATE",
+          "evidenceId": null
+        },
+        {
+          "requirementId": "r3",
+          "status": "MEETS",
+          "basis": "AI_ESTIMATE",
+          "evidenceId": null
+        }
+      ],
+      "lineage": {
+        "relation": "OTHER_BRAND",
+        "generation": null,
+        "basis": "NONE",
+        "tier": "SAME"
+      },
+      "verified": false
+    }
+  ],
+  "pricing": {
+    "referenceDate": "2026-11-12",
+    "tier": {
+      "level": "UPPER_PREMIUM",
+      "basis": "AI_ESTIMATE"
+    },
+    "prices": [
+      {
+        "id": "p1",
+        "kind": "CURRENT_RETAIL_NEW",
+        "subject": "REPLACEMENT",
+        "candidate": "SUCCESSOR",
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 1025,
+          "high": 1025
+        },
+        "asOf": "2026-11-12",
+        "asOfBasis": "OBSERVED",
+        "verification": "SEARCH_LISTING",
+        "evidenceId": "e1"
+      },
+      {
+        "id": "p2",
+        "kind": "ORIGINAL_LISTING",
+        "subject": "ORIGINAL",
+        "candidate": null,
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 1012.26,
+          "high": 1012.26
+        },
+        "asOf": "2026-11-12",
+        "asOfBasis": "OBSERVED",
+        "verification": "SEARCH_LISTING",
+        "evidenceId": "e2"
+      },
+      {
+        "id": "p3",
+        "kind": "CURRENT_RETAIL_NEW",
+        "subject": "REPLACEMENT",
+        "candidate": "SUCCESSOR",
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 999.99,
+          "high": 999.99
+        },
+        "asOf": "2026-11-12",
+        "asOfBasis": "OBSERVED",
+        "verification": "SEARCH_LISTING",
+        "evidenceId": "e3",
+        "sizeConfirmed": false
+      },
+      {
+        "id": "p4",
+        "kind": "AI_ESTIMATE",
+        "subject": "ORIGINAL",
+        "candidate": null,
+        "model": null,
+        "amount": {
+          "currency": "USD",
+          "low": 1300,
+          "high": 1800
+        },
+        "asOf": null,
+        "asOfBasis": "UNKNOWN",
+        "verification": "NONE",
+        "evidenceId": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "subject": "SUCCESSOR",
+        "sourceName": "Target",
+        "sourceDomain": "target.com",
+        "sourceUrl": "https://www.target.com/",
+        "sourceClass": "RETAILER",
+        "firstParty": true,
+        "publishedAt": null,
+        "observedAt": "2026-11-12",
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      },
+      {
+        "id": "e2",
+        "subject": "ORIGINAL",
+        "sourceName": "Best Buy",
+        "sourceDomain": "bestbuy.com",
+        "sourceUrl": "https://www.bestbuy.com/",
+        "sourceClass": "RETAILER",
+        "firstParty": true,
+        "publishedAt": null,
+        "observedAt": "2026-11-12",
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      },
+      {
+        "id": "e3",
+        "subject": "SUCCESSOR",
+        "sourceName": "LG",
+        "sourceDomain": "lg.com",
+        "sourceUrl": "https://www.lg.com/",
+        "sourceClass": "MANUFACTURER",
+        "firstParty": true,
+        "publishedAt": null,
+        "observedAt": "2026-11-12",
+        "subjectModel": null,
+        "expectedModel": null,
+        "modelRelation": "UNKNOWN"
+      }
+    ],
+    "valuation": {
+      "method": "PROVISIONAL_LISTINGS",
+      "basis": "PROVISIONAL_LISTINGS",
+      "verified": false,
+      "range": {
+        "currency": "USD",
+        "low": 1025,
+        "high": 1025
+      },
+      "confidence": "LOW",
+      "asOf": "2026-11-12",
+      "comparables": [
+        {
+          "priceId": "p1",
+          "candidate": "SUCCESSOR",
+          "verification": "SEARCH_LISTING"
+        }
+      ],
+      "excluded": [
+        {
+          "candidate": "ALT_1",
+          "reason": "NO_CURRENT_PRICE"
+        },
+        {
+          "candidate": "ALT_2",
+          "reason": "NO_CURRENT_PRICE"
+        }
+      ],
+      "reference": null,
+      "notes": [
+        {
+          "code": "BASED_ON_LISTINGS",
+          "count": 1
+        },
+        {
+          "code": "LISTINGS_NOT_CONFIRMED"
+        },
+        {
+          "code": "EXCLUDED_NO_CURRENT_PRICE",
+          "candidate": "ALT_1"
+        },
+        {
+          "code": "EXCLUDED_NO_CURRENT_PRICE",
+          "candidate": "ALT_2"
+        },
+        {
+          "code": "NOT_AN_APPRAISAL"
+        }
+      ]
+    },
+    "rejections": []
+  },
+  "clarify": [],
+  "disclosure": "Research summary. Figures labelled as estimates are estimates. A price marked as confirmed comes from the cited source on the date shown. Confirm specifications, availability and price with a seller before buying.",
+  "warnings": [
+    "DIFFERENCES_MISSING"
+  ],
+  "meta": {
+    "requestId": "req-production-cached",
+    "elapsedMs": 954,
+    "cached": true,
+    "answerSource": "AI_ESTIMATE"
+  },
+  "quota": {
+    "limit": 5,
+    "remaining": 5,
+    "charged": false
+  }
+}

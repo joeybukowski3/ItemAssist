@@ -153,7 +153,8 @@ test("chat and cards say the same: the chat answers come from the same functions
   const compare = RS.localAnswer(session, "How does it compare with mine?");
   assert.ok(compare.some((line) => line.includes(RS.comparisonSummary(out.successor)) && line.includes(RS.COMPARISON_NOTE)), "the comparison answer is the card's summary");
   const none = project(fixture("lg-c3-after-stage-b"));
-  assert.ok(RS.localAnswer({ last: none }, "What is the exact model number?").every((line) => /not established/.test(line)), "with no observation the chat says so");
+  // With no observation the chat says no exact model is established or confirmed (Release 2.1: and acknowledges a generation the lineage states, see research-release-2-1.test.mjs).
+  assert.ok(RS.localAnswer({ last: none }, "What is the exact model number?").every((line) => /exact model is not established|couldn't confirm the exact model code/.test(line)), "with no observation the chat says so");
 });
 
 test("non-television results carry neither block and render exactly as before", () => {
